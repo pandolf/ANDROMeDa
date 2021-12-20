@@ -82,6 +82,16 @@ int main() {
 
   c1_fn->SaveAs("fn.pdf");
 
+  float phi = 4.7; // in eV
+  float d = 3.; // in mm
+  float gamma = -6.83E6*phi*sqrt(phi)*d/f1_line->GetParameter(1);
+
+  std::cout << std::endl;
+  std::cout << "------------------" << std::endl;
+  std::cout << " gamma: " << gamma << std::endl;
+  std::cout << "------------------" << std::endl;
+
+
   return 0;
 
 }
