@@ -4,7 +4,7 @@ CFLAGS = -Wall -c -g -fpermissive
 #ROOFIT_INCLUDE := $(shell cd $(CMSSW_BASE); scram tool info roofitcore | grep INCLUDE= | sed 's|INCLUDE=||')
 #ROOFIT_LIBDIR := $(shell cd $(CMSSW_BASE); scram tool info roofitcore | grep LIBDIR= | sed 's|LIBDIR=||')
 
-INCLUDES = -I. -I.. -I$(ROOTSYS)/include  -I../../CommonTools/ -I../../CommonTools/interface/ -I../interface/  #-I$(ROOFIT_INCLUDE)/ C-I$(CMSSW_BASE)/src -I$(CMSSW_BASE)/src/NanoUVCommonTools  
+INCLUDES = -I. -I.. -I$(ROOTSYS)/include  -I../../CommonTools/ -I../../CommonTools/interface/ -I../interface/  #-I$(ROOFIT_INCLUDE)/ C-I$(CMSSW_BASE)/src 
 
 ROOTSYS ?= ERROR_RootSysIsNotDefined
 
@@ -13,33 +13,18 @@ ROOTFLAG = `${ROOTSYS}/bin/root-config --cflags --libs`
 EXTRALIBS := -L$(ROOTSYS)/lib -lHtml -lMathCore -lGenVector -lMinuit -lTreePlayer -lRooFitCore -lRooFit #-L$(ROOFIT_LIBDIR)/ 
 
 
-drawScan: drawScan.cpp BearScan.o NanoUVCommon.o
-	$(CC) -Wall $(INCLUDES) -o drawScan drawScan.cpp BearScan.o NanoUVCommon.o $(ROOTFLAG) $(EXTRALIBS)
-
-drawScanRatio: drawScanRatio.cpp BearScan.o NanoUVCommon.o
-	$(CC) -Wall $(INCLUDES) -o drawScanRatio drawScanRatio.cpp BearScan.o NanoUVCommon.o $(ROOTFLAG) $(EXTRALIBS)
-
-drawThreeRatios: drawThreeRatios.cpp BearScan.o NanoUVCommon.o
-	$(CC) -Wall $(INCLUDES) -o drawThreeRatios drawThreeRatios.cpp BearScan.o NanoUVCommon.o $(ROOTFLAG) $(EXTRALIBS)
-
-drawPsiC: drawPsiC.cpp BearScan.o NanoUVCommon.o
-	$(CC) -Wall $(INCLUDES) -o drawPsiC drawPsiC.cpp BearScan.o NanoUVCommon.o $(ROOTFLAG) $(EXTRALIBS)
-
-
-
-checkScanKeithley: checkScanKeithley.cpp 
-	$(CC) -Wall $(INCLUDES) -o checkScanKeithley checkScanKeithley.cpp $(ROOTFLAG) $(EXTRALIBS)
+drawFieldEmission: drawFieldEmission.cpp AmdCommon.o
+	$(CC) -Wall $(INCLUDES) -o drawFieldEmission drawFieldEmission.cpp AmdCommon.o $(ROOTFLAG) $(EXTRALIBS)
 
 
 
 
-BearScan.o: ../../BearAnalysis/src/BearScan.cc NanoUVCommon.o
-	$(CC) -Wall $(INCLUDES) -c ../../BearAnalysis/src/BearScan.cc $(ROOTFLAG) $(EXTRALIBS)
 
-NanoUVCommon.o: ../../CommonTools/src/NanoUVCommon.cc 
-	$(CC) -Wall $(INCLUDES) -c ../../CommonTools/src/NanoUVCommon.cc $(ROOTFLAG) $(EXTRALIBS)
+
+AmdCommon.o: ../../CommonTools/src/AmdCommon.cc 
+	$(CC) -Wall $(INCLUDES) -c ../../CommonTools/src/AmdCommon.cc $(ROOTFLAG) $(EXTRALIBS)
 
 
 
 clean:
-	rm *.o drawGain
+	rm *.o 
