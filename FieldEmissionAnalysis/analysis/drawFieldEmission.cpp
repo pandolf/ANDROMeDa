@@ -37,10 +37,9 @@ int main( int argc, char* argv[] ) {
 
   TGraphErrors* graph = getGraphFromFile( dataFileName );
 
-//addPoint( graph, 1499., { 291.9, 268.2, 270.2, 233.9, 258.2, 242.0, 249.6, 205.1, 263.6, 220.3 } );
-//addPoint( graph, 1249., { 37.06, 35.02, 39.59, 45.18, 39.12, 37.03, 37.56, 38.53, 40.54, 41.24 } );
-//addPoint( graph, 1002., { 2.171, 2.015, 2.047, 2.114, 2.159, 2.826, 2.992, 2.341, 2.391, 2.618 } );
-//addPoint( graph, 1743., { 903.3, 916.8, 964.6, 902.3, 876.1, 931.2, 872.9, 951.6, 890.1 } );
+
+  std::string outdir(Form("plots/%s/", dataName.c_str()));
+  system( Form("mkdir -p %s", outdir.c_str()) );
 
 
   TCanvas* c1 = new TCanvas( "c1", "", 600, 600 );
@@ -59,7 +58,7 @@ int main( int argc, char* argv[] ) {
 
   graph->Draw("P same");
 
-  c1->SaveAs( "iv.pdf" );
+  c1->SaveAs( Form("%s/iv.pdf", outdir.c_str()) );
 
   c1->Clear();
   c1->SetLogy();
@@ -71,7 +70,7 @@ int main( int argc, char* argv[] ) {
 
   graph->Draw("P same");
 
-  c1->SaveAs( "iv_log.pdf" );
+  c1->SaveAs( Form("%s/iv_log.pdf", outdir.c_str()) );
 
 
   TGraphErrors* gr_fn = getFNgraph( graph );
@@ -96,8 +95,6 @@ int main( int argc, char* argv[] ) {
   f1_line->SetLineWidth(2);
   gr_fn->Fit( f1_line );
 
-  c1_fn->SaveAs("fn.pdf");
-
   float phi = 4.7; // in eV
   float d = 3.; // in mm
   float d_err = 0.5;
@@ -105,6 +102,16 @@ int main( int argc, char* argv[] ) {
   float s_err = f1_line->GetParError(1);
   float gamma = -6.83E6*phi*sqrt(phi)*d/s;
   float gamma_err = sqrt( gamma*gamma/(s*s)*s_err*s_err + gamma*gamma/(d*d)*d_err*d_err );
+
+  TPaveText* gamma_text = new TPaveText( 0.6, 0.7, 0.9, 0.9, "brNDC" );
+  gamma_text->SetFillColor(0);
+  gamma_text->SetTextSize(0.038);
+  gamma_text->SetTextColor( 46 );
+  //gamma_text->SetTextColor( kGray+3 );
+  gamma_text->AddText( Form("#gamma = %.0f +/- %.0f", gamma, gamma_err) );
+  gamma_text->Draw("same");
+
+  c1_fn->SaveAs( Form("%s/fn.pdf", outdir.c_str()) );
 
   std::cout << std::endl;
   std::cout << "------------------" << std::endl;
@@ -142,7 +149,10 @@ TGraphErrors* getGraphFromFile( const std::string& fileName ) {
 
   std::ifstream ifs( fileName.c_str() );
 
-  if( !ifs.good() ) return 0;
+  if( !ifs.good() ) {
+    std::cout << "[getGraphFromFile] ERROR! File '" << fileName << "' does not exist. Please check name." << std::endl;
+    exit(2);
+  }
 
   std::string line;
   TGraphErrors* graph = new TGraphErrors(0);
@@ -173,12 +183,7 @@ TGraphErrors* getGraphFromFile( const std::string& fileName ) {
       for( unsigned iw=1; iw<words.size(); ++iw )
         v_i.push_back( std::atof(words[iw].c_str()) );
 
-      float i_nA, err_i_nA;
-      getMeanRMS( v_i, i_nA, err_i_nA );
-
-      int nPoints = graph->GetN();
-      graph->SetPoint     ( nPoints, hv, i_nA );
-      graph->SetPointError( nPoints, 1., err_i_nA );
+      addPoint( graph, hv, v_i );
 
     }  // while get lines
 
@@ -196,7 +201,7 @@ void addPoint( TGraphErrors* gr, float hv, std::vector<float> i_meas ) {
 
   int iPoint = gr->GetN();
   gr->SetPoint     ( iPoint, hv, mean );
-  gr->SetPointError( iPoint, 0., rms  );
+  gr->SetPointError( iPoint, 1., rms  );
 
 }
 
