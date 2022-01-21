@@ -13,16 +13,16 @@ ROOTFLAG = `${ROOTSYS}/bin/root-config --cflags --libs`
 EXTRALIBS := -L$(ROOTSYS)/lib -lHtml -lMathCore -lGenVector -lMinuit -lTreePlayer -lRooFitCore -lRooFit #-L$(ROOFIT_LIBDIR)/ 
 
 
-drawFieldEmission: drawFieldEmission.cpp AmdCommon.o
-	$(CC) -Wall $(INCLUDES) -o drawFieldEmission drawFieldEmission.cpp AmdCommon.o $(ROOTFLAG) $(EXTRALIBS)
+drawFieldEmission: drawFieldEmission.cpp AndCommon.o
+	$(CC) -Wall $(INCLUDES) -o drawFieldEmission drawFieldEmission.cpp AndCommon.o $(ROOTFLAG) $(EXTRALIBS)
 
 
 
 
 
 
-AmdCommon.o: ../../CommonTools/src/AmdCommon.cc 
-	$(CC) -Wall $(INCLUDES) -c ../../CommonTools/src/AmdCommon.cc $(ROOTFLAG) $(EXTRALIBS)
+AndCommon.o: ../../CommonTools/src/AndCommon.cc 
+	$(CC) -Wall $(INCLUDES) -c ../../CommonTools/src/AndCommon.cc $(ROOTFLAG) $(EXTRALIBS)
 
 
 
