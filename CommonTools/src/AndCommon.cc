@@ -270,7 +270,7 @@ float AndCommon::getPedestal( TGraph* graph, int nPoints ) {
 
 
 
-std::string AndCommon::scientific( double x, int decimals ) {
+std::string AndCommon::scientific( float x, int decimals ) {
 
   int power = 0.;
 
