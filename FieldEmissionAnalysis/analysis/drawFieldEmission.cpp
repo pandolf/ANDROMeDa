@@ -104,13 +104,22 @@ int main( int argc, char* argv[] ) {
   float gamma = -6.83E6*phi*sqrt(phi)*d/s;
   float gamma_err = sqrt( gamma*gamma/(s*s)*s_err*s_err + gamma*gamma/(d*d)*d_err*d_err );
 
-  TPaveText* gamma_text = new TPaveText( 0.6, 0.7, 0.9, 0.9, "brNDC" );
+  TPaveText* gamma_text = new TPaveText( 0.65, 0.8, 0.9, 0.9, "brNDC" );
   gamma_text->SetFillColor(0);
   gamma_text->SetTextSize(0.038);
   gamma_text->SetTextColor( 46 );
   //gamma_text->SetTextColor( kGray+3 );
-  gamma_text->AddText( Form("#gamma = %.0f +/- %.0f", gamma, gamma_err) );
+  gamma_text->AddText( Form("#gamma = %.0f #pm %.0f", gamma, gamma_err) );
   gamma_text->Draw("same");
+
+  TPaveText* pd_text = new TPaveText( 0.2, 0.2, 0.5, 0.3, "brNDC" );
+  pd_text->SetFillColor(0);
+  pd_text->SetTextSize(0.038);
+  pd_text->SetTextColor(kGray+3);
+  pd_text->AddText( Form("p = %s mbar", AndCommon::scientific(ivs.p(), 0).c_str()) );
+  pd_text->AddText( Form("d = %.1f mm"  , ivs.d()) );
+  pd_text->Draw("same");
+
 
   c1_fn->SaveAs( Form("%s/fn.pdf", outdir.c_str()) );
 
