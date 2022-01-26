@@ -1,4 +1,5 @@
 #include "../interface/IVScan.h"
+#include "interface/AndCommon.h"
 
 #include <iostream>
 #include <fstream>
@@ -12,6 +13,8 @@
 
 IVScan::IVScan( const std::string& name ) {
 
+  std::cout << "[IVScam] Setting up new IVScan with name: " << name << std::endl;
+
   name_ = name;
 
   p_ = 0.;
@@ -19,6 +22,14 @@ IVScan::IVScan( const std::string& name ) {
 
   graph_ = new TGraphErrors(0);
   graph_->SetName( Form("gr_%s", name_.c_str()) );
+
+}
+
+
+IVScan::~IVScan() {
+
+  delete graph_;
+  graph_ = 0;
 
 }
 
@@ -95,7 +106,7 @@ std::string IVScan::getDataFileName( const std::string& dataName ) {
 void IVScan::readFile( const std::string& name ) {
 
 
-  std::string fileName = (name=="") ? getDataFileName(name) : name;
+  std::string fileName = (name=="") ? getDataFileName(name_) : getDataFileName(name);
 
   std::cout << "-> Opening data file: " << fileName << std::endl;
 
@@ -112,16 +123,7 @@ void IVScan::readFile( const std::string& name ) {
 
     while( getline(ifs,line) ) {
 
-      std::string delimiter = " ";
-      size_t pos = 0;
-      std::vector<std::string> words;
-      std::string word;
-      while ((pos = line.find(delimiter)) != std::string::npos) {
-        word = line.substr(0, pos);
-        line.erase(0, pos + delimiter.length());
-        words.push_back(word);
-      }
-      words.push_back(line); // last part
+      std::vector<std::string> words = AndCommon::splitString( line, " " );
 
       if( words.size()<2 ) continue;
 
@@ -130,8 +132,14 @@ void IVScan::readFile( const std::string& name ) {
 
         TString line_tstr(line);
 
-        if( line_tstr.BeginsWith("#p") || line_tstr.BeginsWith("# p") ) p_ = std::atof(words[words.size()-1].c_str());
-        if( line_tstr.BeginsWith("#d") || line_tstr.BeginsWith("# d") ) d_ = std::atof(words[words.size()-1].c_str());
+        if( line_tstr.BeginsWith("#p") || line_tstr.BeginsWith("# p") ) {
+          p_ = std::atof(words[words.size()-1].c_str());
+          std::cout << "-> Pressure p = " << p_ << " mbar" << std::endl;
+        }
+        if( line_tstr.BeginsWith("#d") || line_tstr.BeginsWith("# d") ) {
+          d_ = std::atof(words[words.size()-1].c_str());
+          std::cout << "-> Distance d = " << d_ << " mm" << std::endl;
+        }
 
         continue;
 

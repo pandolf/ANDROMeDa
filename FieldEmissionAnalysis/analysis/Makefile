@@ -25,8 +25,8 @@ AndCommon.o: ../../CommonTools/src/AndCommon.cc
 	$(CC) -Wall $(INCLUDES) -c ../../CommonTools/src/AndCommon.cc $(ROOTFLAG) $(EXTRALIBS)
 
 
-IVScan.o: ../src/IVScan.cc 
-	$(CC) -Wall $(INCLUDES) -c ../src/IVScan.cc $(ROOTFLAG) $(EXTRALIBS)
+IVScan.o: ../src/IVScan.cc AndCommon.o
+	$(CC) -Wall $(INCLUDES) -c ../src/IVScan.cc AndCommon.o $(ROOTFLAG) $(EXTRALIBS)
 
 
 
