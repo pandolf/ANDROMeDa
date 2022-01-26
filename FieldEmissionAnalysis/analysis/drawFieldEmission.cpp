@@ -1,4 +1,5 @@
 #include "AndCommon.h"
+#include "IVScan.h"
 
 #include <iostream>
 #include <fstream>
@@ -12,14 +13,6 @@
 
 
 
-std::string getDataFileName( const std::string& dataName );
-
-TGraphErrors* getGraphFromFile( const std::string& fileName );
-
-void addPoint( TGraphErrors* gr, float hv, std::vector<float> i_meas );
-void getMeanRMS( std::vector<float> v, float& mean, float& rms );
-TGraphErrors* getFNgraph( TGraphErrors* g );
-
 
 
 
@@ -30,12 +23,16 @@ int main( int argc, char* argv[] ) {
     exit(1);
   }
 
-  std::string dataName( argv[1] );
-  std::string dataFileName = getDataFileName(dataName);
+  std::string name( argv[1] );
+  std::string dataName = AndCommon::removePathAndSuffix(name);
 
   AndCommon::setStyle();
 
-  TGraphErrors* graph = getGraphFromFile( dataFileName );
+  IVScan ivs( dataName );
+
+  ivs.readFile();
+
+  TGraphErrors* graph = ivs.graph();
 
 
   std::string outdir(Form("plots/%s/", dataName.c_str()));
@@ -73,12 +70,12 @@ int main( int argc, char* argv[] ) {
   c1->SaveAs( Form("%s/iv_log.pdf", outdir.c_str()) );
 
 
-  TGraphErrors* gr_fn = getFNgraph( graph );
+  TGraphErrors* gr_fn = ivs.getFNgraph();
 
   TCanvas* c1_fn = new TCanvas( "c1_fn", "", 600, 600 );
   c1_fn->Clear();
 
-  TH2D* h2_axes_fn = new TH2D( "axes_fn", "", 10, 0.0005, 0.0011, 10, -15., -5. );
+  TH2D* h2_axes_fn = new TH2D( "axes_fn", "", 10, 0.0002, 0.0011, 10, -25., 0. );
   h2_axes_fn->SetXTitle( "1/V (V^{-1})" );
   h2_axes_fn->SetYTitle( "Log(I/V^{2}) (a.u.)" );
   h2_axes_fn->Draw();
@@ -95,9 +92,13 @@ int main( int argc, char* argv[] ) {
   f1_line->SetLineWidth(2);
   gr_fn->Fit( f1_line );
 
+  std::cout << std::endl;
+  std::cout << "Chi^2 / NDF: " << f1_line->GetChisquare() << " / " << f1_line->GetNDF() <<std::endl;
+  std::cout << std::endl;
+
   float phi = 4.7; // in eV
   float d = 3.; // in mm
-  float d_err = 0.5;
+  float d_err = 0.1; // see logbook_ANDROMeDa entry 24/01/22 for details on why 0.1 mm
   float s = f1_line->GetParameter(1);
   float s_err = f1_line->GetParError(1);
   float gamma = -6.83E6*phi*sqrt(phi)*d/s;
@@ -123,129 +124,4 @@ int main( int argc, char* argv[] ) {
 
 }
 
-
-
-std::string getDataFileName( const std::string& dataName ) {
-
-  TString dataName_tstr(dataName);
-
-  std::string dataFileName(dataName);
-
-  if( !(dataName_tstr.BeginsWith("data/")) )
-    dataFileName = "data/"+dataFileName;
-
-  if( !(dataName_tstr.EndsWith  (".dat")) )
-    dataFileName = dataFileName+".dat";
-
-  return dataFileName;
-
-}
-
-
-
-TGraphErrors* getGraphFromFile( const std::string& fileName ) {
-
-  std::cout << "-> Opening data file: " << fileName << std::endl;
-
-  std::ifstream ifs( fileName.c_str() );
-
-  if( !ifs.good() ) {
-    std::cout << "[getGraphFromFile] ERROR! File '" << fileName << "' does not exist. Please check name." << std::endl;
-    exit(2);
-  }
-
-  std::string line;
-  TGraphErrors* graph = new TGraphErrors(0);
-  graph->SetName(Form("fe_%s", fileName.c_str()));
-
-  if( ifs.good() ) {
-
-    while( getline(ifs,line) ) {
-
-      if( line[0] == '#' ) continue;
-
-      std::string delimiter = " ";
-      size_t pos = 0;
-      std::vector<std::string> words;
-      std::string word;
-      while ((pos = line.find(delimiter)) != std::string::npos) {
-        word = line.substr(0, pos);
-        line.erase(0, pos + delimiter.length());
-        words.push_back(word);
-      }
-      words.push_back(line); // last part
-
-      if( words.size()<2 ) continue;
-
-      float hv = std::atof( words[0].c_str() );
-
-      std::vector<float> v_i;
-      for( unsigned iw=1; iw<words.size(); ++iw )
-        v_i.push_back( std::atof(words[iw].c_str()) );
-
-      addPoint( graph, hv, v_i );
-
-    }  // while get lines
-
-  } // if file good
-
-  return graph;
-
-}
-
-
-void addPoint( TGraphErrors* gr, float hv, std::vector<float> i_meas ) {
-
-  float mean, rms;
-  getMeanRMS( i_meas, mean, rms );
-
-  int iPoint = gr->GetN();
-  gr->SetPoint     ( iPoint, hv, mean );
-  gr->SetPointError( iPoint, 1., rms  );
-
-}
-
-
-
-void getMeanRMS( std::vector<float> v, float& mean, float& rms ) {
-
-  mean = 0.;
-  rms = 0.;
-
-  for( unsigned i=0; i<v.size(); ++i )
-    mean += v[i];
-  
-  mean /= (float)(v.size());
-
-
-  for( unsigned i=0; i<v.size(); ++i ) 
-    rms += (v[i] - mean)*(v[i] - mean);
-  rms /= (float)(v.size()-1);
-  rms = sqrt(rms);
-
-}
-
-
-
-TGraphErrors* getFNgraph( TGraphErrors* g ) {
-
-  TGraphErrors* gr_fn = new TGraphErrors(0);
-  gr_fn->SetName( "gr_fn" );
-
-  for( unsigned iPoint=0; iPoint<g->GetN(); ++iPoint ) {
-
-    double i, v;
-    g->GetPoint(iPoint, v, i);
-    float i_err = g->GetErrorY( iPoint );
-    float v_err = 1.;
-
-    gr_fn->SetPoint     ( iPoint, 1./v, TMath::Log( i / (v*v) ) );
-    std::cout << 1./v << " " <<  TMath::Log( i / (v*v) ) << std::endl;
-    gr_fn->SetPointError( iPoint, v_err/(v*v), i_err/i );
-
-  } // for
-
-  return gr_fn;
-
-}
 
