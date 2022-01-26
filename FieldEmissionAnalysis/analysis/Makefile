@@ -13,8 +13,8 @@ ROOTFLAG = `${ROOTSYS}/bin/root-config --cflags --libs`
 EXTRALIBS := -L$(ROOTSYS)/lib -lHtml -lMathCore -lGenVector -lMinuit -lTreePlayer -lRooFitCore -lRooFit #-L$(ROOFIT_LIBDIR)/ 
 
 
-drawFieldEmission: drawFieldEmission.cpp AndCommon.o
-	$(CC) -Wall $(INCLUDES) -o drawFieldEmission drawFieldEmission.cpp AndCommon.o $(ROOTFLAG) $(EXTRALIBS)
+drawFieldEmission: drawFieldEmission.cpp AndCommon.o IVScan.o
+	$(CC) -Wall $(INCLUDES) -o drawFieldEmission drawFieldEmission.cpp AndCommon.o IVScan.o $(ROOTFLAG) $(EXTRALIBS)
 
 
 
@@ -23,6 +23,10 @@ drawFieldEmission: drawFieldEmission.cpp AndCommon.o
 
 AndCommon.o: ../../CommonTools/src/AndCommon.cc 
 	$(CC) -Wall $(INCLUDES) -c ../../CommonTools/src/AndCommon.cc $(ROOTFLAG) $(EXTRALIBS)
+
+
+IVScan.o: ../src/IVScan.cc 
+	$(CC) -Wall $(INCLUDES) -c ../src/IVScan.cc $(ROOTFLAG) $(EXTRALIBS)
 
 
 
