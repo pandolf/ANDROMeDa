@@ -168,17 +168,7 @@ TGraph* AndCommon::getGraphFromFile( const std::string& fileName ) {
 
     while( getline(ifs,line) ) {
 
-      std::string delimiter = ",";
-      size_t pos = 0;
-      std::vector<std::string> words;
-      std::string word;
-      while ((pos = line.find(delimiter)) != std::string::npos) {
-        word = line.substr(0, pos);
-        line.erase(0, pos + delimiter.length());
-        words.push_back(word);
-      }
-      line.erase( line.size()-1, line.size() ); // chopping off trailing char
-      words.push_back(line); // last part
+      std::vector<std::string> words = splitString(",");
 
       if( read ) {
 
@@ -304,6 +294,44 @@ std::string AndCommon::scientific( float x, int decimals ) {
   else if( decimals==0 ) scient = std::string(Form("%.0fE%s%d", x, sign.c_str(), power));
 
   return scient;
+
+}
+
+
+std::vector<std::string> AndCommon::splitString( const std::string& s, const std::string& divider ) {
+
+  std::string s_copy(s);
+
+  size_t pos = 0;
+  std::vector<std::string> words;
+  std::string word;
+  while ((pos = s_copy.find(divider)) != std::string::npos) {
+    word = s_copy.substr(0, pos);
+    s_copy.erase(0, pos + divider.length());
+    words.push_back(word);
+  }
+  //s_copy.erase( s_copy.size()-1, s_copy.size() ); // chopping off trailing char
+  words.push_back(s_copy); // last part
+
+  return words;
+
+}
+
+
+
+std::string AndCommon::removePathAndSuffix( const std::string& fileName ) {
+
+  std::string name;
+
+  std::vector<std::string> split_dot   = splitString( fileName, "." );
+
+  name = split_dot[0];
+
+  std::vector<std::string> split_slash = splitString( name, "/" );
+
+  name = split_slash[split_slash.size()-1];
+
+  return name;
 
 }
 

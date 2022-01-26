@@ -40,6 +40,10 @@ class AndCommon {
 
   static std::string scientific( float x, int decimals = 1 );
 
+  static std::vector<std::string> splitString( const std::string& s, const std::string& divider=" " );
+
+  static std::string removePathAndSuffix( const std::string& fileName );
+
 };
 
 #endif
