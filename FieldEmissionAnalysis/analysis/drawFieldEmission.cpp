@@ -97,7 +97,7 @@ int main( int argc, char* argv[] ) {
   std::cout << std::endl;
 
   float phi = 4.7; // in eV
-  float d = 3.; // in mm
+  float d = ivs.d(); // in mm
   float d_err = 0.1; // see logbook_ANDROMeDa entry 24/01/22 for details on why 0.1 mm
   float s = f1_line->GetParameter(1);
   float s_err = f1_line->GetParError(1);
