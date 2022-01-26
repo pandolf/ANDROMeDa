@@ -270,16 +270,16 @@ float AndCommon::getPedestal( TGraph* graph, int nPoints ) {
 
 
 
-std::string AndCommon::scientific( float x, int decimals ) {
+std::string AndCommon::scientific( double x, int decimals ) {
 
   int power = 0.;
 
-  while( x > 10. ) {
+  while( x >= 10. ) {
     x /= 10.;
     power += 1;
   }
 
-  while( x < 1. ) {
+  while( x < 0.9999 ) {
     x *= 10.;
     power -= 1;
   }
