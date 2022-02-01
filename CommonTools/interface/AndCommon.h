@@ -4,6 +4,7 @@
 #include "TCanvas.h"
 #include "TPaveText.h"
 #include "TGraphErrors.h"
+#include "TStyle.h"
 
 
 #include <vector>
@@ -16,7 +17,7 @@ class AndCommon {
   AndCommon();
   ~AndCommon();
 
-  static void setStyle();
+  static TStyle* setStyle();
 
   static std::vector<int> colors();
 

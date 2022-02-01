@@ -336,7 +336,7 @@ std::string AndCommon::removePathAndSuffix( const std::string& fileName ) {
 }
 
 
-void AndCommon::setStyle() {
+TStyle* AndCommon::setStyle() {
 
   // set the TStyle
   TStyle* style = new TStyle("DrawBaseStyle", "");
@@ -350,8 +350,6 @@ void AndCommon::setStyle() {
   style->SetCanvasBorderMode(0);
   style->SetPadBorderMode(0);
   style->SetFrameBorderMode(0);
-  style->SetPadBottomMargin(0.12);
-  style->SetPadLeftMargin(0.12);
   style->cd();
   // For the canvas:
   style->SetCanvasBorderMode(0);
@@ -417,6 +415,8 @@ void AndCommon::setStyle() {
   style->SetNumberContours(100);
 
   style->cd();
+
+  return style;
 
 }
 
