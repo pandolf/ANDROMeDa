@@ -36,6 +36,8 @@ class IVScan {
   void set_p( float p );
   void set_d( float d );
 
+  void setColor( int color );
+
   void addPointToGraph( float hv, std::vector<float> i_meas );
 
   static float xMinFN();

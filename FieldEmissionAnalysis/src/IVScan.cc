@@ -14,9 +14,9 @@
 
 IVScan::IVScan( const std::string& name ) {
 
-  std::cout << "[IVScam] Setting up new IVScan with name: " << name << std::endl;
+  name_ = AndCommon::removePathAndSuffix(name);
 
-  name_ = name;
+  std::cout << "[IVScan] Setting up new IVScan with name: " << name_ << std::endl;
 
   p_ = 0.;
   d_ = -1.;
@@ -25,12 +25,14 @@ IVScan::IVScan( const std::string& name ) {
   gamma_err_ = 0.;
 
   graph_ = new TGraphErrors(0);
-  graph_->SetName( "gr_iv" );
-  //graph_->SetName( Form("gr_%s", name_.c_str()) );
+  //graph_->SetName( "gr_iv" );
+  graph_->SetName( Form("gr_%s", name_.c_str()) );
 
   graphFN_ = new TGraphErrors(0);
-  graphFN_->SetName( "gr_fn" );
-  //gr_fn->SetName( Form("graphFN_%s", name_.c_str()) );
+  //graphFN_->SetName( "gr_fn" );
+  graphFN_->SetName( Form("graphFN_%s", name_.c_str()) );
+
+  readFile();
 
 }
 
@@ -42,6 +44,14 @@ IVScan::~IVScan() {
 
   delete graphFN_;
   graphFN_ = 0;
+
+}
+
+
+
+std::string IVScan::name() const {
+
+  return name_;
 
 }
 
@@ -118,6 +128,20 @@ void IVScan::set_d( float d ) {
 
 }
 
+
+void IVScan::setColor( int color ) {
+
+  graph_->SetMarkerColor( color );
+  graph_->SetLineColor( color );
+
+  graphFN_->SetMarkerColor( color );
+  graphFN_->SetLineColor( color );
+
+  graphFN_->GetFunction( Form("line_%s", name_.c_str()) )->SetLineColor( color );
+
+}
+
+  
 
 std::string IVScan::getDataFileName( const std::string& dataName ) {
 
@@ -216,7 +240,7 @@ void IVScan::set_graphFN() {
 
   } // for
 
-  TF1* f1_line = new TF1( "line", "[0]+[1]*x" );
+  TF1* f1_line = new TF1( Form("line_%s", name_.c_str()), "[0]+[1]*x" );
   f1_line->SetLineColor(46);
   f1_line->SetLineWidth(2);
   graphFN_->Fit( f1_line, "Q+" );
