@@ -38,7 +38,6 @@ int main( int argc, char* argv[] ) {
 
   TCanvas* c1 = new TCanvas( "c1", "", 800, 800 );
   c1->cd();
-  c1->SetLogy();
 
   TH2D* h2_axes = new TH2D( "axes", "", 10, IVScan::xMinFN(), IVScan::xMaxFN(), 10, IVScan::yMinFN(), IVScan::yMaxFN() );
   h2_axes->SetXTitle( IVScan::xTitleFN().c_str() );
