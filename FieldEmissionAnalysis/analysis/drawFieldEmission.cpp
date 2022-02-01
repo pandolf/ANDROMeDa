@@ -25,18 +25,16 @@ int main( int argc, char* argv[] ) {
   }
 
   std::string name( argv[1] );
-  std::string dataName = AndCommon::removePathAndSuffix(name);
 
   AndCommon::setStyle();
 
-  IVScan ivs( dataName );
+  IVScan ivs( name );
 
-  ivs.readFile();
 
   TGraphErrors* graph = ivs.graph();
 
 
-  std::string outdir(Form("plots/%s/", dataName.c_str()));
+  std::string outdir(Form("plots/%s/", ivs.name().c_str()));
   system( Form("mkdir -p %s", outdir.c_str()) );
 
 
