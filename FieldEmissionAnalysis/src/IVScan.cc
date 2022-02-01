@@ -27,12 +27,18 @@ IVScan::IVScan( const std::string& name ) {
   graph_ = new TGraphErrors(0);
   //graph_->SetName( "gr_iv" );
   graph_->SetName( Form("gr_%s", name_.c_str()) );
+  graph_->SetMarkerSize(1.8);
+  graph_->SetMarkerStyle(20);
 
   graphFN_ = new TGraphErrors(0);
   //graphFN_->SetName( "gr_fn" );
   graphFN_->SetName( Form("graphFN_%s", name_.c_str()) );
+  graphFN_->SetMarkerSize(1.8);
+  graphFN_->SetMarkerStyle(20);
 
   readFile();
+
+  setColor(46);
 
 }
 
@@ -299,7 +305,7 @@ void IVScan::getMeanRMS( std::vector<float> v, float& mean, float& rms ) {
 
 float IVScan::xMinFN() {
 
-  return 0.0002;
+  return 0.00025;
 
 }
 
