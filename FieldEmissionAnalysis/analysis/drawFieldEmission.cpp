@@ -75,7 +75,7 @@ int main( int argc, char* argv[] ) {
   TCanvas* c1_fn = new TCanvas( "c1_fn", "", 600, 600 );
   c1_fn->Clear();
 
-  TH2D* h2_axes_fn = new TH2D( "axes_fn", "", 10, 0.0002, 0.0011, 10, -25., 0. );
+  TH2D* h2_axes_fn = new TH2D( "axes_fn", "", 10, 0.0002, 0.0007, 10, -20., 0. );
   h2_axes_fn->SetXTitle( "1/V (V^{-1})" );
   h2_axes_fn->SetYTitle( "Log(I/V^{2}) (a.u.)" );
   h2_axes_fn->Draw();
