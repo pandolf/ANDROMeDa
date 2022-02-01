@@ -10,6 +10,7 @@
 #include "TH2D.h"
 #include "TMath.h"
 #include "TF1.h"
+#include "TFile.h"
 
 
 
@@ -70,14 +71,14 @@ int main( int argc, char* argv[] ) {
   c1->SaveAs( Form("%s/iv_log.pdf", outdir.c_str()) );
 
 
-  TGraphErrors* gr_fn = ivs.getFNgraph();
+  TGraphErrors* gr_fn = ivs.graphFN();
 
   TCanvas* c1_fn = new TCanvas( "c1_fn", "", 600, 600 );
   c1_fn->Clear();
 
-  TH2D* h2_axes_fn = new TH2D( "axes_fn", "", 10, 0.0002, 0.0007, 10, -20., 0. );
-  h2_axes_fn->SetXTitle( "1/V (V^{-1})" );
-  h2_axes_fn->SetYTitle( "Log(I/V^{2}) (a.u.)" );
+  TH2D* h2_axes_fn = new TH2D( "axes_fn", "", 10, IVScan::xMinFN(), IVScan::xMaxFN(), 10, IVScan::yMinFN(), IVScan::yMaxFN() );
+  h2_axes_fn->SetXTitle( IVScan::xTitleFN().c_str() );
+  h2_axes_fn->SetYTitle( IVScan::yTitleFN().c_str() );
   h2_axes_fn->Draw();
 
   gr_fn->SetMarkerStyle(20);
@@ -87,30 +88,22 @@ int main( int argc, char* argv[] ) {
 
   gr_fn->Draw("P same");
 
-  TF1* f1_line = new TF1( "line", "[0]+[1]*x" );
-  f1_line->SetLineColor(46);
-  f1_line->SetLineWidth(2);
-  gr_fn->Fit( f1_line );
-
   std::cout << std::endl;
-  std::cout << "Chi^2 / NDF: " << f1_line->GetChisquare() << " / " << f1_line->GetNDF() <<std::endl;
+  std::cout << "Chi^2 / NDF: " << ivs.lineFN()->GetChisquare() << " / " << ivs.lineFN()->GetNDF() <<std::endl;
   std::cout << std::endl;
 
-  float phi = 4.7; // in eV
-  float d = ivs.d(); // in mm
-  float d_err = 0.1; // see logbook_ANDROMeDa entry 24/01/22 for details on why 0.1 mm
-  float s = f1_line->GetParameter(1);
-  float s_err = f1_line->GetParError(1);
-  float gamma = -6.83E6*phi*sqrt(phi)*d/s;
-  float gamma_err = sqrt( gamma*gamma/(s*s)*s_err*s_err + gamma*gamma/(d*d)*d_err*d_err );
+  float gamma = ivs.gamma();
+  float gamma_err = ivs.gamma_err();
 
-  TPaveText* gamma_text = new TPaveText( 0.65, 0.8, 0.9, 0.9, "brNDC" );
-  gamma_text->SetFillColor(0);
-  gamma_text->SetTextSize(0.038);
-  gamma_text->SetTextColor( 46 );
-  //gamma_text->SetTextColor( kGray+3 );
-  gamma_text->AddText( Form("#gamma = %.0f #pm %.0f", gamma, gamma_err) );
-  gamma_text->Draw("same");
+//ivs.getGammaFromLine( gamma, gamma_err, f1_line );
+
+//TPaveText* gamma_text = new TPaveText( 0.65, 0.8, 0.9, 0.9, "brNDC" );
+//gamma_text->SetFillColor(0);
+//gamma_text->SetTextSize(0.038);
+//gamma_text->SetTextColor( 46 );
+////gamma_text->SetTextColor( kGray+3 );
+//gamma_text->AddText( Form("#gamma = %.0f #pm %.0f", gamma, gamma_err) );
+//gamma_text->Draw("same");
 
   TPaveText* pd_text = new TPaveText( 0.2, 0.2, 0.5, 0.3, "brNDC" );
   pd_text->SetFillColor(0);
@@ -127,6 +120,16 @@ int main( int argc, char* argv[] ) {
   std::cout << "------------------" << std::endl;
   std::cout << " gamma: " << gamma << " +/- " << gamma_err  << std::endl;
   std::cout << "------------------" << std::endl;
+
+
+  TFile* outfile = TFile::Open( Form("%s/graphs.root", outdir.c_str()), "RECREATE" );
+  outfile->cd();
+
+  graph->Write();
+  gr_fn->Write();
+
+  outfile->Write();
+  outfile->Close();
 
 
   return 0;
