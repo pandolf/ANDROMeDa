@@ -8,6 +8,7 @@
 
 #include "TString.h"
 #include "TMath.h"
+#include "TF1.h"
 
 
 
@@ -20,8 +21,16 @@ IVScan::IVScan( const std::string& name ) {
   p_ = 0.;
   d_ = -1.;
 
+  gamma_ = 0.;
+  gamma_err_ = 0.;
+
   graph_ = new TGraphErrors(0);
-  graph_->SetName( Form("gr_%s", name_.c_str()) );
+  graph_->SetName( "gr_iv" );
+  //graph_->SetName( Form("gr_%s", name_.c_str()) );
+
+  graphFN_ = new TGraphErrors(0);
+  graphFN_->SetName( "gr_fn" );
+  //gr_fn->SetName( Form("graphFN_%s", name_.c_str()) );
 
 }
 
@@ -31,6 +40,9 @@ IVScan::~IVScan() {
   delete graph_;
   graph_ = 0;
 
+  delete graphFN_;
+  graphFN_ = 0;
+
 }
 
 
@@ -38,6 +50,13 @@ IVScan::~IVScan() {
 TGraphErrors* IVScan::graph() const {
 
   return graph_;
+
+}
+
+
+TGraphErrors* IVScan::graphFN() const {
+
+  return graphFN_;
 
 }
 
@@ -63,9 +82,25 @@ float IVScan::d() const {
 }
 
 
+float IVScan::gamma() const {
+
+  return gamma_;
+
+}
+
+
+float IVScan::gamma_err() const {
+
+  return gamma_err_;
+
+}
+
+
 void IVScan::set_graph( TGraphErrors* graph ) {
 
   graph_ = graph;
+
+  set_graphFN();
 
 }
 
@@ -158,9 +193,50 @@ void IVScan::readFile( const std::string& name ) {
 
   } // if file good
 
-} // readFile
+
+  // now set FN graph:
+  set_graphFN();
+ 
+
+}
 
 
+
+void IVScan::set_graphFN() {
+
+  for( unsigned iPoint=0; iPoint<graph_->GetN(); ++iPoint ) {
+
+    double i, v;
+    graph_->GetPoint(iPoint, v, i);
+    float i_err = graph_->GetErrorY( iPoint );
+    float v_err = 1.;
+
+    graphFN_->SetPoint     ( iPoint, 1./v, TMath::Log( i / (v*v) ) );
+    graphFN_->SetPointError( iPoint, v_err/(v*v), i_err/i );
+
+  } // for
+
+  TF1* f1_line = new TF1( "line", "[0]+[1]*x" );
+  f1_line->SetLineColor(46);
+  f1_line->SetLineWidth(2);
+  graphFN_->Fit( f1_line, "Q+" );
+
+  float phi = 4.7; // in eV
+  float d = d_; // in mm
+  float d_err = 0.1; // see logbook_ANDROMeDa entry 24/01/22 for details on why 0.1 mm
+  float s = f1_line->GetParameter(1);
+  float s_err = f1_line->GetParError(1);
+  gamma_ = -6.83E6*phi*sqrt(phi)*d/s;
+  gamma_err_ = sqrt( gamma_*gamma_/(s*s)*s_err*s_err + gamma_*gamma_/(d*d)*d_err*d_err );
+
+} 
+
+
+TF1* IVScan::lineFN() const {
+
+  return graphFN_->GetFunction("line");
+
+}
 
 
 void IVScan::addPointToGraph( float hv, std::vector<float> i_meas ) {
@@ -196,24 +272,46 @@ void IVScan::getMeanRMS( std::vector<float> v, float& mean, float& rms ) {
 
 
 
-TGraphErrors* IVScan::getFNgraph() const {
 
-  TGraphErrors* gr_fn = new TGraphErrors(0);
-  gr_fn->SetName( Form("gr_fn_%s", name_.c_str()) );
+float IVScan::xMinFN() {
 
-  for( unsigned iPoint=0; iPoint<graph_->GetN(); ++iPoint ) {
-
-    double i, v;
-    graph_->GetPoint(iPoint, v, i);
-    float i_err = graph_->GetErrorY( iPoint );
-    float v_err = 1.;
-
-    gr_fn->SetPoint     ( iPoint, 1./v, TMath::Log( i / (v*v) ) );
-    gr_fn->SetPointError( iPoint, v_err/(v*v), i_err/i );
-
-  } // for
-
-  return gr_fn;
+  return 0.0002;
 
 }
+
+
+float IVScan::xMaxFN() {
+
+  return 0.0007;
+
+}
+
+
+float IVScan::yMinFN() {
+
+  return -20.;
+
+}
+
+
+float IVScan::yMaxFN() {
+
+  return 0.;
+
+}
+
+
+std::string IVScan::xTitleFN() {
+
+  return "1/V (V^{-1})";
+
+}
+
+
+std::string IVScan::yTitleFN() {
+
+  return "Log(I/V^{2}) (a.u.)";
+
+}
+
 
