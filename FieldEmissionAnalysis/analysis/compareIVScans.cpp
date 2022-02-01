@@ -23,6 +23,12 @@ int main( int argc, char* argv[] ) {
 
   }
 
+  TStyle* style = AndCommon::setStyle();
+  style->SetPadLeftMargin(0.12);
+  style->SetPadRightMargin(0.11);
+  style->SetTitleYOffset(1.15);
+  style->cd();
+
   std::string name1( argv[1] );
   std::string name2( argv[2] );
 
@@ -48,8 +54,8 @@ int main( int argc, char* argv[] ) {
 
   gr_scan2->Draw("Psame");
 
-  TLegend* legend = new TLegend( 0.2, 0.2, 0.8, 0.3 );
-  legend->SetTextSize(0.038);
+  TLegend* legend = new TLegend( 0.15, 0.2, 0.8, 0.3 );
+  legend->SetTextSize(0.028);
   legend->SetFillColor(0);
   legend->AddEntry( gr_scan1, Form("%s (#gamma = %.0f #pm %.0f)", ivs1.name().c_str(), ivs1.gamma(), ivs1.gamma_err()) );
   legend->AddEntry( gr_scan2, Form("%s (#gamma = %.0f #pm %.0f)", ivs2.name().c_str(), ivs2.gamma(), ivs2.gamma_err()) );
