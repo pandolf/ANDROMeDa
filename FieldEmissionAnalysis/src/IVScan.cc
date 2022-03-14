@@ -264,7 +264,7 @@ void IVScan::set_graphFN() {
 
 TF1* IVScan::lineFN() const {
 
-  return graphFN_->GetFunction("line");
+  return graphFN_->GetFunction(Form("line_%s", name_.c_str()));
 
 }
 
