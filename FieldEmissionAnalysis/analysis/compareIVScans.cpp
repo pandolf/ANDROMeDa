@@ -32,12 +32,12 @@ int main( int argc, char* argv[] ) {
   std::string name1( argv[1] );
   std::string name2( argv[2] );
   std::string name3("");
-  if( argc>2 ) name3 = std::string(argv[3]);
+  if( argc>3 ) name3 = std::string(argv[3]);
 
   IVScan* ivs1 = new IVScan( name1 );
   IVScan* ivs2 = new IVScan( name2 );
   IVScan* ivs3;
-  if( argc>2 ) ivs3 = new IVScan( name3 );
+  if( argc>3 ) ivs3 = new IVScan( name3 );
 
   int color1 = 46;
   int color2 = kGray+3;
@@ -45,12 +45,12 @@ int main( int argc, char* argv[] ) {
 
   ivs1->setColor(color1);
   ivs2->setColor(color2);
-  if( argc>2 ) ivs3->setColor(color3);
+  if( argc>3 ) ivs3->setColor(color3);
 
   TGraphErrors* gr_scan1 = ivs1->graphFN();
   TGraphErrors* gr_scan2 = ivs2->graphFN();
   TGraphErrors* gr_scan3;
-  if( argc>2 ) gr_scan3 = ivs3->graphFN();
+  if( argc>3 ) gr_scan3 = ivs3->graphFN();
 
 
   TCanvas* c1 = new TCanvas( "c1", "", 800, 800 );
@@ -63,7 +63,7 @@ int main( int argc, char* argv[] ) {
 
   gr_scan1->Draw("Psame");
   gr_scan2->Draw("Psame");
-  if( argc>2 ) gr_scan3->Draw("Psame");
+  if( argc>3 ) gr_scan3->Draw("Psame");
 
   TLegend* legend1 = new TLegend( 0.15, 0.25 - (3-argc)*0.05, 0.8, 0.3 - (3-argc)*0.05 );
   legend1->SetTextSize(0.028);
@@ -79,7 +79,7 @@ int main( int argc, char* argv[] ) {
   legend2->AddEntry( gr_scan2, Form("%s (#gamma = %.0f #pm %.0f)", ivs2->name().c_str(), ivs2->gamma(), ivs2->gamma_err()) );
   legend2->Draw("same");
 
-  if( argc>2 ) {
+  if( argc>3 ) {
 
     TLegend* legend3 = new TLegend( 0.15, 0.2, 0.8, 0.25 );
     legend3->SetTextSize(0.028);
@@ -99,10 +99,10 @@ int main( int argc, char* argv[] ) {
   //legend->AddEntry( gr_scan2, Form("%s (#gamma = %.0f #pm %.0f)", ivs2.name().c_str(), ivs2.gamma(), ivs2.gamma_err()) );
   //legend->Draw("same");
 
-  if( argc==2 )
-    c1->SaveAs( Form("plots/compare_%s_vs_%s.pdf", ivs1->name().c_str(), ivs2->name().c_str()) );
-  else
+  if( argc>3 )
     c1->SaveAs( Form("plots/compare_%s_vs_%s_vs_%s.pdf", ivs1->name().c_str(), ivs2->name().c_str(), ivs3->name().c_str()) );
+  else
+    c1->SaveAs( Form("plots/compare_%s_vs_%s.pdf", ivs1->name().c_str(), ivs2->name().c_str()) );
 
 
   return 0;
