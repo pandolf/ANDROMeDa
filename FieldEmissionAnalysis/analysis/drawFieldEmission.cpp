@@ -26,7 +26,11 @@ int main( int argc, char* argv[] ) {
 
   std::string name( argv[1] );
 
-  AndCommon::setStyle();
+  TStyle* style = AndCommon::setStyle();
+  style->SetPadLeftMargin(0.12);
+  style->SetPadRightMargin(0.11);
+  style->SetTitleYOffset(1.15);
+  style->cd();
 
   IVScan ivs( name );
 
@@ -74,6 +78,8 @@ int main( int argc, char* argv[] ) {
   TCanvas* c1_fn = new TCanvas( "c1_fn", "", 600, 600 );
   c1_fn->Clear();
 
+
+  //TH2D* h2_axes_fn = new TH2D( "axes_fn", "", 10, 0.0005, 0.0012, 10, IVScan::yMinFN(), IVScan::yMaxFN() );
   TH2D* h2_axes_fn = new TH2D( "axes_fn", "", 10, IVScan::xMinFN(), IVScan::xMaxFN(), 10, IVScan::yMinFN(), IVScan::yMaxFN() );
   h2_axes_fn->SetXTitle( IVScan::xTitleFN().c_str() );
   h2_axes_fn->SetYTitle( IVScan::yTitleFN().c_str() );
@@ -93,15 +99,13 @@ int main( int argc, char* argv[] ) {
   float gamma = ivs.gamma();
   float gamma_err = ivs.gamma_err();
 
-//ivs.getGammaFromLine( gamma, gamma_err, f1_line );
-
-//TPaveText* gamma_text = new TPaveText( 0.65, 0.8, 0.9, 0.9, "brNDC" );
-//gamma_text->SetFillColor(0);
-//gamma_text->SetTextSize(0.038);
-//gamma_text->SetTextColor( 46 );
-////gamma_text->SetTextColor( kGray+3 );
-//gamma_text->AddText( Form("#gamma = %.0f #pm %.0f", gamma, gamma_err) );
-//gamma_text->Draw("same");
+  TPaveText* gamma_text = new TPaveText( 0.6, 0.8, 0.85, 0.9, "brNDC" );
+  gamma_text->SetFillColor(0);
+  gamma_text->SetTextSize(0.038);
+  gamma_text->SetTextColor( 46 );
+  //gamma_text->SetTextColor( kGray+3 );
+  gamma_text->AddText( Form("#gamma = %.0f #pm %.0f", gamma, gamma_err) );
+  gamma_text->Draw("same");
 
   TPaveText* pd_text = new TPaveText( 0.2, 0.2, 0.5, 0.3, "brNDC" );
   pd_text->SetFillColor(0);
