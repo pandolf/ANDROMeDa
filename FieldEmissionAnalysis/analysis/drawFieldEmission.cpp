@@ -46,10 +46,18 @@ int main( int argc, char* argv[] ) {
   c1->cd();
 
 
-  TH2D* h2_axes = new TH2D( "axes", "", 10, 700., 1999., 10, 0., 950. );
+  TH2D* h2_axes = new TH2D( "axes", "", 10, 1500., 2999., 10, 0., 30000. );
   h2_axes->SetXTitle( "-#DeltaV (V)" );
   h2_axes->SetYTitle( "I (nA)" );
   h2_axes->Draw();
+
+  TPaveText* pd_text = new TPaveText( 0.2, 0.75, 0.5, 0.85, "brNDC" );
+  pd_text->SetFillColor(0);
+  pd_text->SetTextSize(0.038);
+  pd_text->SetTextColor(kGray+3);
+  pd_text->AddText( Form("p = %s mbar", AndCommon::scientific(ivs.p(), 0).c_str()) );
+  pd_text->AddText( Form("d = %.1f mm"  , ivs.d()) );
+  pd_text->Draw("Same");
 
   graph->SetMarkerStyle(20);
   graph->SetMarkerSize(1.5);
@@ -63,11 +71,12 @@ int main( int argc, char* argv[] ) {
   c1->Clear();
   c1->SetLogy();
 
-  TH2D* h2_axes_log = new TH2D( "axes_log", "", 10, 700., 1999., 10, 0.1, 2000. );
+  TH2D* h2_axes_log = new TH2D( "axes_log", "", 10, 1500., 2999., 10, 2, 200000. );
   h2_axes_log->SetXTitle( "-#DeltaV (V)" );
   h2_axes_log->SetYTitle( "I (nA)" );
   h2_axes_log->Draw();
 
+  pd_text->Draw("Same");
   graph->Draw("P same");
 
   c1->SaveAs( Form("%s/iv_log.pdf", outdir.c_str()) );
@@ -107,13 +116,13 @@ int main( int argc, char* argv[] ) {
   gamma_text->AddText( Form("#gamma = %.0f #pm %.0f", gamma, gamma_err) );
   gamma_text->Draw("same");
 
-  TPaveText* pd_text = new TPaveText( 0.2, 0.2, 0.5, 0.3, "brNDC" );
-  pd_text->SetFillColor(0);
-  pd_text->SetTextSize(0.038);
-  pd_text->SetTextColor(kGray+3);
-  pd_text->AddText( Form("p = %s mbar", AndCommon::scientific(ivs.p(), 0).c_str()) );
-  pd_text->AddText( Form("d = %.1f mm"  , ivs.d()) );
-  pd_text->Draw("same");
+  TPaveText* pd_text_log = new TPaveText( 0.2, 0.2, 0.5, 0.3, "brNDC" );
+  pd_text_log->SetFillColor(0);
+  pd_text_log->SetTextSize(0.038);
+  pd_text_log->SetTextColor(kGray+3);
+  pd_text_log->AddText( Form("p = %s mbar", AndCommon::scientific(ivs.p(), 0).c_str()) );
+  pd_text_log->AddText( Form("d = %.1f mm"  , ivs.d()) );
+  pd_text_log->Draw("same");
 
 
   c1_fn->SaveAs( Form("%s/fn.pdf", outdir.c_str()) );
