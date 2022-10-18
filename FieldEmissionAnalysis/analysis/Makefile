@@ -16,6 +16,9 @@ EXTRALIBS := -L$(ROOTSYS)/lib -lHtml -lMathCore -lGenVector -lMinuit -lTreePlaye
 drawFieldEmission: drawFieldEmission.cpp AndCommon.o IVScan.o
 	$(CC) -Wall $(INCLUDES) -o drawFieldEmission drawFieldEmission.cpp AndCommon.o IVScan.o $(ROOTFLAG) $(EXTRALIBS)
 
+drawFieldEmission_forTES: drawFieldEmission_forTES.cpp AndCommon.o IVScan.o
+	$(CC) -Wall $(INCLUDES) -o drawFieldEmission_forTES drawFieldEmission_forTES.cpp AndCommon.o IVScan.o $(ROOTFLAG) $(EXTRALIBS)
+
 compareIVScans: compareIVScans.cpp AndCommon.o IVScan.o
 	$(CC) -Wall $(INCLUDES) -o compareIVScans compareIVScans.cpp AndCommon.o IVScan.o $(ROOTFLAG) $(EXTRALIBS)
 
@@ -30,6 +33,9 @@ AndCommon.o: ../../CommonTools/src/AndCommon.cc
 
 IVScan.o: ../src/IVScan.cc AndCommon.o
 	$(CC) -Wall $(INCLUDES) -c ../src/IVScan.cc AndCommon.o $(ROOTFLAG) $(EXTRALIBS)
+
+IVScanFN.o: ../src/IVScanFN.cc IVScan.o AndCommon.o
+	$(CC) -Wall $(INCLUDES) -c ../src/IVScanFN.cc IVScan.o AndCommon.o $(ROOTFLAG) $(EXTRALIBS)
 
 
 

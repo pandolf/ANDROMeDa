@@ -21,20 +21,12 @@ IVScan::IVScan( const std::string& name ) {
   p_ = 0.;
   d_ = -1.;
 
-  gamma_ = 0.;
-  gamma_err_ = 0.;
-
   graph_ = new TGraphErrors(0);
   //graph_->SetName( "gr_iv" );
   graph_->SetName( Form("gr_%s", name_.c_str()) );
   graph_->SetMarkerSize(1.8);
   graph_->SetMarkerStyle(20);
 
-  graphFN_ = new TGraphErrors(0);
-  //graphFN_->SetName( "gr_fn" );
-  graphFN_->SetName( Form("graphFN_%s", name_.c_str()) );
-  graphFN_->SetMarkerSize(1.8);
-  graphFN_->SetMarkerStyle(20);
 
   readFile();
 
@@ -47,9 +39,6 @@ IVScan::~IVScan() {
 
   delete graph_;
   graph_ = 0;
-
-  delete graphFN_;
-  graphFN_ = 0;
 
 }
 
@@ -69,12 +58,6 @@ TGraphErrors* IVScan::graph() const {
 
 }
 
-
-TGraphErrors* IVScan::graphFN() const {
-
-  return graphFN_;
-
-}
 
 
 float IVScan::pressure() const {
@@ -98,25 +81,10 @@ float IVScan::d() const {
 }
 
 
-float IVScan::gamma() const {
-
-  return gamma_;
-
-}
-
-
-float IVScan::gamma_err() const {
-
-  return gamma_err_;
-
-}
-
 
 void IVScan::set_graph( TGraphErrors* graph ) {
 
   graph_ = graph;
-
-  set_graphFN();
 
 }
 
@@ -139,11 +107,6 @@ void IVScan::setColor( int color ) {
 
   graph_->SetMarkerColor( color );
   graph_->SetLineColor( color );
-
-  graphFN_->SetMarkerColor( color );
-  graphFN_->SetLineColor( color );
-
-  graphFN_->GetFunction( Form("line_%s", name_.c_str()) )->SetLineColor( color );
 
 }
 
@@ -224,49 +187,8 @@ void IVScan::readFile( const std::string& name ) {
   } // if file good
 
 
-  // now set FN graph:
-  set_graphFN();
- 
-
 }
 
-
-
-void IVScan::set_graphFN() {
-
-  for( unsigned iPoint=0; iPoint<graph_->GetN(); ++iPoint ) {
-
-    double i, v;
-    graph_->GetPoint(iPoint, v, i);
-    float i_err = graph_->GetErrorY( iPoint );
-    float v_err = 1.;
-
-    graphFN_->SetPoint     ( iPoint, 1./v, TMath::Log( i / (v*v) ) );
-    graphFN_->SetPointError( iPoint, v_err/(v*v), i_err/i );
-
-  } // for
-
-  TF1* f1_line = new TF1( Form("line_%s", name_.c_str()), "[0]+[1]*x" );
-  f1_line->SetLineColor(46);
-  f1_line->SetLineWidth(2);
-  graphFN_->Fit( f1_line, "Q+" );
-
-  float phi = 4.7; // in eV
-  float d = d_; // in mm
-  float d_err = 0.1; // see logbook_ANDROMeDa entry 24/01/22 for details on why 0.1 mm
-  float s = f1_line->GetParameter(1);
-  float s_err = f1_line->GetParError(1);
-  gamma_ = -6.83E6*phi*sqrt(phi)*d/s;
-  gamma_err_ = sqrt( gamma_*gamma_/(s*s)*s_err*s_err + gamma_*gamma_/(d*d)*d_err*d_err );
-
-} 
-
-
-TF1* IVScan::lineFN() const {
-
-  return graphFN_->GetFunction(Form("line_%s", name_.c_str()));
-
-}
 
 
 void IVScan::addPointToGraph( float hv, std::vector<float> i_meas ) {
@@ -287,61 +209,30 @@ void IVScan::getMeanRMS( std::vector<float> v, float& mean, float& rms ) {
   mean = 0.;
   rms = 0.;
 
-  for( unsigned i=0; i<v.size(); ++i )
-    mean += v[i];
-  
-  mean /= (float)(v.size());
+  if( v.size()<2 ) {
+
+    std::cout << "[IVScan::getMeanRMS] Data vector size < 2" << std::endl;
+    exit(2);
+
+  } else if( v.size()==2 ) { // first is mean second is RMS
+
+    mean = v[0];
+    rms  = v[1];
+
+  } else { // just a number of measurements
+
+    for( unsigned i=0; i<v.size(); ++i )
+      mean += v[i];
+    
+    mean /= (float)(v.size());
 
 
-  for( unsigned i=0; i<v.size(); ++i ) 
-    rms += (v[i] - mean)*(v[i] - mean);
-  rms /= (float)(v.size()-1);
-  rms = sqrt(rms);
+    for( unsigned i=0; i<v.size(); ++i ) 
+      rms += (v[i] - mean)*(v[i] - mean);
+    rms /= (float)(v.size()-1);
+    rms = sqrt(rms);
 
-}
-
-
-
-
-float IVScan::xMinFN() {
-
-  return 0.00025;
-
-}
-
-
-float IVScan::xMaxFN() {
-
-  return 0.0007;
+  }  // if
 
 }
-
-
-float IVScan::yMinFN() {
-
-  return -20.;
-
-}
-
-
-float IVScan::yMaxFN() {
-
-  return 0.;
-
-}
-
-
-std::string IVScan::xTitleFN() {
-
-  return "1/V (V^{-1})";
-
-}
-
-
-std::string IVScan::yTitleFN() {
-
-  return "Log(I/V^{2}) (a.u.)";
-
-}
-
 
