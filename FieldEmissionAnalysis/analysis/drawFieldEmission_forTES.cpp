@@ -11,20 +11,19 @@
 #include "TMath.h"
 #include "TF1.h"
 #include "TFile.h"
-
-
+#include "TLegend.h"
 
 
 
 
 int main( int argc, char* argv[] ) {
 
-  if( argc < 2 ) {
-    std::cout << "USAGE: ./drawFieldEmission_forTES [dataName]" << std::endl;
-    exit(1);
-  }
+//if( argc < 2 ) {
+//  std::cout << "USAGE: ./drawFieldEmission_forTES [dataName]" << std::endl;
+//  exit(1);
+//}
 
-  std::string name( argv[1] );
+//std::string name( argv[1] );
 
   TStyle* style = AndCommon::setStyle();
   style->SetPadLeftMargin(0.12);
@@ -32,16 +31,19 @@ int main( int argc, char* argv[] ) {
   style->SetTitleYOffset(1.15);
   style->cd();
 
-  IVScan ivs( name );
+  std::vector< std::string > scans;
+  scans.push_back( "CNTArO2Etching_AG_d3_new" );
+  scans.push_back( "CNTArO2Etching_AG_d4_new" );
+  scans.push_back( "CNTArO2Etching_AG_d5_new" );
 
+  std::vector<int> colors = AndCommon::colors();
 
-  TGraphErrors* graph = ivs.graph();
 
   TCanvas* c1 = new TCanvas( "c1", "", 800, 600 );
   c1->cd();
 
   int xMin = 0.;
-  int xMax = 1250.;
+  int xMax = 2200.;
 
   TH2D* h2_axes = new TH2D( "axes", "", 10, xMin, xMax, 10, -3., 1. );
   h2_axes->SetXTitle( "-#DeltaV(CNT-anode) [V]" );
@@ -53,27 +55,56 @@ int main( int argc, char* argv[] ) {
   lineZero->Draw("same");
 
   TLine* lineOne = new TLine( xMin, -1., xMax, -1. );
-  lineOne->SetLineColor( 46 );
+  //lineOne->SetLineColor( 46 );
   lineOne->Draw("same");
 
-  graph->SetMarkerStyle(20);
-  graph->SetMarkerSize(1.5);
-  graph->SetMarkerColor(kGray+3);
-  graph->SetLineColor(kGray+3);
-  graph->Draw("P same");
+  TLegend* legend = new TLegend( 0.17, 0.2, 0.35, 0.4 );
+  legend->SetName("legend");
+  legend->SetFillColor(0);
+  legend->SetTextSize(0.035);
+  
+  for ( unsigned i=0; i<scans.size(); ++i ) {
 
-  TPaveText* label = new TPaveText( 0.17, 0.2, 0.35, 0.4, "brNDC" );
-  label->SetTextSize(0.038);
-  label->SetTextAlign(11);
-  label->SetTextColor(46);
-  label->SetFillColor(0);
-  label->AddText( "CNT As Grown (no etching)" );
-  //label->AddText( ivs.name().c_str() );
-  label->AddText( Form("p = %s mbar", AndCommon::scientific(ivs.p(), 0).c_str()) );
-  label->AddText( Form("d = %.1f mm", ivs.d()) );
-  label->Draw("same");
+    IVScan* ivs = new IVScan( scans[i] );
+
+    TGraphErrors* graph = ivs->graph();
+
+    c1->cd();
+ 
+    graph->SetMarkerStyle(20);
+    graph->SetMarkerSize(1.5);
+    graph->SetMarkerColor(colors[i]);
+    graph->SetLineColor(colors[i]);
+    //graph->SetMarkerColor(kGray+3);
+    //graph->SetLineColor(kGray+3);
+    graph->Draw("P same");
+
+    legend->AddEntry( graph, Form("d = %.1f mm", ivs->d()) );
+
+    delete ivs;
+
+  }
+
+  c1->cd();
+  legend->Draw("same");
+
+  gPad->RedrawAxis();
+
+  //TPaveText* label = new TPaveText( 0.17, 0.2, 0.35, 0.4, "brNDC" );
+  //label->SetTextSize(0.038);
+  //label->SetTextAlign(11);
+  //label->SetTextColor(46);
+  //label->SetFillColor(0);
+  //label->AddText( "CNT As Grown (no etching)" );
+  ////label->AddText( ivs.name().c_str() );
+  //label->AddText( Form("p = %s mbar", AndCommon::scientific(ivs.p(), 0).c_str()) );
+  //label->AddText( Form("d = %.1f mm", ivs.d()) );
+  //label->Draw("same");
 
   c1->SaveAs("fe_forTES.pdf");
+
+  delete c1;
+  delete legend;
 
   return 0;
 
