@@ -37,8 +37,8 @@ IVScan::IVScan( const std::string& name ) {
 
 IVScan::~IVScan() {
 
-  delete graph_;
-  graph_ = 0;
+//delete graph_;
+//graph_ = 0;
 
 }
 
