@@ -308,10 +308,11 @@ std::vector<std::string> AndCommon::splitString( const std::string& s, const std
   while ((pos = s_copy.find(divider)) != std::string::npos) {
     word = s_copy.substr(0, pos);
     s_copy.erase(0, pos + divider.length());
-    words.push_back(word);
+    if( word!=divider && word.size()>0 )  words.push_back(word);
   }
   //s_copy.erase( s_copy.size()-1, s_copy.size() ); // chopping off trailing char
   words.push_back(s_copy); // last part
+
 
   return words;
 
