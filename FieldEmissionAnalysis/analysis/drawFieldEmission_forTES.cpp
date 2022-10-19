@@ -37,10 +37,43 @@ int main( int argc, char* argv[] ) {
 
   TGraphErrors* graph = ivs.graph();
 
-  TFile* outfile = TFile::Open("test.root", "recreate");
-  outfile->cd();
-  graph->Write();
-  outfile->Close();
+  TCanvas* c1 = new TCanvas( "c1", "", 800, 600 );
+  c1->cd();
+
+  int xMin = 0.;
+  int xMax = 1250.;
+
+  TH2D* h2_axes = new TH2D( "axes", "", 10, xMin, xMax, 10, -3., 1. );
+  h2_axes->SetXTitle( "-#DeltaV(CNT-anode) [V]" );
+  h2_axes->SetYTitle( "I(anode) [pA]" );
+  h2_axes->Draw();
+
+  TLine* lineZero = new TLine( xMin, 0., xMax, 0. );
+  lineZero->SetLineColor( kBlack );
+  lineZero->Draw("same");
+
+  TLine* lineOne = new TLine( xMin, -1., xMax, -1. );
+  lineOne->SetLineColor( 46 );
+  lineOne->Draw("same");
+
+  graph->SetMarkerStyle(20);
+  graph->SetMarkerSize(1.5);
+  graph->SetMarkerColor(kGray+3);
+  graph->SetLineColor(kGray+3);
+  graph->Draw("P same");
+
+  TPaveText* label = new TPaveText( 0.17, 0.2, 0.35, 0.4, "brNDC" );
+  label->SetTextSize(0.038);
+  label->SetTextAlign(11);
+  label->SetTextColor(46);
+  label->SetFillColor(0);
+  label->AddText( "CNT As Grown (no etching)" );
+  //label->AddText( ivs.name().c_str() );
+  label->AddText( Form("p = %s mbar", AndCommon::scientific(ivs.p(), 0).c_str()) );
+  label->AddText( Form("d = %.1f mm", ivs.d()) );
+  label->Draw("same");
+
+  c1->SaveAs("fe_forTES.pdf");
 
   return 0;
 
