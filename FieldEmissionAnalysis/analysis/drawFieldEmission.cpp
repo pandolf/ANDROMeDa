@@ -45,8 +45,10 @@ int main( int argc, char* argv[] ) {
   TCanvas* c1 = new TCanvas( "c1", "", 600, 600 );
   c1->cd();
 
+  float xMin = 1300.;
+  float xMax = 2999.;
 
-  TH2D* h2_axes = new TH2D( "axes", "", 10, 1500., 2999., 10, 0., 30000. );
+  TH2D* h2_axes = new TH2D( "axes", "", 10, xMin, xMax, 10, 0., 30000. );
   h2_axes->SetXTitle( "-#DeltaV (V)" );
   h2_axes->SetYTitle( "I (nA)" );
   h2_axes->Draw();
@@ -71,7 +73,7 @@ int main( int argc, char* argv[] ) {
   c1->Clear();
   c1->SetLogy();
 
-  TH2D* h2_axes_log = new TH2D( "axes_log", "", 10, 1500., 2999., 10, 2, 200000. );
+  TH2D* h2_axes_log = new TH2D( "axes_log", "", 10, xMin, xMax, 10, 2, 200000. );
   h2_axes_log->SetXTitle( "-#DeltaV (V)" );
   h2_axes_log->SetYTitle( "I (nA)" );
   h2_axes_log->Draw();
