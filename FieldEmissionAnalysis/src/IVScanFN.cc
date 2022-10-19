@@ -33,8 +33,8 @@ IVScanFN::IVScanFN( const std::string& name ) : IVScan( name ) {
 
 IVScanFN::~IVScanFN() {
 
-  delete graphFN_;
-  graphFN_ = 0;
+  //delete graphFN_;
+  //graphFN_ = 0;
 
 }
 
