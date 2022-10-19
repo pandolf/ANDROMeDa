@@ -51,18 +51,45 @@ int main( int argc, char* argv[] ) {
   h2_axes->Draw();
 
   TLine* lineZero = new TLine( xMin, 0., xMax, 0. );
-  lineZero->SetLineColor( kBlack );
   lineZero->Draw("same");
 
   TLine* lineOne = new TLine( xMin, -1., xMax, -1. );
-  //lineOne->SetLineColor( 46 );
   lineOne->Draw("same");
+
+
+  TCanvas* c1_E = new TCanvas( "c1_E", "", 800, 600 );
+  c1_E->cd();
+
+
+
+
+  int xMax_E = 500.;
+
+  TH2D* h2_axes_E = new TH2D( "axes_E", "", 10, xMin, xMax_E, 10, -3., 1. );
+  h2_axes_E->SetXTitle( "-E [V/mm]" );
+  h2_axes_E->SetYTitle( "I(anode) [pA]" );
+  h2_axes_E->Draw();
+
+  TLine* lineZero_E = new TLine( xMin, 0., xMax_E, 0. );
+  lineZero_E->Draw("same");
+
+  TLine* lineOne_E = new TLine( xMin, -1., xMax_E, -1. );
+  lineOne_E->Draw("same");
+
+
 
   TLegend* legend = new TLegend( 0.17, 0.2, 0.35, 0.4 );
   legend->SetName("legend");
   legend->SetFillColor(0);
   legend->SetTextSize(0.035);
   
+  TLegend* legend_E = new TLegend( 0.17, 0.2, 0.35, 0.4 );
+  legend_E->SetName("legend");
+  legend_E->SetFillColor(0);
+  legend_E->SetTextSize(0.035);
+  
+
+
   for ( unsigned i=0; i<scans.size(); ++i ) {
 
     IVScan* ivs = new IVScan( scans[i] );
@@ -75,11 +102,23 @@ int main( int argc, char* argv[] ) {
     graph->SetMarkerSize(1.5);
     graph->SetMarkerColor(colors[i]);
     graph->SetLineColor(colors[i]);
-    //graph->SetMarkerColor(kGray+3);
-    //graph->SetLineColor(kGray+3);
     graph->Draw("P same");
 
     legend->AddEntry( graph, Form("d = %.1f mm", ivs->d()) );
+
+
+    c1_E->cd();
+
+    TGraphErrors* graph_E = ivs->graph_E();
+
+    graph_E->SetMarkerStyle(20);
+    graph_E->SetMarkerSize(1.5);
+    graph_E->SetMarkerColor(colors[i]);
+    graph_E->SetLineColor(colors[i]);
+    graph_E->Draw("P same");
+
+    legend_E->AddEntry( graph_E, Form("d = %.1f mm", ivs->d()) );
+
 
     delete ivs;
 
@@ -102,6 +141,15 @@ int main( int argc, char* argv[] ) {
   //label->Draw("same");
 
   c1->SaveAs("fe_forTES.pdf");
+
+
+  c1_E->cd();
+
+  legend_E->Draw("same");
+
+  gPad->RedrawAxis();
+
+  c1_E->SaveAs("feE_forTES.pdf");
 
   delete c1;
   delete legend;
