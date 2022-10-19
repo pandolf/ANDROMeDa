@@ -22,6 +22,7 @@ class IVScan {
   std::string name() const;
 
   TGraphErrors* graph() const;
+  TGraphErrors* graph_E() const; // divide V (in V) by d (in mm) to get I vs. E in V/mm
 
   float pressure() const;
   float p() const;

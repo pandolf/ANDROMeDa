@@ -59,6 +59,28 @@ TGraphErrors* IVScan::graph() const {
 }
 
 
+TGraphErrors* IVScan::graph_E() const {
+
+  TGraphErrors* graph_E = new TGraphErrors(0);
+  graph_E->SetName( Form("gr_E_%s", name_.c_str()) );
+
+  for( unsigned iPoint=0; iPoint<graph_->GetN(); ++iPoint ) {
+
+    double x,y;
+    graph_->GetPoint( iPoint, x, y );
+    double xerr = graph_->GetErrorX( iPoint );
+    double yerr = graph_->GetErrorY( iPoint );
+
+    graph_E->SetPoint( iPoint, x/d_, y );
+    graph_E->SetPointError( iPoint, xerr, yerr );
+
+  } // for points
+
+  return graph_E;
+
+}
+
+
 
 float IVScan::pressure() const {
 
@@ -87,6 +109,7 @@ void IVScan::set_graph( TGraphErrors* graph ) {
   graph_ = graph;
 
 }
+
 
 
 void IVScan::set_p( float p ) {
