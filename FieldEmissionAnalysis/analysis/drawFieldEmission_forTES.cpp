@@ -31,6 +31,9 @@ int main( int argc, char* argv[] ) {
   style->SetTitleYOffset(1.15);
   style->cd();
 
+
+  std::string sampleName = "CNT as grown (no etching)";
+
   std::vector< std::string > scans;
   scans.push_back( "CNTArO2Etching_AG_d3_new" );
   scans.push_back( "CNTArO2Etching_AG_d4_new" );
@@ -66,7 +69,7 @@ int main( int argc, char* argv[] ) {
   int xMax_E = 500.;
 
   TH2D* h2_axes_E = new TH2D( "axes_E", "", 10, xMin, xMax_E, 10, -3., 1. );
-  h2_axes_E->SetXTitle( "-E [V/mm]" );
+  h2_axes_E->SetXTitle( "E [V/mm]" );
   h2_axes_E->SetYTitle( "I(anode) [pA]" );
   h2_axes_E->Draw();
 
@@ -74,17 +77,16 @@ int main( int argc, char* argv[] ) {
   lineZero_E->Draw("same");
 
   TLine* lineOne_E = new TLine( xMin, -1., xMax_E, -1. );
+  lineOne_E->SetLineStyle(2);
   lineOne_E->Draw("same");
 
 
 
-  TLegend* legend = new TLegend( 0.17, 0.2, 0.35, 0.4 );
-  legend->SetName("legend");
+  TLegend* legend = new TLegend( 0.17, 0.2, 0.35, 0.4, sampleName.c_str() );
   legend->SetFillColor(0);
   legend->SetTextSize(0.035);
   
-  TLegend* legend_E = new TLegend( 0.17, 0.2, 0.35, 0.4 );
-  legend_E->SetName("legend");
+  TLegend* legend_E = new TLegend( 0.17, 0.2, 0.35, 0.4, sampleName.c_str() );
   legend_E->SetFillColor(0);
   legend_E->SetTextSize(0.035);
   
