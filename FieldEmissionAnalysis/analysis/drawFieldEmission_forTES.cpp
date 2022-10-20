@@ -111,15 +111,15 @@ int main( int argc, char* argv[] ) {
 
     c1_E->cd();
 
-    TGraphErrors* graph_E = ivs->graph_E();
+    TGraphErrors* graph_vsE = ivs->graph_vsE();
 
-    graph_E->SetMarkerStyle(20);
-    graph_E->SetMarkerSize(1.5);
-    graph_E->SetMarkerColor(colors[i]);
-    graph_E->SetLineColor(colors[i]);
-    graph_E->Draw("P same");
+    graph_vsE->SetMarkerStyle(20);
+    graph_vsE->SetMarkerSize(1.5);
+    graph_vsE->SetMarkerColor(colors[i]);
+    graph_vsE->SetLineColor(colors[i]);
+    graph_vsE->Draw("P same");
 
-    legend_E->AddEntry( graph_E, Form("d = %.1f mm", ivs->d()) );
+    legend_E->AddEntry( graph_vsE, Form("d = %.1f mm", ivs->d()) );
 
 
     delete ivs;
@@ -142,7 +142,7 @@ int main( int argc, char* argv[] ) {
   //label->AddText( Form("d = %.1f mm", ivs.d()) );
   //label->Draw("same");
 
-  c1->SaveAs("fe_forTES.pdf");
+  c1->SaveAs( "fe_forTES.pdf");
 
 
   c1_E->cd();
@@ -151,7 +151,7 @@ int main( int argc, char* argv[] ) {
 
   gPad->RedrawAxis();
 
-  c1_E->SaveAs("feE_forTES.pdf");
+  c1_E->SaveAs("fe_vsE_forTES.pdf");
 
   delete c1;
   delete legend;
