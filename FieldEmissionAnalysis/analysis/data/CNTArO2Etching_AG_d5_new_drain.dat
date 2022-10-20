@@ -1,4 +1,4 @@
-#p 5.3E-6
+#p 5.9E-6
 #d 5
 #m k6487
 #this time polarizing the anode to +DeltaV and reading the drain current from the CNT cathode
