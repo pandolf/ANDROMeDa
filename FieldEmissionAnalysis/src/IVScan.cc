@@ -59,10 +59,10 @@ TGraphErrors* IVScan::graph() const {
 }
 
 
-TGraphErrors* IVScan::graph_E() const {
+TGraphErrors* IVScan::graph_vsE() const {
 
-  TGraphErrors* graph_E = new TGraphErrors(0);
-  graph_E->SetName( Form("gr_E_%s", name_.c_str()) );
+  TGraphErrors* graph_vsE = new TGraphErrors(0);
+  graph_vsE->SetName( Form("gr_E_%s", name_.c_str()) );
 
   for( unsigned iPoint=0; iPoint<graph_->GetN(); ++iPoint ) {
 
@@ -71,12 +71,12 @@ TGraphErrors* IVScan::graph_E() const {
     double xerr = graph_->GetErrorX( iPoint );
     double yerr = graph_->GetErrorY( iPoint );
 
-    graph_E->SetPoint( iPoint, x/d_, y );
-    graph_E->SetPointError( iPoint, xerr, yerr );
+    graph_vsE->SetPoint( iPoint, x/d_, y );
+    graph_vsE->SetPointError( iPoint, xerr, yerr );
 
   } // for points
 
-  return graph_E;
+  return graph_vsE;
 
 }
 
