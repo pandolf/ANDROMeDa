@@ -13,17 +13,20 @@ ROOTFLAG = `${ROOTSYS}/bin/root-config --cflags --libs`
 EXTRALIBS := -L$(ROOTSYS)/lib -lHtml -lMathCore -lGenVector -lMinuit -lTreePlayer -lRooFitCore -lRooFit #-L$(ROOFIT_LIBDIR)/ 
 
 
-drawFieldEmission: drawFieldEmission.cpp AndCommon.o IVScan.o
-	$(CC) -Wall $(INCLUDES) -o drawFieldEmission drawFieldEmission.cpp AndCommon.o IVScan.o $(ROOTFLAG) $(EXTRALIBS)
+drawFieldEmission: drawFieldEmission.cpp AndCommon.o IScan.o IVScan.o
+	$(CC) -Wall $(INCLUDES) -o drawFieldEmission drawFieldEmission.cpp AndCommon.o IScan.o IVScan.o $(ROOTFLAG) $(EXTRALIBS)
 
-drawCompareAnodeAndDrain: drawCompareAnodeAndDrain.cpp AndCommon.o IVScan.o
-	$(CC) -Wall $(INCLUDES) -o drawCompareAnodeAndDrain drawCompareAnodeAndDrain.cpp AndCommon.o IVScan.o $(ROOTFLAG) $(EXTRALIBS)
+drawFieldEmission_forTES: drawFieldEmission_forTES.cpp AndCommon.o IScan.o IVScan.o
+	$(CC) -Wall $(INCLUDES) -o drawFieldEmission_forTES drawFieldEmission_forTES.cpp AndCommon.o IScan.o IVScan.o $(ROOTFLAG) $(EXTRALIBS)
 
-drawCompareAnodeAndDrain: drawCompareAnodeAndDrain.cpp AndCommon.o IVScan.o
-	$(CC) -Wall $(INCLUDES) -o drawCompareAnodeAndDrain drawCompareAnodeAndDrain.cpp AndCommon.o IVScan.o $(ROOTFLAG) $(EXTRALIBS)
+drawCompareAnodeAndDrain: drawCompareAnodeAndDrain.cpp AndCommon.o IScan.o IVScan.o
+	$(CC) -Wall $(INCLUDES) -o drawCompareAnodeAndDrain drawCompareAnodeAndDrain.cpp AndCommon.o IScan.o IVScan.o $(ROOTFLAG) $(EXTRALIBS)
 
-compareIVScans: compareIVScans.cpp AndCommon.o IVScan.o
-	$(CC) -Wall $(INCLUDES) -o compareIVScans compareIVScans.cpp AndCommon.o IVScan.o $(ROOTFLAG) $(EXTRALIBS)
+compareIVScans: compareIVScans.cpp AndCommon.o IScan.o IVScan.o
+	$(CC) -Wall $(INCLUDES) -o compareIVScans compareIVScans.cpp AndCommon.o IScan.o IVScan.o $(ROOTFLAG) $(EXTRALIBS)
+
+drawTimeStability: drawTimeStability.cpp AndCommon.o IScan.o IVScan.o
+	$(CC) -Wall $(INCLUDES) -o drawTimeStability drawTimeStability.cpp AndCommon.o IScan.o IVScan.o $(ROOTFLAG) $(EXTRALIBS)
 
 
 
@@ -34,11 +37,14 @@ AndCommon.o: ../../CommonTools/src/AndCommon.cc
 	$(CC) -Wall $(INCLUDES) -c ../../CommonTools/src/AndCommon.cc $(ROOTFLAG) $(EXTRALIBS)
 
 
-IVScan.o: ../src/IVScan.cc AndCommon.o
-	$(CC) -Wall $(INCLUDES) -c ../src/IVScan.cc AndCommon.o $(ROOTFLAG) $(EXTRALIBS)
+IScan.o: ../src/IScan.cc AndCommon.o
+	$(CC) -Wall $(INCLUDES) -c ../src/IScan.cc AndCommon.o $(ROOTFLAG) $(EXTRALIBS)
 
-IVScanFN.o: ../src/IVScanFN.cc IVScan.o AndCommon.o
-	$(CC) -Wall $(INCLUDES) -c ../src/IVScanFN.cc IVScan.o AndCommon.o $(ROOTFLAG) $(EXTRALIBS)
+IVScan.o: ../src/IVScan.cc IScan.o AndCommon.o
+	$(CC) -Wall $(INCLUDES) -c ../src/IVScan.cc IScan.o AndCommon.o $(ROOTFLAG) $(EXTRALIBS)
+
+IVScanFN.o: ../src/IVScanFN.cc IScan.o IVScan.o AndCommon.o
+	$(CC) -Wall $(INCLUDES) -c ../src/IVScanFN.cc IScan.o IVScan.o AndCommon.o $(ROOTFLAG) $(EXTRALIBS)
 
 
 
