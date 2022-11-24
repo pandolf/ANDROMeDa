@@ -1,0 +1,27 @@
+#p 5.6E-6
+#d 4
+#m k6487
+#this time polarizing the anode to +DeltaV and reading the drain current from the CNT cathode
+#compare to data/CNTArO2Etching_AG_d4_new_drain.dat this time left the anode at +2600V overnight
+#from about 17:00 to 13:00 the next day, so a total of 20 hours. the drain current was about 15uA
+#when I left at 17:00 and was ~35uA when I arrived the next day.
+#this time also making extra sure that (a) the pressure gauge is off and (b) there is no light seeping in the chamber
+6 -0.047 0.021
+398 -0.060 0.070
+803 -0.41 0.40
+1198 0.43 0.44
+1454 -0.04 0.25
+1471 -0.08 0.10
+1485 -0.06 0.14
+1500 -0.15 0.28
+1515 -0.08 0.10
+1531 -0.083 0.089
+1545 -0.59 0.26
+1559 -0.2 0.23
+1575 0.20 0.37
+1591 -0.06 0.14
+1604 -0.12 0.10
+1621 -0.05 0.28
+1658 -0l53 0.42
+
+
