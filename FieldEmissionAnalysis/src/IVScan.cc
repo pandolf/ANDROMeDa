@@ -12,25 +12,10 @@
 
 
 
-IVScan::IVScan( const std::string& name ) {
-
-  name_ = AndCommon::removePathAndSuffix(name);
-
-  std::cout << "[IVScan] Setting up new IVScan with name: " << name_ << std::endl;
-
-  p_ = 0.;
-  d_ = -1.;
-
-  graph_ = new TGraphErrors(0);
-  //graph_->SetName( "gr_iv" );
-  graph_->SetName( Form("gr_%s", name_.c_str()) );
-  graph_->SetMarkerSize(1.8);
-  graph_->SetMarkerStyle(20);
 
 
-  readFile();
+IVScan::IVScan( const std::string& name ) : IScan(name) {
 
-  setColor(46);
 
 }
 
@@ -44,34 +29,19 @@ IVScan::~IVScan() {
 
 
 
-std::string IVScan::name() const {
-
-  return name_;
-
-}
-
-
-
-TGraphErrors* IVScan::graph() const {
-
-  return graph_;
-
-}
-
-
 TGraphErrors* IVScan::graph_vsE() const {
 
   TGraphErrors* graph_vsE = new TGraphErrors(0);
-  graph_vsE->SetName( Form("gr_E_%s", name_.c_str()) );
+  graph_vsE->SetName( Form("gr_E_%s", this->name().c_str()) );
 
-  for( unsigned iPoint=0; iPoint<graph_->GetN(); ++iPoint ) {
+  for( unsigned iPoint=0; iPoint<this->graph()->GetN(); ++iPoint ) {
 
     double x,y;
-    graph_->GetPoint( iPoint, x, y );
-    double xerr = graph_->GetErrorX( iPoint );
-    double yerr = graph_->GetErrorY( iPoint );
+    this->graph()->GetPoint( iPoint, x, y );
+    double xerr = this->graph()->GetErrorX( iPoint );
+    double yerr = this->graph()->GetErrorY( iPoint );
 
-    graph_vsE->SetPoint( iPoint, x/d_, y );
+    graph_vsE->SetPoint( iPoint, x/this->d(), y );
     graph_vsE->SetPointError( iPoint, xerr, yerr );
 
   } // for points
@@ -82,133 +52,15 @@ TGraphErrors* IVScan::graph_vsE() const {
 
 
 
-float IVScan::pressure() const {
+void IVScan::readDataLine( const std::vector< std::string >& words ) {
 
-  return this->p();
+  float hv = std::atof( words[0].c_str() );
 
-}
+  std::vector<float> v_i;
+  for( unsigned iw=1; iw<words.size(); ++iw )
+    v_i.push_back( std::atof(words[iw].c_str()) );
 
-
-float IVScan::p() const {
-
-  return p_;
-
-}
-
-
-float IVScan::d() const {
-
-  return d_;
-
-}
-
-
-
-void IVScan::set_graph( TGraphErrors* graph ) {
-
-  graph_ = graph;
-
-}
-
-
-
-void IVScan::set_p( float p ) {
-
-  p_ = p;
-
-}
-
-
-void IVScan::set_d( float d ) {
-
-  d_ = d;
-
-}
-
-
-void IVScan::setColor( int color ) {
-
-  graph_->SetMarkerColor( color );
-  graph_->SetLineColor( color );
-
-}
-
-  
-
-std::string IVScan::getDataFileName( const std::string& dataName ) {
-
-  TString dataName_tstr(dataName);
-
-  std::string dataFileName(dataName);
-
-  if( !(dataName_tstr.BeginsWith("data/")) )
-    dataFileName = "data/"+dataFileName;
-
-  if( !(dataName_tstr.EndsWith  (".dat")) )
-    dataFileName = dataFileName+".dat";
-
-  return dataFileName;
-
-}
-
-
-
-
-void IVScan::readFile( const std::string& name ) {
-
-
-  std::string fileName = (name=="") ? getDataFileName(name_) : getDataFileName(name);
-
-  std::cout << "-> Opening data file: " << fileName << std::endl;
-
-  std::ifstream ifs( fileName.c_str() );
-
-  if( !ifs.good() ) {
-    std::cout << "[IVScan::readFile] ERROR! File '" << fileName << "' does not exist. Please check name." << std::endl;
-    exit(2);
-  }
-
-  std::string line;
-
-  if( ifs.good() ) {
-
-    while( getline(ifs,line) ) {
-
-      std::vector<std::string> words = AndCommon::splitString( line, " " );
-
-      if( words.size()<2 ) continue;
-
-
-      if( line[0] == '#' ) {
-
-        TString line_tstr(line);
-
-        if( line_tstr.BeginsWith("#p") || line_tstr.BeginsWith("# p") ) {
-          p_ = std::atof(words[words.size()-1].c_str());
-          std::cout << "-> Pressure p = " << p_ << " mbar" << std::endl;
-        }
-        if( line_tstr.BeginsWith("#d") || line_tstr.BeginsWith("# d") ) {
-          d_ = std::atof(words[words.size()-1].c_str());
-          std::cout << "-> Distance d = " << d_ << " mm" << std::endl;
-        }
-
-        continue;
-
-      }
-
-
-      float hv = std::atof( words[0].c_str() );
-
-      std::vector<float> v_i;
-      for( unsigned iw=1; iw<words.size(); ++iw )
-        v_i.push_back( std::atof(words[iw].c_str()) );
-
-      addPointToGraph( hv, v_i );
-
-    }  // while get lines
-
-  } // if file good
-
+  addPointToGraph( hv, v_i );
 
 }
 
@@ -219,9 +71,9 @@ void IVScan::addPointToGraph( float hv, std::vector<float> i_meas ) {
   float mean, rms;
   getMeanRMS( i_meas, mean, rms );
 
-  int iPoint = graph_->GetN();
-  graph_->SetPoint     ( iPoint, hv, mean );
-  graph_->SetPointError( iPoint, 1., rms  );
+  int iPoint = this->graph()->GetN();
+  this->graph()->SetPoint     ( iPoint, hv, mean );
+  this->graph()->SetPointError( iPoint, 1., rms  );
 
 }
 
