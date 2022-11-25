@@ -16,6 +16,11 @@
 
 
 
+
+void addCrossingPoint( TGraphErrors* gr_crossing, float graph_x, TGraphErrors* graph, float crossingPoint );
+
+
+
 int main( int argc, char* argv[] ) {
 
 //if( argc < 2 ) {
@@ -32,12 +37,45 @@ int main( int argc, char* argv[] ) {
   style->cd();
 
 
+  std::string batchName(argv[1]);
   std::string sampleName = "CNT as grown (no etching)";
 
+  float xMax = 2200.;
+  float xMax_E = 500.;
   std::vector< std::string > scans;
-  scans.push_back( "CNTArO2Etching_AG_d3_new" );
-  scans.push_back( "CNTArO2Etching_AG_d4_new" );
-  scans.push_back( "CNTArO2Etching_AG_d5_new" );
+
+  if( argc > 1 ) {
+
+    if( batchName=="CNTArO2Etching_AG" ) {
+
+      xMax = 2200.;
+      xMax_E = 500.;
+      scans.push_back( "CNTArO2Etching_AG_d3_new" );
+      scans.push_back( "CNTArO2Etching_AG_d4_new" );
+      scans.push_back( "CNTArO2Etching_AG_d5_new" );
+
+    } else if( batchName=="CNTArO2Etching_N1" ) {
+
+      xMax = 800.;
+      xMax_E = 200.;
+      scans.push_back( "CNTArO2Etching_N1_d3_new_2" );
+      scans.push_back( "CNTArO2Etching_N1_d4_new" );
+      scans.push_back( "CNTArO2Etching_N1_d5_new" );
+
+    } else {
+
+      scans.push_back( std::string(argv[1]) );
+
+    }
+
+  } else {
+
+    std::cout << "No default argument, exiting." << std::endl;
+    std::cout << "USAGE: ./drawFieldEmission_forTES [name]" << std::endl;
+    exit(12);
+
+  }
+
 
   std::vector<int> colors = AndCommon::colors();
 
@@ -45,8 +83,7 @@ int main( int argc, char* argv[] ) {
   TCanvas* c1 = new TCanvas( "c1", "", 800, 600 );
   c1->cd();
 
-  int xMin = 0.;
-  int xMax = 2200.;
+  float xMin = 0.;
 
   TH2D* h2_axes = new TH2D( "axes", "", 10, xMin, xMax, 10, -3., 1. );
   h2_axes->SetXTitle( "-#DeltaV(CNT-anode) [V]" );
@@ -57,6 +94,7 @@ int main( int argc, char* argv[] ) {
   lineZero->Draw("same");
 
   TLine* lineOne = new TLine( xMin, -1., xMax, -1. );
+  lineOne->SetLineStyle(2);
   lineOne->Draw("same");
 
 
@@ -66,7 +104,6 @@ int main( int argc, char* argv[] ) {
 
 
 
-  int xMax_E = 500.;
 
   TH2D* h2_axes_E = new TH2D( "axes_E", "", 10, xMin, xMax_E, 10, -3., 1. );
   h2_axes_E->SetXTitle( "E [V/mm]" );
@@ -91,6 +128,12 @@ int main( int argc, char* argv[] ) {
   legend_E->SetTextSize(0.035);
   
 
+  TGraphErrors* gr_crossing_1p  = new TGraphErrors(0);
+  TGraphErrors* gr_crossing_02p = new TGraphErrors(0);
+
+  gr_crossing_1p ->SetName( "gr_crossing_1p"  );
+  gr_crossing_02p->SetName( "gr_crossing_02p" );
+
 
   for ( unsigned i=0; i<scans.size(); ++i ) {
 
@@ -107,6 +150,9 @@ int main( int argc, char* argv[] ) {
     graph->Draw("P same");
 
     legend->AddEntry( graph, Form("d = %.1f mm", ivs->d()) );
+
+    addCrossingPoint( gr_crossing_1p , ivs->d(), graph, -1.0 );
+    addCrossingPoint( gr_crossing_02p, ivs->d(), graph, -0.2 );
 
 
     c1_E->cd();
@@ -142,7 +188,7 @@ int main( int argc, char* argv[] ) {
   //label->AddText( Form("d = %.1f mm", ivs.d()) );
   //label->Draw("same");
 
-  c1->SaveAs( "fe_forTES.pdf");
+  c1->SaveAs( Form("plots/fe_forTES_%s.pdf", batchName.c_str()) );
 
 
   c1_E->cd();
@@ -151,7 +197,49 @@ int main( int argc, char* argv[] ) {
 
   gPad->RedrawAxis();
 
-  c1_E->SaveAs("fe_vsE_forTES.pdf");
+  c1_E->SaveAs( Form("plots/fe_vsE_forTES_%s.pdf", batchName.c_str()) );
+
+
+  AndCommon::setStyle();
+
+  TCanvas* c1_cross = new TCanvas( "c1_cross", "", 600, 600 );
+  c1_cross->cd();
+
+  TH2D* h2_axes_crossing = new TH2D( "axes_crossing", "", 10, 0., 6., 10, 0., 1000. );
+  h2_axes_crossing->SetXTitle( "d(anode-cathode) [mm]" );
+  h2_axes_crossing->SetYTitle( "#DeltaV [V]" );
+  h2_axes_crossing->Draw();
+
+  gr_crossing_1p->SetMarkerStyle( 20 );
+  gr_crossing_1p->SetMarkerSize( 1.7 );
+  gr_crossing_1p->SetMarkerColor( 46 );
+  gr_crossing_1p->SetLineColor  ( 46 );
+
+  gr_crossing_02p->SetMarkerStyle( 24 );
+  gr_crossing_02p->SetMarkerSize( 1.7 );
+  gr_crossing_02p->SetMarkerColor( 46 );
+  gr_crossing_02p->SetLineColor  ( 46 );
+
+  TF1* f1_crossFit = new TF1( "crossFit", "[0] + [1]*x", 0., 6. );
+  f1_crossFit->SetLineColor(46);
+  f1_crossFit->SetLineWidth(1);
+  gr_crossing_1p->Fit( f1_crossFit, "R" );
+
+  gr_crossing_1p ->Draw("Psame");
+  gr_crossing_02p->Draw("Psame");
+
+  TLegend* legend_cross = new TLegend( 0.2, 0.7, 0.5, 0.9 );
+  legend_cross->SetFillColor(0);
+  legend_cross->SetTextSize(0.035);
+  legend_cross->AddEntry( gr_crossing_1p , "I = 1 pA", "PL" );
+  legend_cross->AddEntry( gr_crossing_02p, "I = 0.2 pA", "P" );
+  legend_cross->Draw();
+
+
+  gPad->RedrawAxis();
+
+  c1_cross->SaveAs( Form("plots/fe_crossing_vs_d_%s.pdf", batchName.c_str()) );
+
 
   delete c1;
   delete legend;
@@ -159,6 +247,43 @@ int main( int argc, char* argv[] ) {
   return 0;
 
 }
+
+
+
+void addCrossingPoint( TGraphErrors* gr_crossing, float graph_x, TGraphErrors* graph, float crossingPoint ) {
+
+  double old_x(0.), old_y(0.);
+
+  for( unsigned iPoint=0; iPoint<graph->GetN(); ++iPoint ) {
+
+    double x, y;
+    graph->GetPoint( iPoint, x, y );
+
+    if( old_y>crossingPoint && y<crossingPoint ) {
+
+      int crossN = gr_crossing->GetN();
+      gr_crossing->SetPoint     ( crossN, graph_x, 0.5*(old_x+x) );
+      gr_crossing->SetPointError( crossN,      0., fabs(old_x-x) );
+
+      break;
+
+    } else {
+
+      old_x = x;
+      old_y = y;
+
+    }
+
+  } // for points
+
+}
+
+      
+
+
+
+
+
 
 //
 //
