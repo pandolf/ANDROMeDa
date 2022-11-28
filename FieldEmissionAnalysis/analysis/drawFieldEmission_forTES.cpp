@@ -42,22 +42,27 @@ int main( int argc, char* argv[] ) {
 
   float xMax = 2200.;
   float xMax_E = 500.;
+  float yMax_cross = 1000.;
   std::vector< std::string > scans;
 
   if( argc > 1 ) {
 
     if( batchName=="CNTArO2Etching_AG" ) {
 
+      sampleName = "CNT as grown (no etching)";
       xMax = 2200.;
       xMax_E = 500.;
+      yMax_cross = 2500.;
       scans.push_back( "CNTArO2Etching_AG_d3_new" );
       scans.push_back( "CNTArO2Etching_AG_d4_new" );
       scans.push_back( "CNTArO2Etching_AG_d5_new" );
 
     } else if( batchName=="CNTArO2Etching_N1" ) {
 
+      sampleName = "Mild Ar/O_{2} Etching";
       xMax = 800.;
       xMax_E = 200.;
+      yMax_cross = 1000.;
       scans.push_back( "CNTArO2Etching_N1_d3_new_2" );
       scans.push_back( "CNTArO2Etching_N1_d4_new" );
       scans.push_back( "CNTArO2Etching_N1_d5_new" );
@@ -205,7 +210,7 @@ int main( int argc, char* argv[] ) {
   TCanvas* c1_cross = new TCanvas( "c1_cross", "", 600, 600 );
   c1_cross->cd();
 
-  TH2D* h2_axes_crossing = new TH2D( "axes_crossing", "", 10, 0., 6., 10, 0., 1000. );
+  TH2D* h2_axes_crossing = new TH2D( "axes_crossing", "", 10, 0., 6., 10, 0., yMax_cross );
   h2_axes_crossing->SetXTitle( "d(anode-cathode) [mm]" );
   h2_axes_crossing->SetYTitle( "#DeltaV [V]" );
   h2_axes_crossing->Draw();
@@ -224,6 +229,8 @@ int main( int argc, char* argv[] ) {
   f1_crossFit->SetLineColor(46);
   f1_crossFit->SetLineWidth(1);
   gr_crossing_1p->Fit( f1_crossFit, "R" );
+
+  std::cout << "Crossing fit: f(1 mm) = " << f1_crossFit->Eval(1.) << " V" << std::endl;
 
   gr_crossing_1p ->Draw("Psame");
   gr_crossing_02p->Draw("Psame");
