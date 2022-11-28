@@ -38,6 +38,7 @@ int main( int argc, char* argv[] ) {
 
     IVScan ivs_anode(Form("CNTArO2Etching_AG_d%d_new"      , i));
     IVScan ivs_drain(Form("CNTArO2Etching_AG_d%d_new_drain", i));
+    //IVScan ivs_drain(Form("CNTArO2Etching_AG_d%d_new_drain_2", i));
 
     draw_AvsD( ivs_anode.graph(), ivs_drain.graph(), Form("d = %.1f mm", d), Form("d%d", i), "CNT as grown (no etching)" );
 
