@@ -134,18 +134,63 @@ std::string IScan::getDataFileName( const std::string& dataName ) {
 
 
 
+
 void IScan::readCommentLine( const std::vector< std::string >& words ) {
 
-  TString word0_tstr(words[0]);
-
-  if( word0_tstr.BeginsWith("#p") || (words[0]=="#" && words[1]=="p") ) {
+  if( (words[0]=="#p") || (words[0]=="#" && words[1]=="p") ) {
     p_ = std::atof(words[words.size()-1].c_str());
     std::cout << "-> Pressure p = " << p_ << " mbar" << std::endl;
   }
-  if( word0_tstr.BeginsWith("#d") || (words[0]=="#" && words[1]=="d") ) {
+  if( (words[0]=="#d") || (words[0]=="#" && words[1]=="d") ) {
     d_ = std::atof(words[words.size()-1].c_str());
     std::cout << "-> Distance d = " << d_ << " mm" << std::endl;
   }
+
+}
+
+
+void IScan::readDataLine( const std::vector< std::string >& words ) {
+
+  float x = std::atof( words[0].c_str() );
+
+  std::vector<float> v_i;
+  for( unsigned iw=1; iw<words.size(); ++iw ) {
+    if( words[iw][0] == '#' ) break; // ignore from comment onwards
+    v_i.push_back( std::atof(words[iw].c_str()) );
+  }
+
+  addPointToGraph( x, v_i );
+
+}
+
+
+
+void IScan::scaleDataPoints( float scale ) {
+
+  for( unsigned iPoint=0; iPoint<graph_->GetN(); ++iPoint ) {
+
+    double x,y;
+    graph_->GetPoint( iPoint, x, y );
+    double xerr, yerr;
+    xerr = graph_->GetErrorX( iPoint );
+    yerr = graph_->GetErrorY( iPoint );
+
+    graph_->SetPoint( iPoint, x, y*scale );
+    graph_->SetPointError( iPoint, xerr, abs(yerr*scale) );
+
+  } // for ipoints
+
+}
+
+
+void IScan::addPointToGraph( float hv, std::vector<float> i_meas ) {
+
+  float mean, rms;
+  getMeanRMS( i_meas, mean, rms );
+
+  int iPoint = this->graph()->GetN();
+  this->graph()->SetPoint     ( iPoint, hv, mean );
+  this->graph()->SetPointError( iPoint, 1., rms  );
 
 }
 
@@ -178,19 +223,53 @@ void IScan::readFile( const std::string& name ) {
 
       if( line[0] == '#' ) {
 
-        this->readCommentLine(words);
+        readCommentLine(words);
 
         continue;
 
       }
 
-      this->readDataLine( words );
+      readDataLine( words );
 
 
     }  // while get lines
 
   } // if file good
 
+
+}
+
+
+
+void IScan::getMeanRMS( std::vector<float> v, float& mean, float& rms ) {
+
+  mean = 0.;
+  rms = 0.;
+
+  if( v.size()<2 ) {
+
+    std::cout << "[IScan::getMeanRMS] Data vector size < 2" << std::endl;
+    exit(2);
+
+  } else if( v.size()==2 ) { // first is mean second is RMS
+
+    mean = v[0];
+    rms  = v[1];
+
+  } else { // just a number of measurements
+
+    for( unsigned i=0; i<v.size(); ++i )
+      mean += v[i];
+    
+    mean /= (float)(v.size());
+
+
+    for( unsigned i=0; i<v.size(); ++i ) 
+      rms += (v[i] - mean)*(v[i] - mean);
+    rms /= (float)(v.size()-1);
+    rms = sqrt(rms);
+
+  }  // if
 
 }
 
