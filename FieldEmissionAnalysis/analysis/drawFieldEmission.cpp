@@ -1,5 +1,5 @@
 #include "AndCommon.h"
-#include "IVScan.h"
+#include "IVScanFN.h"
 
 #include <iostream>
 #include <fstream>
@@ -24,7 +24,7 @@ int main( int argc, char* argv[] ) {
     exit(1);
   }
 
-  std::string name( argv[1] );
+  std::string name( AndCommon::removePathAndSuffix(argv[1]) );
 
   TStyle* style = AndCommon::setStyle();
   style->SetPadLeftMargin(0.12);
@@ -32,8 +32,53 @@ int main( int argc, char* argv[] ) {
   style->SetTitleYOffset(1.15);
   style->cd();
 
-  IVScan ivs( name );
 
+  float hvMin = -1.;
+  float hvMax = -1.;
+  float scale = 1.;
+
+  if( name=="CNTArO2Etching_N1_d5_20221130" ) {
+
+    hvMin = 480.;
+    hvMax = 560.;
+    scale = -1.;
+
+  } else if( name=="CNTArO2Etching_N1_d4_20221130" ) {
+
+    hvMin = 385.;
+    hvMax = 440.;
+    scale = -1.;
+
+  } else if( name=="CNTArO2Etching_N1_d3_20221130" ) {
+
+    hvMin = 280.;
+    hvMax = 350.;
+    scale = -1.;
+
+  } else if( name=="CNTArO2Etching_AG_d5_new" ) {
+
+    hvMin = 1930.;
+    hvMax = 2100.;
+    scale = -1.;
+
+  } else if( name=="CNTArO2Etching_AG_d4_new" ) {
+
+    hvMin = 1500.;
+    hvMax = 1800.;
+    scale = -1.;
+
+  } else if( name=="CNTArO2Etching_AG_d3_new" ) {
+
+    hvMin = 1110.;
+    hvMax = 1230.;
+    scale = -1.;
+
+  }
+
+
+  IVScanFN ivs( name, scale, hvMin, hvMax );
+
+  
 
   TGraphErrors* graph = ivs.graph();
 
@@ -45,12 +90,14 @@ int main( int argc, char* argv[] ) {
   TCanvas* c1 = new TCanvas( "c1", "", 600, 600 );
   c1->cd();
 
-  float xMin = 1300.;
-  float xMax = 2999.;
+  //float xMin = 1300.;
+  //float xMax = 2999.;
+  float xMin = 0.9*hvMin;
+  float xMax = 1.1*hvMax;
 
-  TH2D* h2_axes = new TH2D( "axes", "", 10, xMin, xMax, 10, 0., 30000. );
+  TH2D* h2_axes = new TH2D( "axes", "", 10, xMin, xMax, 10, 0., 30. );
   h2_axes->SetXTitle( "-#DeltaV (V)" );
-  h2_axes->SetYTitle( "I (nA)" );
+  h2_axes->SetYTitle( "I (pA)" );
   h2_axes->Draw();
 
   TPaveText* pd_text = new TPaveText( 0.2, 0.75, 0.5, 0.85, "brNDC" );
@@ -73,7 +120,7 @@ int main( int argc, char* argv[] ) {
   c1->Clear();
   c1->SetLogy();
 
-  TH2D* h2_axes_log = new TH2D( "axes_log", "", 10, xMin, xMax, 10, 2, 200000. );
+  TH2D* h2_axes_log = new TH2D( "axes_log", "", 10, xMin, xMax, 10, 0.02, 20. );
   h2_axes_log->SetXTitle( "-#DeltaV (V)" );
   h2_axes_log->SetYTitle( "I (nA)" );
   h2_axes_log->Draw();
@@ -90,10 +137,13 @@ int main( int argc, char* argv[] ) {
   c1_fn->Clear();
 
 
-  //TH2D* h2_axes_fn = new TH2D( "axes_fn", "", 10, 0.0005, 0.0012, 10, IVScan::yMinFN(), IVScan::yMaxFN() );
-  TH2D* h2_axes_fn = new TH2D( "axes_fn", "", 10, IVScan::xMinFN(), IVScan::xMaxFN(), 10, IVScan::yMinFN(), IVScan::yMaxFN() );
-  h2_axes_fn->SetXTitle( IVScan::xTitleFN().c_str() );
-  h2_axes_fn->SetYTitle( IVScan::yTitleFN().c_str() );
+  float xMinFN = 1./hvMax;
+  float xMaxFN = 1./hvMin;
+
+  //TH2D* h2_axes_fn = new TH2D( "axes_fn", "", 10, 0.0005, 0.0012, 10, IVScanFN::yMinFN(), IVScanFN::yMaxFN() );
+  TH2D* h2_axes_fn = new TH2D( "axes_fn", "", 10, xMinFN, xMaxFN, 10, IVScanFN::yMinFN(), IVScanFN::yMaxFN() );
+  h2_axes_fn->SetXTitle( IVScanFN::xTitleFN().c_str() );
+  h2_axes_fn->SetYTitle( IVScanFN::yTitleFN().c_str() );
   h2_axes_fn->Draw();
 
   gr_fn->SetMarkerStyle(20);
