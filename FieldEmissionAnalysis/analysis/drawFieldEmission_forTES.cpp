@@ -42,7 +42,7 @@ int main( int argc, char* argv[] ) {
 
   float xMax = 2200.;
   float xMax_E = 500.;
-  float yMax_cross = 1000.;
+  float yMax_cross = 0.;
   std::vector< std::string > scans;
 
   if( argc > 1 ) {
@@ -62,10 +62,11 @@ int main( int argc, char* argv[] ) {
       sampleName = "Mild Ar/O_{2} Etching";
       xMax = 800.;
       xMax_E = 200.;
-      yMax_cross = 1000.;
-      scans.push_back( "CNTArO2Etching_N1_d3_new_2" );
-      scans.push_back( "CNTArO2Etching_N1_d4_new" );
-      scans.push_back( "CNTArO2Etching_N1_d5_new" );
+      yMax_cross = 700.;
+      scans.push_back( "CNTArO2Etching_N1_d2_20221130" );
+      scans.push_back( "CNTArO2Etching_N1_d3_20221130" );
+      scans.push_back( "CNTArO2Etching_N1_d4_20221130" );
+      scans.push_back( "CNTArO2Etching_N1_d5_20221130" );
 
     } else {
 
@@ -210,7 +211,9 @@ int main( int argc, char* argv[] ) {
   TCanvas* c1_cross = new TCanvas( "c1_cross", "", 600, 600 );
   c1_cross->cd();
 
-  TH2D* h2_axes_crossing = new TH2D( "axes_crossing", "", 10, 0., 6., 10, 0., yMax_cross );
+  float xMax_cross = 6.;
+
+  TH2D* h2_axes_crossing = new TH2D( "axes_crossing", "", 10, 0., xMax_cross, 10, 0., yMax_cross );
   h2_axes_crossing->SetXTitle( "d(anode-cathode) [mm]" );
   h2_axes_crossing->SetYTitle( "#DeltaV [V]" );
   h2_axes_crossing->Draw();
@@ -230,17 +233,23 @@ int main( int argc, char* argv[] ) {
   f1_crossFit->SetLineWidth(1);
   gr_crossing_1p->Fit( f1_crossFit, "R" );
 
+  TLine* line_100V = new TLine( 0., 100., xMax_cross, 100. );
+  line_100V->Draw("same");
+
+  std::cout << "Crossing fit: f(2 mm) = " << f1_crossFit->Eval(2.) << " V" << std::endl;
   std::cout << "Crossing fit: f(1 mm) = " << f1_crossFit->Eval(1.) << " V" << std::endl;
+  std::cout << "Crossing fit: 100V @ d = " << f1_crossFit->GetX(100.) << " mm " << std::endl;
+
 
   gr_crossing_1p ->Draw("Psame");
-  gr_crossing_02p->Draw("Psame");
+  //gr_crossing_02p->Draw("Psame");
 
   TLegend* legend_cross = new TLegend( 0.2, 0.7, 0.5, 0.9 );
   legend_cross->SetFillColor(0);
   legend_cross->SetTextSize(0.035);
   legend_cross->AddEntry( gr_crossing_1p , "I = 1 pA", "PL" );
   legend_cross->AddEntry( gr_crossing_02p, "I = 0.2 pA", "P" );
-  legend_cross->Draw();
+  //legend_cross->Draw();
 
 
   gPad->RedrawAxis();
