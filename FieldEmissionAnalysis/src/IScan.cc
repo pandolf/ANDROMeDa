@@ -14,7 +14,7 @@
 
 
 
-IScan::IScan( const std::string& name ) {
+IScan::IScan( const std::string& name, float scale, float xMin, float xMax ) {
 
   name_ = AndCommon::removePathAndSuffix(name);
 
@@ -24,13 +24,14 @@ IScan::IScan( const std::string& name ) {
   d_ = -1.;
 
   graph_ = new TGraphErrors(0);
-  //graph_->SetName( "gr_iv" );
   graph_->SetName( Form("gr_%s", name_.c_str()) );
   graph_->SetMarkerSize(1.8);
   graph_->SetMarkerStyle(20);
 
 
-  readFile();
+  readFile( getDataFileName(name_), xMin, xMax );
+
+  scaleDataPoints( scale );
 
   setColor(46);
 
@@ -149,23 +150,29 @@ void IScan::readCommentLine( const std::vector< std::string >& words ) {
 }
 
 
-void IScan::readDataLine( const std::vector< std::string >& words ) {
+void IScan::readDataLine( const std::vector< std::string >& words, float xMin, float xMax ) {
 
   float x = std::atof( words[0].c_str() );
 
-  std::vector<float> v_i;
-  for( unsigned iw=1; iw<words.size(); ++iw ) {
-    if( words[iw][0] == '#' ) break; // ignore from comment onwards
-    v_i.push_back( std::atof(words[iw].c_str()) );
-  }
+  if( x>xMin && x<xMax ) {
 
-  addPointToGraph( x, v_i );
+    std::vector<float> v_i;
+    for( unsigned iw=1; iw<words.size(); ++iw ) {
+      if( words[iw][0] == '#' ) break; // ignore from comment onwards
+      v_i.push_back( std::atof(words[iw].c_str()) );
+    }
+
+    addPointToGraph( x, v_i );
+
+  } // if x
 
 }
 
 
 
 void IScan::scaleDataPoints( float scale ) {
+
+  std::cout << "-> Scaling graph by factor: " << scale << std::endl;
 
   for( unsigned iPoint=0; iPoint<graph_->GetN(); ++iPoint ) {
 
@@ -196,12 +203,13 @@ void IScan::addPointToGraph( float hv, std::vector<float> i_meas ) {
 
 
 
-void IScan::readFile( const std::string& name ) {
+void IScan::readFile( const std::string& name, float xMin, float xMax ) {
 
 
   std::string fileName = (name=="") ? getDataFileName(name_) : getDataFileName(name);
 
   std::cout << "-> Opening data file: " << fileName << std::endl;
+  if( xMin > -50000. && xMax < 50000 ) std::cout << "-> Will add only data points with " << xMin << " < x < " << xMax << std::endl;
 
   std::ifstream ifs( fileName.c_str() );
 
@@ -229,13 +237,14 @@ void IScan::readFile( const std::string& name ) {
 
       }
 
-      readDataLine( words );
+      readDataLine( words, xMin, xMax );
 
 
     }  // while get lines
 
   } // if file good
 
+  std::cout << "-> Added " << graph_->GetN() << " data points." << std::endl;
 
 }
 

@@ -12,16 +12,20 @@ class IScan {
 
  public:
 
-  IScan( const std::string& name );
+  IScan( const std::string& name, float scale=1., float xMin=-99999., float xMax=+99999. );
 
   virtual ~IScan();
 
 
-  virtual void readFile( const std::string& name="" );
-
+  virtual void readFile( const std::string& name="", float xMin=-99999., float xMax=+99999. );
   virtual void readCommentLine( const std::vector< std::string >& words );
+  virtual void readDataLine( const std::vector< std::string >& words, float xMin=-99999., float xMax=+99999. );
 
-  virtual void readDataLine( const std::vector< std::string >& words ) = 0;
+  void scaleDataPoints( float scale = 1. );
+
+  void addPointToGraph( float hv, std::vector<float> i_meas );
+
+  void getMeanRMS( std::vector<float> v, float& mean, float& rms );
 
   std::string name() const;
 
