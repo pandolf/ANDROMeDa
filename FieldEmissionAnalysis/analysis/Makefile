@@ -13,8 +13,8 @@ ROOTFLAG = `${ROOTSYS}/bin/root-config --cflags --libs`
 EXTRALIBS := -L$(ROOTSYS)/lib -lHtml -lMathCore -lGenVector -lMinuit -lTreePlayer -lRooFitCore -lRooFit #-L$(ROOFIT_LIBDIR)/ 
 
 
-drawFieldEmission: drawFieldEmission.cpp AndCommon.o IScan.o IVScan.o
-	$(CC) -Wall $(INCLUDES) -o drawFieldEmission drawFieldEmission.cpp AndCommon.o IScan.o IVScan.o $(ROOTFLAG) $(EXTRALIBS)
+drawFieldEmission: drawFieldEmission.cpp AndCommon.o IScan.o IVScan.o IVScanFN.o
+	$(CC) -Wall $(INCLUDES) -o drawFieldEmission drawFieldEmission.cpp AndCommon.o IScan.o IVScan.o IVScanFN.o $(ROOTFLAG) $(EXTRALIBS)
 
 drawFieldEmission_forTES: drawFieldEmission_forTES.cpp AndCommon.o IScan.o IVScan.o
 	$(CC) -Wall $(INCLUDES) -o drawFieldEmission_forTES drawFieldEmission_forTES.cpp AndCommon.o IScan.o IVScan.o $(ROOTFLAG) $(EXTRALIBS)
@@ -25,8 +25,8 @@ drawCompareAnodeAndDrain: drawCompareAnodeAndDrain.cpp AndCommon.o IScan.o IVSca
 compareIVScans: compareIVScans.cpp AndCommon.o IScan.o IVScan.o
 	$(CC) -Wall $(INCLUDES) -o compareIVScans compareIVScans.cpp AndCommon.o IScan.o IVScan.o $(ROOTFLAG) $(EXTRALIBS)
 
-drawTimeStability: drawTimeStability.cpp AndCommon.o IScan.o IVScan.o
-	$(CC) -Wall $(INCLUDES) -o drawTimeStability drawTimeStability.cpp AndCommon.o IScan.o IVScan.o $(ROOTFLAG) $(EXTRALIBS)
+drawTimeStability: drawTimeStability.cpp AndCommon.o IScan.o 
+	$(CC) -Wall $(INCLUDES) -o drawTimeStability drawTimeStability.cpp AndCommon.o IScan.o $(ROOTFLAG) $(EXTRALIBS)
 
 
 
