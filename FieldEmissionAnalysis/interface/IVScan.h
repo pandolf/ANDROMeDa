@@ -14,21 +14,13 @@ class IVScan : public IScan {
 
  public:
 
-  IVScan( const std::string& name );
+  IVScan( const std::string& name, float scale=1., float xMin=-99999., float xMax=99999. );
 
   virtual ~IVScan();
 
-  virtual void readDataLine( const std::vector< std::string >& words );
-
   TGraphErrors* graph_vsE() const; // I vs deltaV/d = E (V/mm)
 
-  void addPointToGraph( float hv, std::vector<float> i_meas );
-
-
-
  private:
-
-  void getMeanRMS( std::vector<float> v, float& mean, float& rms );
 
 };
 
