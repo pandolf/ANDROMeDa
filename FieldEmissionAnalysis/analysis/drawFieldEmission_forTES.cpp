@@ -60,7 +60,7 @@ int main( int argc, char* argv[] ) {
     } else if( batchName=="CNTArO2Etching_N1" ) {
 
       sampleName = "Mild Ar/O_{2} Etching";
-      xMax = 800.;
+      xMax = 600.;
       xMax_E = 200.;
       yMax_cross = 700.;
       scans.push_back( "CNTArO2Etching_N1_d2_20221130" );
@@ -91,7 +91,7 @@ int main( int argc, char* argv[] ) {
 
   float xMin = 0.;
 
-  TH2D* h2_axes = new TH2D( "axes", "", 10, xMin, xMax, 10, -3., 1. );
+  TH2D* h2_axes = new TH2D( "axes", "", 10, xMin, xMax, 10, -3., 0.6 );
   h2_axes->SetXTitle( "-#DeltaV(CNT-anode) [V]" );
   h2_axes->SetYTitle( "I(anode) [pA]" );
   h2_axes->Draw();
@@ -111,7 +111,7 @@ int main( int argc, char* argv[] ) {
 
 
 
-  TH2D* h2_axes_E = new TH2D( "axes_E", "", 10, xMin, xMax_E, 10, -3., 1. );
+  TH2D* h2_axes_E = new TH2D( "axes_E", "", 10, xMin, xMax_E, 10, -3., 0.6 );
   h2_axes_E->SetXTitle( "E [V/mm]" );
   h2_axes_E->SetYTitle( "I(anode) [pA]" );
   h2_axes_E->Draw();
@@ -125,11 +125,11 @@ int main( int argc, char* argv[] ) {
 
 
 
-  TLegend* legend = new TLegend( 0.17, 0.2, 0.35, 0.4, sampleName.c_str() );
+  TLegend* legend = new TLegend( 0.17, 0.37-0.05*scans.size(), 0.35, 0.42, sampleName.c_str() );
   legend->SetFillColor(0);
   legend->SetTextSize(0.035);
   
-  TLegend* legend_E = new TLegend( 0.17, 0.2, 0.35, 0.4, sampleName.c_str() );
+  TLegend* legend_E = new TLegend( 0.17, 0.37-0.05*scans.size(), 0.35, 0.42, sampleName.c_str() );
   legend_E->SetFillColor(0);
   legend_E->SetTextSize(0.035);
   
