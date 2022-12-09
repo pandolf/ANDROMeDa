@@ -22,8 +22,8 @@ drawFieldEmission_forTES: drawFieldEmission_forTES.cpp AndCommon.o IScan.o IVSca
 drawCompareAnodeAndDrain: drawCompareAnodeAndDrain.cpp AndCommon.o IScan.o IVScan.o
 	$(CC) -Wall $(INCLUDES) -o drawCompareAnodeAndDrain drawCompareAnodeAndDrain.cpp AndCommon.o IScan.o IVScan.o $(ROOTFLAG) $(EXTRALIBS)
 
-compareIVScans: compareIVScans.cpp AndCommon.o IScan.o IVScan.o
-	$(CC) -Wall $(INCLUDES) -o compareIVScans compareIVScans.cpp AndCommon.o IScan.o IVScan.o $(ROOTFLAG) $(EXTRALIBS)
+compareFN: compareFN.cpp AndCommon.o IScan.o IVScan.o IVScanFN.o
+	$(CC) -Wall $(INCLUDES) -o compareFN compareFN.cpp AndCommon.o IScan.o IVScan.o IVScanFN.o $(ROOTFLAG) $(EXTRALIBS)
 
 drawTimeStability: drawTimeStability.cpp AndCommon.o IScan.o 
 	$(CC) -Wall $(INCLUDES) -o drawTimeStability drawTimeStability.cpp AndCommon.o IScan.o $(ROOTFLAG) $(EXTRALIBS)
