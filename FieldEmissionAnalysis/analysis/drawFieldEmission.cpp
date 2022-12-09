@@ -15,6 +15,8 @@
 
 
 
+IVScanFN analyzeFN( const std::string& name );
+
 
 
 int main( int argc, char* argv[] ) {
@@ -31,6 +33,31 @@ int main( int argc, char* argv[] ) {
   style->SetPadRightMargin(0.11);
   style->SetTitleYOffset(1.15);
   style->cd();
+
+
+  std::vector< IVScanFN > scans;
+
+  if( name == "CNTArO2Etching_N1" ) {
+
+    scans.push_back( analyzeFN( "CNTArO2Etching_N1_d5_20221130" ) );
+    scans.push_back( analyzeFN( "CNTArO2Etching_N1_d4_20221130" ) );
+    scans.push_back( analyzeFN( "CNTArO2Etching_N1_d3_20221130" ) );
+    scans.push_back( analyzeFN( "CNTArO2Etching_N1_d2_20221130" ) );
+
+  } else {
+
+    scans.push_back( analyzeFN(name) );
+
+  }
+    
+
+  return 0;
+
+}
+
+
+
+IVScanFN analyzeFN( const std::string& name ) {
 
 
   float hvMin = -1.;
@@ -52,6 +79,12 @@ int main( int argc, char* argv[] ) {
   } else if( name=="CNTArO2Etching_N1_d3_20221130" ) {
 
     hvMin = 280.;
+    hvMax = 350.;
+    scale = -1.;
+
+  } else if( name=="CNTArO2Etching_N1_d2_20221130" ) {
+
+    hvMin = 175.;
     hvMax = 350.;
     scale = -1.;
 
@@ -81,6 +114,11 @@ int main( int argc, char* argv[] ) {
   
 
   TGraphErrors* graph = ivs.graph();
+
+  if( graph->GetN()==0 ) {
+    std::cout << "-> ERROR! No data points in graph. Check the data file or change hvMin and hvMax to select more points." << std::endl;
+    exit(1);
+  }
 
 
   std::string outdir(Form("plots/%s/", ivs.name().c_str()));
@@ -183,9 +221,12 @@ int main( int argc, char* argv[] ) {
   std::cout << "------------------" << std::endl;
   std::cout << " gamma: " << gamma << " +/- " << gamma_err  << std::endl;
   std::cout << "------------------" << std::endl;
+  std::cout << std::endl << std::endl;
 
 
-  TFile* outfile = TFile::Open( Form("%s/graphs.root", outdir.c_str()), "RECREATE" );
+  std::string graphsFileName(Form("%s/graphs.root", outdir.c_str()));
+
+  TFile* outfile = TFile::Open( graphsFileName.c_str(), "RECREATE" );
   outfile->cd();
 
   graph->Write();
@@ -194,8 +235,10 @@ int main( int argc, char* argv[] ) {
   outfile->Write();
   outfile->Close();
 
+  std::cout << "-> Stored graphs in: " << graphsFileName << std::endl;
 
-  return 0;
+
+  return ivs;
 
 }
 
