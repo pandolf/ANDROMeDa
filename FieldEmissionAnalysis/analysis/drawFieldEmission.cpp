@@ -11,6 +11,7 @@
 #include "TMath.h"
 #include "TF1.h"
 #include "TFile.h"
+#include "TGaxis.h"
 
 
 
@@ -61,8 +62,8 @@ IVScanFN analyzeFN( const std::string& name ) {
 
 
   float hvMin = -1.;
-  float hvMax = -1.;
-  float scale = 1.;
+  float hvMax = 3000.;
+  float scale = -1.;
 
   if( name=="CNTArO2Etching_N1_d5_20221130" ) {
 
@@ -106,6 +107,18 @@ IVScanFN analyzeFN( const std::string& name ) {
     hvMax = 1230.;
     scale = -1.;
 
+  } else if( name=="CNTArO2Etching_AG_d4_20221214" ) {
+
+    hvMin = 789.;
+    hvMax = 3000.;
+    scale = -1.;
+
+  } else if( name=="CNTArO2Etching_AG2_d3_20221215" ) {
+
+    hvMin = 210.;
+    hvMax = 3000.;
+    scale = -1.;
+
   }
 
 
@@ -130,10 +143,19 @@ IVScanFN analyzeFN( const std::string& name ) {
 
   //float xMin = 1300.;
   //float xMax = 2999.;
-  float xMin = 0.9*hvMin;
-  float xMax = 1.1*hvMax;
+  //float xMin = 0.9*hvMin;
+  //float xMax = 1.1*hvMax;
 
-  TH2D* h2_axes = new TH2D( "axes", "", 10, xMin, xMax, 10, 0., 30. );
+
+  float xMin, xMax, yMin, yMax;
+  AndCommon::findGraphRanges( graph, xMin, xMax, yMin, yMax );
+
+  xMin = 0.9*xMin;
+  xMax = 1.1*xMax;
+  yMin = 0.9*yMin;
+  yMax = 1.1*yMax;
+
+  TH2D* h2_axes = new TH2D( "axes", "", 10, 0., xMax, 10, 0., yMax );
   h2_axes->SetXTitle( "-#DeltaV (V)" );
   h2_axes->SetYTitle( "I (pA)" );
   h2_axes->Draw();
@@ -158,7 +180,7 @@ IVScanFN analyzeFN( const std::string& name ) {
   c1->Clear();
   c1->SetLogy();
 
-  TH2D* h2_axes_log = new TH2D( "axes_log", "", 10, xMin, xMax, 10, 0.02, 20. );
+  TH2D* h2_axes_log = new TH2D( "axes_log", "", 10, 0., xMax, 10, 0.1*yMin, 20.*yMax);
   h2_axes_log->SetXTitle( "-#DeltaV (V)" );
   h2_axes_log->SetYTitle( "I (nA)" );
   h2_axes_log->Draw();
@@ -174,12 +196,13 @@ IVScanFN analyzeFN( const std::string& name ) {
   TCanvas* c1_fn = new TCanvas( "c1_fn", "", 600, 600 );
   c1_fn->Clear();
 
+  TGaxis::SetMaxDigits(2);
 
-  float xMinFN = 1./hvMax;
-  float xMaxFN = 1./hvMin;
+  float xMinFN = 1./xMax;
+  float xMaxFN = 1./xMin;
 
   //TH2D* h2_axes_fn = new TH2D( "axes_fn", "", 10, 0.0005, 0.0012, 10, IVScanFN::yMinFN(), IVScanFN::yMaxFN() );
-  TH2D* h2_axes_fn = new TH2D( "axes_fn", "", 10, xMinFN, xMaxFN, 10, IVScanFN::yMinFN(), IVScanFN::yMaxFN() );
+  TH2D* h2_axes_fn = new TH2D( "axes_fn", "", 10, xMinFN, xMaxFN, 10, -80, 20);
   h2_axes_fn->SetXTitle( IVScanFN::xTitleFN().c_str() );
   h2_axes_fn->SetYTitle( IVScanFN::yTitleFN().c_str() );
   h2_axes_fn->Draw();
