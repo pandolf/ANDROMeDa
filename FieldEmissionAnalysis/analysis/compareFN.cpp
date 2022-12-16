@@ -37,13 +37,36 @@ int main( int argc, char* argv[] ) {
 
   std::string legendTitle;
 
+  float xMin = 0.;
+  float xMax = 5E-3;
+  float yMin = -20.;
+  float yMax = -6.;
+
   if( batchName == "CNTArO2Etching_N1_20221130" ) {
 
     scanNames.push_back( "CNTArO2Etching_N1_d3_20221130" );
     scanNames.push_back( "CNTArO2Etching_N1_d4_20221130" );
     scanNames.push_back( "CNTArO2Etching_N1_d5_20221130" );
 
+    xMin = 0.;
+    xMax = 5E-3;
+    yMin = -19.999;
+    yMax = -6.;
+
     legendTitle = "Mild Ar/O_{2} Etching";
+
+  } else if( batchName == "CNTArO2Etching_AG" ) {
+
+    scanNames.push_back( "CNTArO2Etching_AG_d3_new" );
+    scanNames.push_back( "CNTArO2Etching_AG_d4_new" );
+    scanNames.push_back( "CNTArO2Etching_AG_d5_new" );
+
+    xMin = 0.2E-3;
+    xMax = 1.2E-3;
+    yMin = -18.999;
+    yMax = -13.;
+    
+    legendTitle = "As Grown (No Etching)";
 
   }
 
@@ -57,7 +80,7 @@ int main( int argc, char* argv[] ) {
 
 
   //TH2D* h2_axes = new TH2D( "axes", "", 10, IVScanFN::xMinFN(), IVScanFN::xMaxFN(), 10, IVScanFN::yMinFN(), IVScanFN::yMaxFN() );
-  TH2D* h2_axes = new TH2D( "axes", "", 10, 0., 0.005, 10, IVScanFN::yMinFN(), -6); 
+  TH2D* h2_axes = new TH2D( "axes", "", 10, xMin, xMax, 10, yMin, yMax );
   h2_axes->SetXTitle( IVScanFN::xTitleFN().c_str() );
   h2_axes->SetYTitle( IVScanFN::yTitleFN().c_str() );
   h2_axes->Draw();
