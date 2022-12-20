@@ -38,11 +38,52 @@ int main( int argc, char* argv[] ) {
   std::string legendTitle;
 
   float xMin = 0.;
-  float xMax = 5E-3;
+  float xMax = 4E-3; // corresponds to 1/250 V-1
   float yMin = -20.;
-  float yMax = -6.;
+  float yMax = 5.;
 
-  if( batchName == "CNTArO2Etching_N1_20221130" ) {
+  if( batchName == "CNTArO2Etching_AG_old" ) {
+
+    scanNames.push_back( "CNTArO2Etching_AG_d3_new" );
+    scanNames.push_back( "CNTArO2Etching_AG_d4_new" );
+    scanNames.push_back( "CNTArO2Etching_AG_d5_new" );
+
+    xMin = 0.2E-3;
+    xMax = 1.5E-3;
+    yMin = -18.999;
+    yMax = -13.;
+    
+    legendTitle = "As Grown (No Etching)";
+
+  } else if( batchName == "CNTArO2Etching_AG_20221220" || batchName == "CNTArO2Etching_AG" ) {
+
+    scanNames.push_back( "CNTArO2Etching_AG_d3_20221220" );
+    scanNames.push_back( "CNTArO2Etching_AG_d4_20221220" );
+    scanNames.push_back( "CNTArO2Etching_AG_d5_20221220" );
+
+    xMin = 0.2E-3;
+    xMax = 1.5E-3;
+    yMin = -9.999;
+    yMax = 5.;
+    
+    legendTitle = "As Grown (No Etching)";
+
+
+  } else if( batchName == "CNTArO2Etching_AG2" ) {
+
+    scanNames.push_back( "CNTArO2Etching_AG2_d3_20221216" );
+    scanNames.push_back( "CNTArO2Etching_AG2_d4_20221216" );
+    scanNames.push_back( "CNTArO2Etching_AG2_d5_20221216" );
+
+    //xMin = 0.2E-3;
+    //xMax = 1.2E-3;
+    //yMin = -18.999;
+    //yMax = -13.;
+    
+    legendTitle = "As Grown (No Etching)";
+
+
+  } else if( batchName == "CNTArO2Etching_N1" ) {
 
     scanNames.push_back( "CNTArO2Etching_N1_d3_20221130" );
     scanNames.push_back( "CNTArO2Etching_N1_d4_20221130" );
@@ -53,20 +94,44 @@ int main( int argc, char* argv[] ) {
     yMin = -19.999;
     yMax = -6.;
 
-    legendTitle = "Mild Ar/O_{2} Etching";
+    legendTitle = "Ar/O_{2} Etching N.1";
 
-  } else if( batchName == "CNTArO2Etching_AG" ) {
+  } else if( batchName == "CNTArO2Etching_N6" ) {
 
-    scanNames.push_back( "CNTArO2Etching_AG_d3_new" );
-    scanNames.push_back( "CNTArO2Etching_AG_d4_new" );
-    scanNames.push_back( "CNTArO2Etching_AG_d5_new" );
+    scanNames.push_back( "CNTArO2Etching_N6_d3_20221219_2" );
+    scanNames.push_back( "CNTArO2Etching_N6_d4_20221219_3" );
+    scanNames.push_back( "CNTArO2Etching_N6_d5_20221219_2" );
 
-    xMin = 0.2E-3;
-    xMax = 1.2E-3;
-    yMin = -18.999;
-    yMax = -13.;
+    xMin = 1.2E-3;
+    xMax = 4.2E-3;
+    yMin = -19.999;
+    yMax = 5.;
     
-    legendTitle = "As Grown (No Etching)";
+    legendTitle = "Ar/O_{2} Etching N.6";
+
+  } else if( batchName == "CNTArO2Etching_N6_old" ) {
+
+    scanNames.push_back( "CNTArO2Etching_N6_d3_20221219" );
+    scanNames.push_back( "CNTArO2Etching_N6_d4_20221219" );
+    scanNames.push_back( "CNTArO2Etching_N6_d5_20221219" );
+
+    xMin = 1.2E-3;
+    xMax = 4.2E-3;
+    yMin = -19.999;
+    yMax = 5.;
+    
+    legendTitle = "Ar/O_{2} Etching N.6";
+
+  } else {
+
+    scanNames.push_back( std::string(argv[1]));
+    if( argc>2 ) scanNames.push_back( std::string(argv[2]));
+    if( argc>3 ) scanNames.push_back( std::string(argv[3]));
+
+    batchName = scanNames[0];
+
+    for( unsigned i=1; i<scanNames.size(); ++i )
+      batchName = batchName + "_vs_" + scanNames[i];
 
   }
 
