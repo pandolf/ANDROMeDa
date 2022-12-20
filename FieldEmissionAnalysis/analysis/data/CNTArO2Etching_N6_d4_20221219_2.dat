@@ -1,0 +1,9 @@
+#p 3E-6
+#d 4
+#m k6487
+# these '_2' measurements were made after linking the two grounds of the picoammeter and the HV generator
+300 -172.10 0.79
+351 -8.097E3 0.54E3
+400 -60.0E3 3.8E3
+450 -274E3 35E3
+#500 -658E3 74E3
