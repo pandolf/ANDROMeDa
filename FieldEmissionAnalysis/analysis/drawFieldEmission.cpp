@@ -202,7 +202,7 @@ IVScanFN analyzeFN( const std::string& name ) {
   float xMaxFN = 1./xMin;
 
   //TH2D* h2_axes_fn = new TH2D( "axes_fn", "", 10, 0.0005, 0.0012, 10, IVScanFN::yMinFN(), IVScanFN::yMaxFN() );
-  TH2D* h2_axes_fn = new TH2D( "axes_fn", "", 10, xMinFN, xMaxFN, 10, -80, 20);
+  TH2D* h2_axes_fn = new TH2D( "axes_fn", "", 10, xMinFN, xMaxFN, 10, -20, 5);
   h2_axes_fn->SetXTitle( IVScanFN::xTitleFN().c_str() );
   h2_axes_fn->SetYTitle( IVScanFN::yTitleFN().c_str() );
   h2_axes_fn->Draw();
@@ -217,6 +217,33 @@ IVScanFN analyzeFN( const std::string& name ) {
   std::cout << std::endl;
   std::cout << "Chi^2 / NDF: " << ivs.lineFN()->GetChisquare() << " / " << ivs.lineFN()->GetNDF() <<std::endl;
   std::cout << std::endl;
+
+
+  // check outliers:
+  for( unsigned iPoint=0; iPoint<gr_fn->GetN(); ++iPoint ) {
+
+    double x, y;
+    gr_fn->GetPoint( iPoint, x, y );
+
+    double yerr = gr_fn->GetErrorY( iPoint );
+
+    float delta = fabs( ivs.lineFN()->Eval(x)-y )/yerr;
+
+    if( delta > 3. ) {
+
+      std::cout << std::endl;
+      std::cout << "   WARNING!! POINT #" << iPoint << " is an OUTLIER!" << std::endl;
+      std::cout << "     hv = " << 1/x << " Volts" << std::endl;
+      std::cout << "     y = " << y << " +/- " << yerr << std::endl;
+      std::cout << "     f(x) = " << ivs.lineFN()->Eval(x) << std::endl;
+      std::cout << "     Delta = " << delta << " sigma" << std::endl;
+      std::cout << std::endl;
+
+    } // if outlier
+
+  } // for points
+
+ 
 
   float gamma = ivs.gamma();
   float gamma_err = ivs.gamma_err();
@@ -241,9 +268,9 @@ IVScanFN analyzeFN( const std::string& name ) {
   c1_fn->SaveAs( Form("%s/fn.pdf", outdir.c_str()) );
 
   std::cout << std::endl;
-  std::cout << "------------------" << std::endl;
+  std::cout << "---------------------------------" << std::endl;
   std::cout << " gamma: " << gamma << " +/- " << gamma_err  << std::endl;
-  std::cout << "------------------" << std::endl;
+  std::cout << "---------------------------------" << std::endl;
   std::cout << std::endl << std::endl;
 
 
@@ -259,6 +286,7 @@ IVScanFN analyzeFN( const std::string& name ) {
   outfile->Close();
 
   std::cout << "-> Stored graphs in: " << graphsFileName << std::endl;
+
 
 
   return ivs;
