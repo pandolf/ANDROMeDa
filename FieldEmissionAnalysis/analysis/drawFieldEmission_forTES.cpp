@@ -49,7 +49,7 @@ int main( int argc, char* argv[] ) {
 
     if( batchName=="CNTArO2Etching_AG" ) {
 
-      sampleName = "CNT as grown (no etching)";
+      sampleName = "As Grown (No Etching)";
       xMax = 2200.;
       xMax_E = 500.;
       yMax_cross = 2500.;
