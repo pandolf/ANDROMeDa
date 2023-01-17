@@ -8,6 +8,7 @@
 #include "TCanvas.h"
 #include "TH1D.h"
 #include "TH2D.h"
+#include "TLegend.h"
 
 
 
@@ -15,6 +16,7 @@
 void computeRollingAverage( float *pshape,  float *pshapeRA, int nSamples );
 void drawPulseShapes( int ev, float *pshape, float *pshapeRA );
 float computeAmp( float *pshape );
+float computeBaseline( float *pshape, int nSamples );
 
 
 
@@ -22,7 +24,10 @@ float computeAmp( float *pshape );
 int main( int argc, char* argv[] ) {
 
 
-  int nSamples = 5;
+  AndCommon::setStyle();
+
+  float ampMax = 0.012;
+  int nSamples = 20;
 
   if( argc > 1 )
     nSamples = atoi(argv[1]);
@@ -44,11 +49,11 @@ int main( int argc, char* argv[] ) {
 
   float pshapeRA[1024];
 
-  TH1D* h1_amp   = new TH1D("amp"  , "", 100, 0., 0.05 );
-  TH1D* h1_ampRA = new TH1D("ampRA", "", 100, 0., 0.05 );
+  TH1D* h1_amp   = new TH1D("amp"  , "", 100, 0., ampMax );
+  TH1D* h1_ampRA = new TH1D("ampRA", "", 100, 0., ampMax );
 
-  //int nentries = tree->GetEntries();
-  int nentries = 10;
+  int nentries = tree->GetEntries();
+  //int nentries = 10;
 
   for( unsigned iEntry=0; iEntry<nentries; ++iEntry ) {
 
@@ -58,10 +63,10 @@ int main( int argc, char* argv[] ) {
 
     computeRollingAverage( pshape, pshapeRA, nSamples );
 
-    if( ev<10 ) 
+    if( ev<20 ) 
       drawPulseShapes( ev, pshape, pshapeRA );
 
-//  h1_ampRA->Fill( computeAmp(pshapeRA) );
+    h1_ampRA->Fill( computeAmp(pshapeRA) );
 
   } // for entries
 
@@ -69,8 +74,37 @@ int main( int argc, char* argv[] ) {
   outfile->cd();
 
   h1_amp->Write();
+  h1_ampRA->Write();
 
   outfile->Close();
+
+  TCanvas* c1 = new TCanvas( "c1", "", 600, 600 );
+  c1->cd();
+
+  TH2D* h2_axes = new TH2D( "axes", "", 10, 0., ampMax, 10, 0., 0.1 );
+  h2_axes->SetXTitle( "Amplitude [V]" );
+  h2_axes->SetYTitle( "Normalized to Unity");
+  h2_axes->Draw();
+
+  h1_amp->SetLineColor(kGray+3);
+  h1_amp->SetLineWidth(2);
+
+  h1_ampRA->SetLineColor(46);
+  h1_ampRA->SetLineWidth(2);
+
+  h1_amp  ->DrawNormalized("same");
+  h1_ampRA->DrawNormalized("same");
+
+  TLegend* legend = new TLegend( 0.2, 0.75, 0.7, 0.9, "^{55}Fe" );
+  legend->SetFillColor(0);
+  legend->SetTextSize(0.035);
+  legend->AddEntry(h1_amp, "Raw amplitude", "L");
+  legend->AddEntry(h1_ampRA, Form("Rolling average (#pm%d samples)", nSamples), "L");
+  legend->Draw("same");
+
+  gPad->RedrawAxis();
+
+  c1->SaveAs( "provaRA.pdf" );
 
   return 0;
 
@@ -116,10 +150,33 @@ void computeRollingAverage( float *pshape,  float *pshapeRA, int nSamples ) {
 
 float computeAmp( float *pshape ) {
 
-  return 1.;
+  float base = computeBaseline( pshape, 16 );
+
+  float amp = 0.;
+
+  for( unsigned i=16; i<1024; i++ )
+    if( fabs(pshape[i]-base) > fabs(amp) ) amp = pshape[i];
+
+  return amp;
 
 }
 
+
+float computeBaseline( float *pshape, int nSamples ) {
+
+  float sum = 0;
+  float n = 0.;
+
+  for( unsigned i=0; i<nSamples; ++i ) {
+
+    sum += pshape[i];
+    n += 1.;
+
+  }
+
+  return sum/n;
+
+}
 
 
 void drawPulseShapes( int ev, float *pshape, float *pshapeRA ) {
