@@ -1,4 +1,5 @@
 #include <iostream>
+#include <stdlib.h>
 
 #include "interface/AndCommon.h"
 
@@ -16,7 +17,15 @@ void drawPulseShapes( int ev, float *pshape, float *pshapeRA );
 float computeAmp( float *pshape );
 
 
-int main() {
+
+
+int main( int argc, char* argv[] ) {
+
+
+  int nSamples = 5;
+
+  if( argc > 1 )
+    nSamples = atoi(argv[1]);
 
 
   TFile* file = TFile::Open("Run_APDWL_HV380_Fe55_th6_Data_1_17_2023_Ascii.root");
@@ -47,7 +56,7 @@ int main() {
 
     h1_amp->Fill( amp );
 
-    computeRollingAverage( pshape,  pshapeRA, 3 );
+    computeRollingAverage( pshape, pshapeRA, nSamples );
 
     if( ev<10 ) 
       drawPulseShapes( ev, pshape, pshapeRA );
@@ -77,8 +86,8 @@ void computeRollingAverage( float *pshape,  float *pshapeRA, int nSamples ) {
 
   for( unsigned i=0; i<1024; i++ ) {
 
-    thisSum += pshape[i];
-    thisN += 1.;
+    thisSum = pshape[i];
+    thisN = 1.;
 
 
     for( int j = 1; j < nSamples; j++ ) {
@@ -130,10 +139,11 @@ void drawPulseShapes( int ev, float *pshape, float *pshapeRA ) {
   TCanvas* c1 = new TCanvas( Form("c1_%d", ev), "", 600, 600 );
   c1->cd();
 
-  TH2D* h2_axes = new TH2D( Form("axes_%d", ev), "", 10, 0., 1024., 10, -0.03, 0.06 );
+  TH2D* h2_axes = new TH2D( Form("axes_%d", ev), "", 10, 0., 1024., 10, -0.005, 0.01 );
   h2_axes->Draw();
 
   h1_pshapeRA->SetLineColor(kRed);
+  h1_pshapeRA->SetLineWidth(2);
 
   h1_pshape->Draw("same");
   h1_pshapeRA->Draw("same");
