@@ -92,7 +92,7 @@ int main( int argc, char* argv[] ) {
 
       if( words[0]=="===" && words[1]=="EVENT" && wasReadingEvent ) {
 
-        if( ev % 500 == 0 ) std::cout << "   ... analyzing event: " << ev << std::endl;
+        if( ev % 1000 == 0 ) std::cout << "   ... analyzing event: " << ev << std::endl;
 
         tree->Fill();
  
