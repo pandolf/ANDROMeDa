@@ -3,6 +3,8 @@
 #include <string>
 #include <stdlib.h>
 
+#include "AndCommon.h"
+
 #include "TFile.h"
 #include "TTree.h"
 #include "TString.h"
@@ -19,29 +21,21 @@ int main( int argc, char* argv[] ) {
 
   }
 
-  std::string fileName(argv[1]);
-  TString fileName_tstr(fileName);
-
-  if( fileName_tstr.BeginsWith("../data/") ) {
-    fileName.erase( 0, 8 );
-  }
+  std::string fullFileName(argv[1]);
+  std::string dataset = AndCommon::removePathAndSuffix(fullFileName);
+  std::string fileName = dataset + ".dat";
+  std::string pathAndFile = "./data/" + fileName;
 
 
-  std::ifstream fs(Form("../data/%s", fileName.c_str()));
+  std::ifstream fs(pathAndFile.c_str());
   if( !fs.good() ) {
-    std::cout << "-> No file called '" << fileName << "' found in '../data/'. Exiting." << std::endl;
+    std::cout << "-> No file called '" << fileName << "' found in './data/'. Exiting." << std::endl;
     exit(1);
   }
 
-  std::cout << "-> Opened ascii data file: " << fileName << std::endl;
+  std::cout << "-> Opened ascii data file: " << pathAndFile << std::endl;
 
-  size_t pos = 0;
-  std::string outfileName;
-  if((pos = fileName.find(".")) != std::string::npos) {
-    std::string prefix = fileName.substr(0, pos);
-    outfileName = prefix + ".root";
-  }
-
+  std::string outfileName = "./data/" + dataset + ".root";;
   TFile* outfile = TFile::Open( outfileName.c_str(), "recreate" );
   TTree* tree = new TTree( "tree", "" );
 
