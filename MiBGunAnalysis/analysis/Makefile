@@ -28,6 +28,9 @@ drawRollingAverage: drawRollingAverage.cpp AndCommon.o
 drawPulseShape: drawPulseShape.cpp AndCommon.o  
 	$(CC) -Wall $(INCLUDES) -o drawPulseShape drawPulseShape.cpp AndCommon.o $(ROOTFLAG) $(EXTRALIBS)
 
+drawNoiseVsPhysics: drawNoiseVsPhysics.cpp AndCommon.o  
+	$(CC) -Wall $(INCLUDES) -o drawNoiseVsPhysics drawNoiseVsPhysics.cpp AndCommon.o $(ROOTFLAG) $(EXTRALIBS)
+
 
 
 
