@@ -42,7 +42,7 @@ int main( int argc, char* argv[] ) {
     plotsToBeDrawn = 1;
   }
 
-  std::string plotsDir(Form("plots/%s", dataset.c_str()));
+  std::string plotsDir(Form("plots/%s/pulseshapes/", dataset.c_str()));
   system( Form("mkdir -p %s", plotsDir.c_str()) );
 
   TCanvas* c1 = new TCanvas("c1", "c1", 600, 600);

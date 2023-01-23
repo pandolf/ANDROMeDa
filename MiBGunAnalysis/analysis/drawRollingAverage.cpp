@@ -14,7 +14,7 @@
 
 
 void computeRollingAverage( float *pshape,  float *pshapeRA, int nSamples );
-void drawPulseShapes( int ev, float *pshape, float *pshapeRA, int nSamples );
+void drawPulseShapes( const std::string& outdir, int ev, float *pshape, float *pshapeRA, int nSamples );
 float computeAmp( float *pshape );
 float computeBaseline( float *pshape, int nSamples );
 
@@ -28,19 +28,18 @@ int main( int argc, char* argv[] ) {
 
   std::string fileName(argv[1]);
   int event_to_pick = -1;
-
   if( argc>2 ) event_to_pick = atoi(argv[2]);
 
   //float ampMax = 0.03;
   float ampMax = 0.012;
   int nSamples = 20;
 
-  //if( argc > 1 )
-  //  nSamples = atoi(argv[1]);
 
+  std::string dataset = AndCommon::removePathAndSuffix(fileName);
+  std::string inFileName = "./data/" + dataset + ".root";
 
-  //TFile* file = TFile::Open("Run_APDWL_HV380_Cd109_th6_Data_1_17_2023_Ascii.root");
-  TFile* file = TFile::Open(fileName.c_str());
+  std::cout << "-> Opening file: " << inFileName << std::endl;
+  TFile* file = TFile::Open(inFileName.c_str());
   TTree* tree = (TTree*)file->Get("tree");
 
   int ev;
@@ -57,6 +56,10 @@ int main( int argc, char* argv[] ) {
   TH1D* h1_amp   = new TH1D("amp"  , "", 100, -0.01, ampMax );
   TH1D* h1_ampRA = new TH1D("ampRA", "", 100, -0.01, ampMax );
 
+  std::string outdir( Form("plots/%s/pulseshapesRA/", dataset.c_str()) );
+  system( Form("mkdir -p %s", outdir.c_str()) );
+
+
   int nentries = tree->GetEntries();
   //int nentries = 10;
 
@@ -70,7 +73,7 @@ int main( int argc, char* argv[] ) {
     computeRollingAverage( pshape, pshapeRA, nSamples );
 
     if( ( (event_to_pick < 0) && (ev<20) ) || ( (event_to_pick >= 0) && (ev==event_to_pick) ) ) 
-      drawPulseShapes( ev, pshape, pshapeRA, nSamples );
+      drawPulseShapes( outdir, ev, pshape, pshapeRA, nSamples );
 
     h1_ampRA->Fill( computeAmp(pshapeRA) );
 
@@ -178,7 +181,7 @@ float computeBaseline( float *pshape, int nSamples ) {
 }
 
 
-void drawPulseShapes( int ev, float *pshape, float *pshapeRA, int nSamples ) {
+void drawPulseShapes( const std::string& outdir, int ev, float *pshape, float *pshapeRA, int nSamples ) {
 
 
   TH1D* h1_pshape   = new TH1D( Form("pshape_%d"  , ev)  , "", 1024, 0., 1024. );
@@ -216,7 +219,7 @@ void drawPulseShapes( int ev, float *pshape, float *pshapeRA, int nSamples ) {
 
   gPad->RedrawAxis();
 
-  c1->SaveAs( Form("plots/pulseshapes/ev_%d.pdf", ev) );
+  c1->SaveAs( Form("%s/ev_%d.pdf", outdir.c_str(), ev) );
 
   delete c1;
   delete h1_pshape;
