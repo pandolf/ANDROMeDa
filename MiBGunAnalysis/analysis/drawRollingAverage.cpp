@@ -106,7 +106,7 @@ int main( int argc, char* argv[] ) {
 
   gPad->RedrawAxis();
 
-  c1->SaveAs( "provaRA.pdf" );
+  c1->SaveAs( Form("plots/%s/rollingAverage.pdf", dataset.c_str()) );
 
   return 0;
 
@@ -152,7 +152,7 @@ void computeRollingAverage( float *pshape,  float *pshapeRA, int nSamples ) {
 
 float computeAmp( float *pshape ) {
 
-  float base = computeBaseline( pshape, 40 );
+  float base = computeBaseline( pshape, 16 );
 
   float amp = 0.;
 
