@@ -26,25 +26,28 @@ int main( int argc, char* argv[] ) {
 
   AndCommon::setStyle();
 
+  std::string fileName(argv[1]);
+  int event_to_pick = -1;
+
+  if( argc>2 ) event_to_pick = atoi(argv[2]);
+
   //float ampMax = 0.03;
   float ampMax = 0.012;
   int nSamples = 20;
 
-  if( argc > 1 )
-    nSamples = atoi(argv[1]);
+  //if( argc > 1 )
+  //  nSamples = atoi(argv[1]);
 
 
   //TFile* file = TFile::Open("Run_APDWL_HV380_Cd109_th6_Data_1_17_2023_Ascii.root");
-  TFile* file = TFile::Open("Run_APDWL_HV380_Fe55_th6_Data_1_17_2023_Ascii.root");
+  TFile* file = TFile::Open(fileName.c_str());
   TTree* tree = (TTree*)file->Get("tree");
 
   int ev;
-  int nch;
   float amp;
   float pshape[1024];
 
   tree->SetBranchAddress( "ev" , &ev     );
-  tree->SetBranchAddress( "nch"   , &nch    );
   tree->SetBranchAddress( "amp", &amp );
   tree->SetBranchAddress( "pshape", &pshape );
 
@@ -66,20 +69,13 @@ int main( int argc, char* argv[] ) {
 
     computeRollingAverage( pshape, pshapeRA, nSamples );
 
-    if( ev<20 ) 
+    if( ( (event_to_pick < 0) && (ev<20) ) || ( (event_to_pick >= 0) && (ev==event_to_pick) ) ) 
       drawPulseShapes( ev, pshape, pshapeRA, nSamples );
 
     h1_ampRA->Fill( computeAmp(pshapeRA) );
 
   } // for entries
 
-  TFile* outfile = TFile::Open("prova.root", "recreate");
-  outfile->cd();
-
-  h1_amp->Write();
-  h1_ampRA->Write();
-
-  outfile->Close();
 
   TCanvas* c1 = new TCanvas( "c1", "", 600, 600 );
   c1->cd();
@@ -207,16 +203,16 @@ void drawPulseShapes( int ev, float *pshape, float *pshapeRA, int nSamples ) {
   h1_pshapeRA->SetLineColor(kRed);
   h1_pshapeRA->SetLineWidth(2);
 
-  h1_pshape->Draw("same");
-  h1_pshapeRA->Draw("same");
-
-  TLegend* legend = new TLegend( 0.5, 0.65, 0.9, 0.9, "Typical ^{55}Fe Event" );
+  TLegend* legend = new TLegend( 0.5, 0.7, 0.9, 0.9 ); //, "Typical ^{55}Fe Event" );
   legend->SetFillColor(0);
   legend->SetTextSize(0.035);
   legend->AddEntry(h1_pshape, "Raw amplitude", "L");
   legend->AddEntry(h1_pshapeRA, Form("Rolling average"), "L");
   legend->AddEntry(h1_pshapeRA, Form("(#pm%d samples)", nSamples), "");
   legend->Draw("same");
+
+  h1_pshape->Draw("same");
+  h1_pshapeRA->Draw("same");
 
   gPad->RedrawAxis();
 
