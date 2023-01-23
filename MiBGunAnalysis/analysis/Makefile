@@ -16,8 +16,8 @@ EXTRALIBS := -L$(ROOTSYS)/lib -lHtml -lMathCore -lGenVector -lMinuit -lTreePlaye
 asciiToTree: asciiToTree.cpp AndCommon.o
 	$(CC) -Wall $(INCLUDES) -o asciiToTree asciiToTree.cpp AndCommon.o $(ROOTFLAG) $(EXTRALIBS)
 
-makeTreeLite: makeTreeLite.cpp
-	$(CC) -Wall $(INCLUDES) -o makeTreeLite makeTreeLite.cpp $(ROOTFLAG) $(EXTRALIBS)
+makeTreeLite: makeTreeLite.cpp AndCommon.o
+	$(CC) -Wall $(INCLUDES) -o makeTreeLite makeTreeLite.cpp AndCommon.o $(ROOTFLAG) $(EXTRALIBS)
 
 checkEnergyLinearity: checkEnergyLinearity.cpp AndCommon.o
 	$(CC) -Wall $(INCLUDES) -o checkEnergyLinearity checkEnergyLinearity.cpp AndCommon.o $(ROOTFLAG) $(EXTRALIBS)
