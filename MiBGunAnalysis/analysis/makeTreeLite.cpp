@@ -65,6 +65,8 @@ int main( int argc, char* argv[] ) {
   treeLite->Branch( "amp", &amp, "amp/F" );
   treeLite->Branch( "charge", &charge, "charge/F" );
 
+  float base;
+  treeLite->Branch( "base", &base, "base/F" );
   float baseRA;
   treeLite->Branch( "baseRA", &baseRA, "baseRA/F" );
   float ampRA;
@@ -85,17 +87,22 @@ int main( int argc, char* argv[] ) {
 
     tree->GetEntry( iEntry );
 
+    amp = 1000.*amp; // in mV
+
     computeRollingAverage( pshape, pshapeRA, nSamplesRA );
 
+    base   = computeBaseline( pshape, nSamplesBase );
     baseRA = computeBaseline( pshapeRA, nSamplesBase );
 
-    ampRA = computeAmp( pshapeRA, baseRA );
-
-    ampNegRA = computeNegAmp( pshapeRA, baseRA );
+    ampRA    = 1000.*computeAmp   ( pshapeRA, base ); // in mV
+    ampNegRA = 1000.*computeNegAmp( pshapeRA, base ); //in mV
 
     chargeRA = computeCharge( pshapeRA, baseRA );
 
     nCross5 = computeNcross( pshapeRA, baseRA, 0.005 );
+
+    base = 1000.*base; // in mV
+    baseRA = 1000.*baseRA; // in mV
 
     treeLite->Fill();
 
