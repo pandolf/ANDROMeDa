@@ -13,12 +13,20 @@ ROOTFLAG = `${ROOTSYS}/bin/root-config --cflags --libs`
 EXTRALIBS := -L$(ROOTSYS)/lib -lHtml -lMathCore -lGenVector -lMinuit -lTreePlayer -lRooFitCore -lRooFit #-L$(ROOFIT_LIBDIR)/ 
 
 
-asciiToTree: asciiToTree.cpp
-	$(CC) -Wall $(INCLUDES) -o asciiToTree asciiToTree.cpp $(ROOTFLAG) $(EXTRALIBS)
+asciiToTree: asciiToTree.cpp AndCommon.o
+	$(CC) -Wall $(INCLUDES) -o asciiToTree asciiToTree.cpp AndCommon.o $(ROOTFLAG) $(EXTRALIBS)
 
+makeTreeLite: makeTreeLite.cpp
+	$(CC) -Wall $(INCLUDES) -o makeTreeLite makeTreeLite.cpp $(ROOTFLAG) $(EXTRALIBS)
+
+checkEnergyLinearity: checkEnergyLinearity.cpp AndCommon.o
+	$(CC) -Wall $(INCLUDES) -o checkEnergyLinearity checkEnergyLinearity.cpp AndCommon.o $(ROOTFLAG) $(EXTRALIBS)
 
 drawRollingAverage: drawRollingAverage.cpp AndCommon.o  
 	$(CC) -Wall $(INCLUDES) -o drawRollingAverage drawRollingAverage.cpp AndCommon.o $(ROOTFLAG) $(EXTRALIBS)
+
+drawPulseShape: drawPulseShape.cpp AndCommon.o  
+	$(CC) -Wall $(INCLUDES) -o drawPulseShape drawPulseShape.cpp AndCommon.o $(ROOTFLAG) $(EXTRALIBS)
 
 
 
