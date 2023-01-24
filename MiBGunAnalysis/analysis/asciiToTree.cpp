@@ -26,6 +26,7 @@ int main( int argc, char* argv[] ) {
   std::string fileName = dataset + ".dat";
   std::string pathAndFile = "./data/" + fileName;
 
+std::cout << "ciao" << std::endl;
 
   std::ifstream fs(pathAndFile.c_str());
   if( !fs.good() ) {
