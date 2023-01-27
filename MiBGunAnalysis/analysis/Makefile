@@ -31,6 +31,12 @@ drawPulseShape: drawPulseShape.cpp AndCommon.o
 drawNoiseVsPhysics: drawNoiseVsPhysics.cpp AndCommon.o  
 	$(CC) -Wall $(INCLUDES) -o drawNoiseVsPhysics drawNoiseVsPhysics.cpp AndCommon.o $(ROOTFLAG) $(EXTRALIBS)
 
+drawCut: drawCut.cpp AndCommon.o  
+	$(CC) -Wall $(INCLUDES) -o drawCut drawCut.cpp AndCommon.o $(ROOTFLAG) $(EXTRALIBS)
+
+drawSimulation1020: drawSimulation1020.cpp AndCommon.o  
+	$(CC) -Wall $(INCLUDES) -o drawSimulation1020 drawSimulation1020.cpp AndCommon.o $(ROOTFLAG) $(EXTRALIBS)
+
 
 
 
