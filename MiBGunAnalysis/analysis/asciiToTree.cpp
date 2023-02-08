@@ -2,6 +2,8 @@
 #include <fstream>
 #include <string>
 #include <stdlib.h>
+#include <cctype>
+#include <algorithm>
 
 #include "AndCommon.h"
 
@@ -49,16 +51,18 @@ int main( int argc, char* argv[] ) {
   float tetime   ;
   float ratecount;
   float pshape   [1024];
+  float sampling_p=-1;  
 
-  tree->Branch( "ev"       , &ev       , "ev/I"            );
-  tree->Branch( "nch"      , &nch      , "nch/I"           );
-  tree->Branch( "base"     , &base     , "base/F"          );
-  tree->Branch( "amp"      , &amp      , "amp/F"           );
-  tree->Branch( "charge"   , &charge   , "charge/F"        );
-  tree->Branch( "letime"   , &letime   , "letime/F"        );
-  tree->Branch( "tetime"   , &tetime   , "tetime/F"        );
-  tree->Branch( "ratecount", &ratecount, "ratecount/F"     );
-  tree->Branch( "pshape"   , pshape    , "pshape[1024]/F"  );
+  tree->Branch( "ev"        , &ev        , "ev/I"            );
+  tree->Branch( "nch"       , &nch       , "nch/I"           );
+  tree->Branch( "base"      , &base      , "base/F"          );
+  tree->Branch( "amp"       , &amp       , "amp/F"           );
+  tree->Branch( "charge"    , &charge    , "charge/F"        );
+  tree->Branch( "letime"    , &letime    , "letime/F"        );
+  tree->Branch( "tetime"    , &tetime    , "tetime/F"        );
+  tree->Branch( "ratecount" , &ratecount , "ratecount/F"     );
+  tree->Branch( "pshape"    , pshape     , "pshape[1024]/F"  );
+  tree->Branch( "sampling_p", &sampling_p, "sampling_p/F"    );
 
 
   std::string line;
@@ -73,7 +77,10 @@ int main( int argc, char* argv[] ) {
     nch=0;
 
     while( getline(fs,line) ) {
-
+      auto it = std::unique(line.begin(), line.end(),[](char const &lhs, char const &rhs) {
+                return (lhs == rhs) && (lhs == ' ');
+            }); 
+      line.erase(it, line.end());
       std::string delimiter = " ";
       size_t pos = 0;
       std::vector<std::string> words;
@@ -82,6 +89,10 @@ int main( int argc, char* argv[] ) {
         word = line.substr(0, pos);
         line.erase(0, pos + delimiter.length());
         words.push_back(word);
+      }
+
+      if( words[0]=="===" && words[1]=="DATA" && words[2]=="SAMPLES") {
+        sampling_p    = atof(words[15].c_str());  
       }
 
       if( words[0]=="===" && words[1]=="EVENT" && wasReadingEvent ) {
