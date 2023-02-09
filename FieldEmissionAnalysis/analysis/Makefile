@@ -25,6 +25,9 @@ drawCompareAnodeAndDrain: drawCompareAnodeAndDrain.cpp AndCommon.o IScan.o IVSca
 compareFN: compareFN.cpp AndCommon.o IScan.o IVScan.o IVScanFN.o
 	$(CC) -Wall $(INCLUDES) -o compareFN compareFN.cpp AndCommon.o IScan.o IVScan.o IVScanFN.o $(ROOTFLAG) $(EXTRALIBS)
 
+compareScans: compareScans.cpp AndCommon.o 
+	$(CC) -Wall $(INCLUDES) -o compareScans compareScans.cpp AndCommon.o $(ROOTFLAG) $(EXTRALIBS)
+
 drawTimeStability: drawTimeStability.cpp AndCommon.o IScan.o 
 	$(CC) -Wall $(INCLUDES) -o drawTimeStability drawTimeStability.cpp AndCommon.o IScan.o $(ROOTFLAG) $(EXTRALIBS)
 
