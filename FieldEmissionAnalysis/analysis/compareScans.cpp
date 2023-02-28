@@ -26,10 +26,12 @@ int main( int argc, char* argv[] ) {
   float scale1(1.);
   float scale2(1.);
   std::string legend1("Scan 1"), legend2("Scan 2");
+  float xmax = 1100.;
   float ymin = -1.;
   float ymax = 9.;
   bool logy = false;
   float textSize = 0.035;
+  std::string legendTitle = "";
   
   if( argc == 3 ) {
 
@@ -101,6 +103,19 @@ int main( int argc, char* argv[] ) {
       legend1 = "HV < 0";
       legend2 = "HV > 0";
 
+    } else if( saveName=="LNGS_T1" ) {
+
+      scan1 = "CNTetchedOLD_N6bis_whopper_LNGS_d1_t1_20230228_drain";
+      scan2 = "CNTetchedOLD_N6bis_whopper_LNGS_d1_t1_20230228";
+      scale1 = -1.;
+      scale2 = +1.;
+      legend1 = "HV < 0";
+      legend2 = "HV > 0";
+      ymin = 100.;
+      ymax = 50E6;
+      xmax = 1300.;
+      legendTitle = "Yeti (T = 1 K)";
+
     } // if saveName
 
   } else {
@@ -134,7 +149,7 @@ int main( int argc, char* argv[] ) {
   TCanvas* c1 = new TCanvas( "c1", "c1", 600, 600 );
   c1->cd();
 
-  TH2D* h2_axes = new TH2D( "axes", "", 10, 0., 1100., 10, ymin, ymax );
+  TH2D* h2_axes = new TH2D( "axes", "", 10, 0., xmax, 10, ymin, ymax );
   h2_axes->SetXTitle( "|#DeltaV| (V)" );
   h2_axes->SetYTitle( "I (pA)" );
   h2_axes->Draw();
@@ -144,12 +159,16 @@ int main( int argc, char* argv[] ) {
   c1_log->cd();
   c1_log->SetLogy();
 
-  TH2D* h2_axes_log = new TH2D( "axes_log", "", 10, 0., 1100., 10, 0.1, 2000. );
+  float ymin_log = (ymin < 0.1 ) ? 0.1 : ymin;
+  TH2D* h2_axes_log = new TH2D( "axes_log", "", 10, 0., xmax, 10, ymin_log, 20*ymax );
   h2_axes_log->SetXTitle( "|#DeltaV| (V)" );
   h2_axes_log->SetYTitle( "I (pA)" );
   h2_axes_log->Draw();
 
-  TLegend* legend = new TLegend( 0.2, 0.72, 0.55, 0.87 );
+  float ymin_legend = 0.72;
+  if( legendTitle!="" ) ymin_legend -= 0.05;
+  TLegend* legend = new TLegend( 0.22, ymin_legend, 0.55, 0.87 );
+  if( legendTitle!="" ) legend->SetHeader( legendTitle.c_str() );
   legend->SetTextSize( textSize );
   legend->SetFillColor( 0 );
   legend->AddEntry( gr0, legend1.c_str(), "P" );
