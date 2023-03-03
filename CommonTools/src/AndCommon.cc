@@ -272,6 +272,8 @@ float AndCommon::getPedestal( TGraph* graph, int nPoints ) {
 
 std::string AndCommon::scientific( float x, int decimals ) {
 
+  if( x==0. ) return "0";
+
   int power = 0.;
 
   while( x >= 10. ) {
@@ -284,7 +286,7 @@ std::string AndCommon::scientific( float x, int decimals ) {
     power -= 1;
   }
 
-  std::string sign = (power>=0) ? "+" : "";
+  std::string sign = (power>=0) ? "+" : "-";
 
   std::string scient;
   if( decimals==1 )      scient = std::string(Form("%.1fE%s%d", x, sign.c_str(), power));
