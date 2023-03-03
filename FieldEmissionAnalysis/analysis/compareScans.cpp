@@ -29,7 +29,6 @@ int main( int argc, char* argv[] ) {
   float xmax = 1100.;
   float ymin = -1.;
   float ymax = 9.;
-  bool logy = false;
   float textSize = 0.035;
   std::string legendTitle = "";
   
@@ -65,7 +64,7 @@ int main( int argc, char* argv[] ) {
       scale2 = -1.;
       legend1 = "CNT HV < 0";
       legend2 = "CNT HV > 0";
-      logy = true;
+      ymax = 1E3;
 
     } else if( saveName=="ionOFF" ) {
 
@@ -114,7 +113,43 @@ int main( int argc, char* argv[] ) {
       ymin = 100.;
       ymax = 50E6;
       xmax = 1300.;
-      legendTitle = "Yeti (T = 1 K)";
+      legendTitle = "IETI (T = 1 K)";
+
+    } else if( saveName=="LNGS_T1_vs_Hyperion" ) {
+
+      scan1 = "CNTetchedOLD_N6bis_whopper_LNGS_d1_t1_20230228_drain";
+      scan2 = "CNTetchedOLD_N6bis_whopper_d1_20230208";
+      scale1 = -1.;
+      scale2 = +1.;
+      legend1 = "IETI (T = 1 K)";
+      legend2 = "Hyperion (RT)";
+      ymax = 50E6;
+      xmax = 1300.;
+
+    } else if( saveName=="LNGS_T1_vs_T0p02" ) {
+
+      scan1 = "CNTetchedOLD_N6bis_whopper_LNGS_d1_t1_20230228_drain";
+      scan2 = "CNTetchedOLD_N6bis_whopper_LNGS_d1_t0p02_20230301_drain";
+      scale1 = -1.;
+      scale2 = -1.;
+      legend1 = "IETI (T = 1 K)";
+      legend2 = "IETI (T = 0.02 K)";
+      ymin = 100;
+      ymax = 50E6;
+      xmax = 1300.;
+
+    } else if( saveName=="Ohm_LNGS_vs_Hyperion" ) {
+
+      scan1 = "CNTetchedOLD_N6bis_whopper_LNGS_d1_t1_20230228";
+      scan2 = "CNTetchedOLD_N6bis_whopper_d1_20230208_posDeltaV";
+      scale1 = 1.;
+      scale2 = -1.;
+      legendTitle = "CNT HV > 0";
+      legend1 = "IETI (T = 1 K)";
+      legend2 = "Hyperion";
+      ymin = 0.1;
+      ymax = 50E5;
+      xmax = 1300.;
 
     } // if saveName
 
@@ -160,7 +195,7 @@ int main( int argc, char* argv[] ) {
   c1_log->SetLogy();
 
   float ymin_log = (ymin < 0.1 ) ? 0.1 : ymin;
-  TH2D* h2_axes_log = new TH2D( "axes_log", "", 10, 0., xmax, 10, ymin_log, 20*ymax );
+  TH2D* h2_axes_log = new TH2D( "axes_log", "", 10, 0., xmax, 10, ymin_log, 2*ymax );
   h2_axes_log->SetXTitle( "|#DeltaV| (V)" );
   h2_axes_log->SetYTitle( "I (pA)" );
   h2_axes_log->Draw();
