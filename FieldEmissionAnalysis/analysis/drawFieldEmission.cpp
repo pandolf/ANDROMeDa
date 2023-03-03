@@ -119,6 +119,14 @@ IVScanFN analyzeFN( const std::string& name ) {
     hvMax = 3000.;
     scale = -1.;
 
+  } else if( name=="CNTetchedOLD_N6bis_whopper_LNGS_d1_t1_20230228_drain" ) {
+
+    //hvMin = 730.; // first component
+    //hvMax = 900.;
+    hvMin = 1030.; // second component
+    hvMax = 1500.;
+    scale = +1.;
+
   }
 
 
@@ -164,7 +172,7 @@ IVScanFN analyzeFN( const std::string& name ) {
   pd_text->SetFillColor(0);
   pd_text->SetTextSize(0.038);
   pd_text->SetTextColor(kGray+3);
-  pd_text->AddText( Form("p = %s mbar", AndCommon::scientific(ivs.p(), 0).c_str()) );
+  //pd_text->AddText( Form("p = %s mbar", AndCommon::scientific(ivs.p(), 0).c_str()) );
   pd_text->AddText( Form("d = %.1f mm"  , ivs.d()) );
   pd_text->Draw("Same");
 
