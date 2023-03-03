@@ -224,6 +224,9 @@ void IScan::readFile( const std::string& name, float xMin, float xMax ) {
 
     while( getline(ifs,line) ) {
 
+      //TString line_tstr(line);
+      //line_tstr.ReplaceAll( "\t", " " );
+      //line = (std::string)(line_tstr.Data());
       std::vector<std::string> words = AndCommon::splitString( line, " " );
 
       if( words.size()<2 ) continue;
