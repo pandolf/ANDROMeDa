@@ -151,6 +151,32 @@ int main( int argc, char* argv[] ) {
       ymax = 50E5;
       xmax = 1300.;
 
+    } else if( saveName=="LNGS_HdM_300K" ) {
+
+      scan1 = "CNTetchedOLD_N6bis_LNGS_HdM_d1p5_300K_20230315_drain";
+      scan2 = "CNTetchedOLD_N6bis_LNGS_HdM_d1p5_300K_20230315";
+      scale1 = -1.;
+      scale2 = 1.;
+      legendTitle = "LNGS HdM T = 300 K";
+      legend1 = "V(cnt) < V(anode)";
+      legend2 = "V(cnt) > V(anode)";
+      ymin = 0.1;
+      ymax = 50E5;
+      xmax = 1300.;
+
+    } else if( saveName=="LNGS_HdM_300K_vs_30K" ) {
+
+      scan1 = "CNTetchedOLD_N6bis_LNGS_HdM_d1p5_300K_20230315_drain";
+      scan2 = "CNTetchedOLD_N6bis_LNGS_HdM_d1p5_30K_20230315_drain";
+      scale1 = -1.;
+      scale2 = -1.;
+      legendTitle = "LNGS HdM";
+      legend1 = "T = 300 K";
+      legend2 = "T = 30 K";
+      ymin = 0.1;
+      ymax = 50E5;
+      xmax = 1300.;
+
     } // if saveName
 
   } else {
