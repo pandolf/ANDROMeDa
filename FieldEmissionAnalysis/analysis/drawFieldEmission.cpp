@@ -127,6 +127,14 @@ IVScanFN analyzeFN( const std::string& name ) {
     hvMax = 1500.;
     scale = +1.;
 
+  } else if( name=="CNTetchedOLD_N6bis_LNGS_HdM_d1p5_t30_20230315_drain" ) {
+
+    //hvMin = 730.; // first component
+    //hvMax = 900.;
+    hvMin = 590.; // second component
+    hvMax = 770.;
+    scale = +1.;
+
   }
 
 
