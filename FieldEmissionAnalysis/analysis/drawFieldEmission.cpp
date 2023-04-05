@@ -135,6 +135,13 @@ IVScanFN analyzeFN( const std::string& name ) {
     hvMax = 770.;
     scale = +1.;
 
+  } else if( name=="CNTetchedOLD_AG2_LNGS_HdM_d1p5_t20_20230404" ) {
+
+    //hvMin = 730.; // first component
+    //hvMax = 900.;
+    hvMin = 680.; // second component
+    hvMax = 880.;
+
   }
 
 
@@ -276,7 +283,7 @@ IVScanFN analyzeFN( const std::string& name ) {
   pd_text_log->SetFillColor(0);
   pd_text_log->SetTextSize(0.038);
   pd_text_log->SetTextColor(kGray+3);
-  pd_text_log->AddText( Form("p = %s mbar", AndCommon::scientific(ivs.p(), 0).c_str()) );
+  //pd_text_log->AddText( Form("p = %s mbar", AndCommon::scientific(ivs.p(), 0).c_str()) );
   pd_text_log->AddText( Form("d = %.1f mm"  , ivs.d()) );
   pd_text_log->Draw("same");
 
