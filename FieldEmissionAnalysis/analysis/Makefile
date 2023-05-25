@@ -31,6 +31,9 @@ compareScans: compareScans.cpp AndCommon.o
 drawTimeStability: drawTimeStability.cpp AndCommon.o IScan.o 
 	$(CC) -Wall $(INCLUDES) -o drawTimeStability drawTimeStability.cpp AndCommon.o IScan.o $(ROOTFLAG) $(EXTRALIBS)
 
+computeGammaFromScans: computeGammaFromScans.cpp AndCommon.o IVScan.o 
+	$(CC) -Wall $(INCLUDES) -o computeGammaFromScans computeGammaFromScans.cpp AndCommon.o IScan.o IVScan.o $(ROOTFLAG) $(EXTRALIBS)
+
 
 
 
