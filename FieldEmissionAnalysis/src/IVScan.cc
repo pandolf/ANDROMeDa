@@ -30,6 +30,7 @@ TGraphErrors* IVScan::graph_vsE() const {
 
   TGraphErrors* graph_vsE = new TGraphErrors(0);
   graph_vsE->SetName( Form("gr_E_%s", this->name().c_str()) );
+  graph_vsE->SetMarkerStyle( 20 );
 
   for( unsigned iPoint=0; iPoint<this->graph()->GetN(); ++iPoint ) {
 
