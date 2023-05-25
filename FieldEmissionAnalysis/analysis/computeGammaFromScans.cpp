@@ -1,5 +1,6 @@
 #include "AndCommon.h"
 #include "IVScan.h"
+#include "IVScanFN.h"
 
 #include <iostream>
 #include <fstream>
@@ -14,6 +15,13 @@
 #include "TLegend.h"
 
 
+
+
+
+TGraphErrors* selectPointsForFN( TGraphErrors graph );
+TGraphErrors* getFNgraph( TGraphErrors* selected );
+void initializeFunction( TF1* f1_line, TGraphErrors* gr_FN );
+int findHighestVoltage( TGraph* graph );
 
 
 
@@ -82,6 +90,7 @@ int main( int argc, char* argv[] ) {
 
   TCanvas* c1 = new TCanvas( "c1", "", 600, 600 );
   TCanvas* c2 = new TCanvas( "c2", "", 600, 600 );
+  TCanvas* c3 = new TCanvas( "c3", "", 600, 600 );
 
 
   TH2D* h2_axes = new TH2D( "axes", "", 10, 0., 2000., 10, 0., 30. );
@@ -92,8 +101,12 @@ int main( int argc, char* argv[] ) {
   h2_axesE->SetXTitle( "#DeltaV / d [V/mm]" );
   h2_axesE->SetYTitle( "I [#muA]" );
 
+  TH2D* h2_axesFN = new TH2D( "axesFN", "", 10, 0.0005, 0.0015, 10, -20., 0. );
+  h2_axesFN->SetXTitle( IVScanFN::xTitleFN().c_str() );
+  h2_axesFN->SetYTitle( IVScanFN::yTitleFN().c_str() );
 
-  int nsteps = 20;
+
+  int nsteps = 1;
   int startstep = 0;
   float stepsize = 0.1; // in mm
 
@@ -101,12 +114,17 @@ int main( int argc, char* argv[] ) {
 
     c1->Clear();
     c2->Clear();
+    c3->Clear();
 
     c1->cd();
     h2_axes->Draw();
 
     c2->cd();
     h2_axesE->Draw();
+
+    c3->cd();
+    h2_axesFN->Draw();
+
 
     TLegend* legend = new TLegend( 0.2, 0.65, 0.5, 0.9, sampleName.c_str() );
     legend->SetTextSize(0.035);
@@ -117,14 +135,15 @@ int main( int argc, char* argv[] ) {
 
       IVScan scan(scans[i]);
 
-      scan.scaleDataPoints( 1./1000000. ); // in microA
+      scan.scaleDataPoints( 1E-6 ); // in microA
 
       scan.set_d( scan.d() + istep*stepsize );
+
+      TGraphErrors* graph = scan.graph();
 
       if( istep==0 ) { // only once
 
         c1->cd();
-        TGraphErrors* graph = scan.graph();
         graph->SetMarkerSize( 1.6 );
         graph->SetMarkerColor( colors[i] );
         graph->SetLineColor( colors[i] );
@@ -141,6 +160,23 @@ int main( int argc, char* argv[] ) {
 
       legend->AddEntry( graph_vsE, Form("d = %.1f mm", scan.d()), "P" );
 
+
+      TGraphErrors* gr_selected = selectPointsForFN( *graph );
+
+      TGraphErrors* gr_FN = getFNgraph( gr_selected );
+
+      TF1* f1_line = new TF1( Form("line_%s", gr_FN->GetName()), "[0]+[1]*x" );
+      f1_line->SetLineColor(gr_FN->GetLineColor());
+      f1_line->SetLineWidth(2);
+
+      initializeFunction( f1_line, gr_FN );
+
+      gr_FN->Fit( f1_line, "+" );
+
+      c3->cd();
+      gr_FN->Draw("P same");
+      
+
     }
 
     if( istep==0 ) { // only once
@@ -155,6 +191,11 @@ int main( int argc, char* argv[] ) {
     gPad->RedrawAxis();
     c2->SaveAs( Form("%s/i_vs_e_step%d.pdf", outdir.c_str(), istep) );
 
+    c3->cd();
+    legend->Draw("same");
+    gPad->RedrawAxis();
+    c3->SaveAs( Form("%s/fn_step%d.pdf", outdir.c_str(), istep) );
+
     delete legend;
 
   } // steps
@@ -167,22 +208,121 @@ int main( int argc, char* argv[] ) {
 
 
 
+TGraphErrors* selectPointsForFN( TGraphErrors graph ) {
 
-/*
-  for( unsigned iPoint=0; iPoint<this->graph()->GetN(); ++iPoint ) {
+  TGraphErrors* selected = new TGraphErrors(0);
+  selected->SetName( Form("selected_%s", graph.GetName()) );
+
+  selected->SetMarkerStyle( graph.GetMarkerStyle() );
+  selected->SetMarkerColor( graph.GetMarkerColor() );
+  selected->SetMarkerSize ( graph.GetMarkerSize()  );
+  selected->SetLineColor  ( graph.GetLineColor()   );
+
+  for( unsigned i = 0; i<5; ++i ) {
+
+    int iPoint = findHighestVoltage( &graph );
+
+    double x, y;
+    graph.GetPoint( iPoint, x, y );
+
+    double xerr = graph.GetErrorX( iPoint );
+    double yerr = graph.GetErrorY( iPoint );
+
+    int nSelected = selected->GetN();
+    selected->SetPoint( nSelected, x, y );
+    selected->SetPointError( nSelected, xerr, yerr );
+
+    graph.RemovePoint( iPoint );
+ 
+  }
+
+  return selected;
+
+}
+
+
+
+int findHighestVoltage( TGraph* graph ) {
+
+  int foundPoint = -1;
+
+  float maxV = 0.;
+
+  for( unsigned iPoint=0; iPoint<graph->GetN(); ++iPoint ) {
+
+    float thisV = graph->GetPointX( iPoint );
+
+    if( thisV > maxV ) {
+      maxV = thisV;
+      foundPoint = iPoint;
+    }
+
+  } // for iPoint
+
+  return foundPoint;
+
+}
+
+
+
+TGraphErrors* getFNgraph( TGraphErrors* selected ) {
+
+  TGraphErrors* gr_FN = new TGraphErrors(0);
+  gr_FN->SetName( Form( "fn_%s", selected->GetName()));
+
+  gr_FN->SetMarkerStyle( selected->GetMarkerStyle() );
+  gr_FN->SetMarkerColor( selected->GetMarkerColor() );
+  gr_FN->SetMarkerSize ( selected->GetMarkerSize()  );
+  gr_FN->SetLineColor  ( selected->GetLineColor()   );
+
+
+  for( unsigned iPoint=0; iPoint<selected->GetN(); ++iPoint ) {
 
     double i, v;
-    this->graph()->GetPoint(iPoint, v, i);
+    selected->GetPoint(iPoint, v, i);
     i = fabs(i);
     v = fabs(v);
-    float i_err = this->graph()->GetErrorY( iPoint );
+    float i_err = selected->GetErrorY( iPoint );
     float v_err = 1.;
 
-    graphFN_->SetPoint     ( iPoint, 1./v, TMath::Log( i / (v*v) ) );
-    graphFN_->SetPointError( iPoint, v_err/(v*v), i_err/i );
+    gr_FN->SetPoint     ( iPoint, 1./v, TMath::Log( i / (v*v) ) );
+    gr_FN->SetPointError( iPoint, v_err/(v*v), i_err/i );
 
   } // for
 
+  return gr_FN;
+
+}
+
+
+
+void initializeFunction( TF1* f1_line, TGraphErrors* gr_FN ) {
+
+  double x1, y1;
+  gr_FN->GetPoint( 0, x1, y1 );
+  
+  double x2, y2;
+  gr_FN->GetPoint( gr_FN->GetN(), x2, y2 );
+
+  if( x1<x2 ) {
+
+    f1_line->SetRange( 0.9*x1, 1.1*x2 );
+    f1_line->SetParameter( 0, x1 );
+    f1_line->SetParameter( 1, (y2-y1)/(x2-x1) );
+
+  } else {
+
+    f1_line->SetRange( 0.9*x2, 1.1*x1 );
+    f1_line->SetParameter( 0, x2 );
+    f1_line->SetParameter( 1, (y1-y2)/(x1-x2) );
+
+  }
+
+}
+
+
+
+/*
 
   if( graphFN_->GetN() > 1 ) {
 
