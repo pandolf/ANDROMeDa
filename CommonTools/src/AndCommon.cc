@@ -289,11 +289,11 @@ std::string AndCommon::scientific( float x, int decimals ) {
   std::string sign = (power>=0) ? "+" : "-";
 
   std::string scient;
-  if( decimals==1 )      scient = std::string(Form("%.1fE%s%d", x, sign.c_str(), power));
-  else if( decimals==2 ) scient = std::string(Form("%.2fE%s%d", x, sign.c_str(), power));
-  else if( decimals==3 ) scient = std::string(Form("%.3fE%s%d", x, sign.c_str(), power));
-  else if( decimals==4 ) scient = std::string(Form("%.4fE%s%d", x, sign.c_str(), power));
-  else if( decimals==0 ) scient = std::string(Form("%.0fE%s%d", x, sign.c_str(), power));
+  if( decimals==1 )      scient = std::string(Form("%.1fE%s%d", x, sign.c_str(), abs(power)));
+  else if( decimals==2 ) scient = std::string(Form("%.2fE%s%d", x, sign.c_str(), abs(power)));
+  else if( decimals==3 ) scient = std::string(Form("%.3fE%s%d", x, sign.c_str(), abs(power)));
+  else if( decimals==4 ) scient = std::string(Form("%.4fE%s%d", x, sign.c_str(), abs(power)));
+  else if( decimals==0 ) scient = std::string(Form("%.0fE%s%d", x, sign.c_str(), abs(power)));
 
   return scient;
 
