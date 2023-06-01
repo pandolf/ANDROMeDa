@@ -37,24 +37,36 @@ void UncCorr::combine( float& mean, float& err ) {
 
   TMatrixD* corrV = getCorrelationMatrix();
 
-  TMatrixD* corrV_inv = new TMatrixD(corrV->Invert());
+  TMatrixD* corrV_inv = new TMatrixD(*corrV);
+  corrV_inv->Invert();
 
   std::vector<float> weights = getWeights( corrV_inv );
 
   for( unsigned i=0; i<weights.size(); ++i )
     std::cout << "w[" << i << "]: " << weights[i] << std::endl;
 
+
+  int dim = datapoints_.size();
+
   mean = 0.;
 
-  for( unsigned i=0; i<datapoints_.size(); ++i )
+  for( unsigned i=0; i<dim; ++i )
     mean += weights[i]*datapoints_[i].mean;
 
 
+
   double* corrV_elem = corrV->GetMatrixArray();
+  std::cout << "Corr V: " << std::endl;
+  for( unsigned i=0; i<dim*dim; ++i )
+    std::cout << "elem " << i << ": " << corrV_elem[i] << std::endl;
+
+  double* corrVinv_elem = corrV_inv->GetMatrixArray();
+  std::cout << "Corr V-1: " << std::endl;
+  for( unsigned i=0; i<dim*dim; ++i )
+    std::cout << "elem " << i << ": " << corrVinv_elem[i] << std::endl;
+
 
   float err2 = 0.;
-
-  int dim = datapoints_.size();
 
   for( unsigned i=0; i<dim; ++i )
     for( unsigned j=0; j<dim; ++j )
