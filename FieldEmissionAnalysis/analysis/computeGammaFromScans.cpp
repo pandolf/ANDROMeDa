@@ -1,6 +1,7 @@
 #include "AndCommon.h"
 #include "IVScan.h"
 #include "IVScanFN.h"
+#include "UncCorr.h"
 
 #include <iostream>
 #include <fstream>
@@ -106,9 +107,12 @@ int main( int argc, char* argv[] ) {
   h2_axesFN->SetYTitle( IVScanFN::yTitleFN().c_str() );
 
 
-  int nsteps = 1;
-  int startstep = 0;
-  float stepsize = 0.1; // in mm
+  int nsteps = 100;
+  int startstep = -50;
+  float stepsize = 0.01; // in mm
+
+  TGraphErrors* gr_chi2_vs_iStep = new TGraphErrors(0);
+  gr_chi2_vs_iStep->SetName("gr_chi2_vs_iStep");
 
   for( int istep=startstep; istep<nsteps; ++istep ) {
 
@@ -129,6 +133,16 @@ int main( int argc, char* argv[] ) {
     TLegend* legend = new TLegend( 0.2, 0.65, 0.5, 0.9, sampleName.c_str() );
     legend->SetTextSize(0.035);
     legend->SetFillColor(0);
+
+    UncCorr uc;
+    UncCorr uc_x0;
+
+    TGraphErrors* gr_selected_forFit = new TGraphErrors(0); // bunch them all together in one graph
+    gr_selected_forFit->SetName( Form("gr_selected_forFit_step%d", istep) );
+    gr_selected_forFit->SetMarkerStyle( 20 );
+    gr_selected_forFit->SetMarkerColor( 46 );
+    gr_selected_forFit->SetMarkerSize ( 1.6 );
+    gr_selected_forFit->SetLineColor  ( 46 );
 
 
     for( unsigned i=0; i<scans.size(); ++i ) {
@@ -151,17 +165,68 @@ int main( int argc, char* argv[] ) {
 
       } // if step =0 
 
-      c2->cd();
       TGraphErrors* graph_vsE = scan.graph_vsE();
       graph_vsE->SetMarkerSize( 1.6 );
       graph_vsE->SetMarkerColor( colors[i] );
-      graph_vsE->SetLineColor( colors[i] );
-      graph_vsE->Draw( "P same" );
-
-      legend->AddEntry( graph_vsE, Form("d = %.1f mm", scan.d()), "P" );
-
+      graph_vsE->SetLineColor  ( colors[i] );
 
       TGraphErrors* gr_selected = selectPointsForFN( *graph );
+      gr_selected->SetMarkerSize(1.6);
+      gr_selected->SetMarkerColor( colors[i] );
+      gr_selected->SetLineColor  ( colors[i] );
+
+      //TGraphErrors* gr_selected_forFit = new TGraphErrors(0);
+      //gr_selected_forFit->SetName( Form("gr_selected_forFit_%s", gr_selected->GetName()) );
+      //gr_selected_forFit->SetMarkerStyle( gr_selected->GetMarkerStyle() );
+      //gr_selected_forFit->SetMarkerColor( gr_selected->GetMarkerColor() );
+      //gr_selected_forFit->SetMarkerSize ( gr_selected->GetMarkerSize()  );
+      //gr_selected_forFit->SetLineColor  ( gr_selected->GetLineColor()   );
+      //double xmin = 9999.;
+      //double xmax = 0.;
+      for( unsigned iPoint=0; iPoint<gr_selected->GetN(); ++iPoint ) {
+        double x, y;
+        gr_selected->GetPoint( iPoint, x, y );
+        double xerr = gr_selected->GetErrorX( iPoint );
+        double yerr = gr_selected->GetErrorY( iPoint );
+
+        //double thisx = x/scan.d();
+        //if( thisx<xmin ) xmin = thisx;
+        //if( thisx>xmax ) xmax = thisx;
+
+        int n_vsE = gr_selected_forFit->GetN();
+        gr_selected_forFit->SetPoint( n_vsE, x/scan.d(), y ); // x->x/d (so vs E)
+        gr_selected_forFit->SetPointError( n_vsE, xerr/scan.d(), yerr ); 
+        //gr_selected_forFit->SetPoint( n_vsE, x/scan.d(), log(y) ); // x->x/d (so vs E) and y -> log(y) to fit with line
+        //gr_selected_forFit->SetPointError( n_vsE, xerr/scan.d(), yerr/y ); // propag log error -> sigma(y)/y
+      }
+
+
+      //TF1* f1_exp = new TF1( Form("exp_%s", gr_selected_forFit->GetName()), "exp([0]*x-[1])", 0.9*xmin, 1.1*xmax );
+      //f1_exp->SetLineColor( gr_selected_forFit->GetLineColor() );
+      //gr_selected_forFit->Fit(f1_exp, "R+");
+
+      //TF1* f1_lineLog = new TF1( Form("line_%s", gr_selected_forFit->GetName()), "[0]+[1]*x", 0.9*xmin, 1.1*xmax );
+      //f1_lineLog->SetLineColor( gr_selected_forFit->GetLineColor() );
+      //gr_selected_forFit->Fit(f1_lineLog, "R+");
+
+      //// want to find x of f(x) = 0
+      //// f(x) = mx + q
+      //float m = f1_lineLog->GetParameter(1);
+      //float q = f1_lineLog->GetParameter(0);
+      //float m_err = f1_lineLog->GetParError(1);
+      //float q_err = f1_lineLog->GetParError(0);
+      //float x0 = -q/m;
+      //float x0_err = sqrt( q_err*q_err/(m*m) + q*q*m_err*m_err/(m*m*m*m) );
+      //uc_x0.addDataPoint(x0, x0_err, 0.);
+
+      //uc_x0.addDataPoint(f1_exp->GetParameter(1), f1_exp->GetParError(1), 0.);
+
+      //c2->cd();
+      //gr_selected_forFit->Draw( "P same" );
+      ////graph_vsE->Draw( "P same" );
+
+      //legend->AddEntry( graph_vsE, Form("d = %.1f mm", scan.d()), "P" );
+
 
       TGraphErrors* gr_FN = getFNgraph( gr_selected );
 
@@ -176,8 +241,61 @@ int main( int argc, char* argv[] ) {
       c3->cd();
       gr_FN->Draw("P same");
       
+      float phi = 4.7; // in eV
+      float phi_err = 0.1; // in eV
+      float d = scan.d(); // in mm
+      float d_err_corr = 0.3; // 0.1 for the syst on the position (linear shifter, see logbook_ANDROMeDa entry 24/01/22) plus 0.1 for the uncertainty on the length of the tubes
+      float d_err_uncorr = 0.01; // relative uncertainty between scans
+      float s = f1_line->GetParameter(1);
+      float s_err = f1_line->GetParError(1);
+      float b = 6.83E6; // this is 4/3 * sqrt(2m) / hbar = 6.83E6 V^-1/2 mm^-1, from FN theory
 
-    }
+      float gamma = -b*phi*sqrt(phi)*d/s;
+
+      float gamma_err2_phi      = 9.*gamma*gamma/(4.*phi*phi)*phi_err*phi_err;
+      float gamma_err2_d_corr   = gamma*gamma/(d*d)*d_err_corr*d_err_corr; 
+      float gamma_err2_d_uncorr = gamma*gamma/(d*d)*d_err_uncorr*d_err_uncorr; 
+      float gamma_err2_s        = gamma*gamma/(s*s)*s_err*s_err;
+
+      //float gamma_err2_tot = gamma_err2_phi + gamma_err2_d_corr + gamma_err2_d_uncorr + gamma_err2_s;
+      //float gamma_err_tot = sqrt( gamma_err2_tot );
+
+      float gamma_err2_tot_uncorr = gamma_err2_d_uncorr + gamma_err2_s;
+      float gamma_err_tot_uncorr = sqrt( gamma_err2_tot_uncorr );
+
+      float gamma_err2_tot_corr = gamma_err2_d_corr + gamma_err2_phi;
+      float gamma_err_tot_corr = sqrt( gamma_err2_tot_corr );
+
+      uc.addDataPoint(gamma, gamma_err_tot_uncorr, gamma_err_tot_corr);
+
+    } // for scans
+
+
+    c2->cd();
+
+    TF1* f1_exp = new TF1( Form("exp_step%d", istep), "exp([0]+[1]*x)" );
+    gr_selected_forFit->Fit(f1_exp);
+    gr_selected_forFit->Draw( "P same" );
+
+    gr_chi2_vs_iStep->SetPoint( gr_chi2_vs_iStep->GetN(), istep, f1_exp->GetChisquare()/f1_exp->GetNDF() );
+
+    //float x0_comb, x0_err_comb;
+    //uc_x0.combine( x0_comb, x0_err_comb );
+
+    //gr_x0_vs_iStep->SetPoint( gr_x0_vs_iStep->GetN(), istep, x0_comb );
+    //gr_x0_err_vs_iStep->SetPoint( gr_x0_err_vs_iStep->GetN(), istep, x0_err_comb/x0_comb );
+    
+
+    float gamma_comb, gamma_err_comb;
+    uc.combine( gamma_comb, gamma_err_comb );
+
+    std::cout << "Combined measurement: " << gamma_comb << " +/- " << gamma_err_comb << std::endl;
+
+    float gamma_nocorr, gamma_err_nocorr;
+    uc.combine( gamma_nocorr, gamma_err_nocorr, false );
+
+    std::cout << "Combined measurement (no correlations): " << gamma_nocorr << " +/- " << gamma_err_nocorr << std::endl;
+
 
     if( istep==0 ) { // only once
       c1->cd();
@@ -199,6 +317,13 @@ int main( int argc, char* argv[] ) {
     delete legend;
 
   } // steps
+
+
+  TFile* outfile = TFile::Open( "test.root", "recreate" );
+  outfile->cd();
+  gr_chi2_vs_iStep->Write();
+  outfile->Close();
+
 
 
   return 0;
