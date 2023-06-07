@@ -107,14 +107,17 @@ int main( int argc, char* argv[] ) {
   h2_axesFN->SetYTitle( IVScanFN::yTitleFN().c_str() );
 
 
-  int nsteps = 100;
-  int startstep = -50;
+  int nsteps = 150;
+  float start_delta = -0.5; // in mm, relative to central d
   float stepsize = 0.01; // in mm
 
-  TGraphErrors* gr_chi2_vs_iStep = new TGraphErrors(0);
-  gr_chi2_vs_iStep->SetName("gr_chi2_vs_iStep");
+  TGraphErrors* gr_chi2_vs_istep = new TGraphErrors(0);
+  gr_chi2_vs_istep->SetName("gr_chi2_vs_istep");
 
-  for( int istep=startstep; istep<nsteps; ++istep ) {
+
+  for( int istep=0; istep<nsteps; ++istep ) {
+
+    float this_delta_d = start_delta + (float)istep*stepsize;
 
     c1->Clear();
     c2->Clear();
@@ -151,7 +154,7 @@ int main( int argc, char* argv[] ) {
 
       scan.scaleDataPoints( 1E-6 ); // in microA
 
-      scan.set_d( scan.d() + istep*stepsize );
+      scan.set_d( scan.d() + this_delta_d );
 
       TGraphErrors* graph = scan.graph();
 
@@ -175,51 +178,20 @@ int main( int argc, char* argv[] ) {
       gr_selected->SetMarkerColor( colors[i] );
       gr_selected->SetLineColor  ( colors[i] );
 
-      //TGraphErrors* gr_selected_forFit = new TGraphErrors(0);
-      //gr_selected_forFit->SetName( Form("gr_selected_forFit_%s", gr_selected->GetName()) );
-      //gr_selected_forFit->SetMarkerStyle( gr_selected->GetMarkerStyle() );
-      //gr_selected_forFit->SetMarkerColor( gr_selected->GetMarkerColor() );
-      //gr_selected_forFit->SetMarkerSize ( gr_selected->GetMarkerSize()  );
-      //gr_selected_forFit->SetLineColor  ( gr_selected->GetLineColor()   );
-      //double xmin = 9999.;
-      //double xmax = 0.;
+
       for( unsigned iPoint=0; iPoint<gr_selected->GetN(); ++iPoint ) {
+
         double x, y;
         gr_selected->GetPoint( iPoint, x, y );
         double xerr = gr_selected->GetErrorX( iPoint );
         double yerr = gr_selected->GetErrorY( iPoint );
 
-        //double thisx = x/scan.d();
-        //if( thisx<xmin ) xmin = thisx;
-        //if( thisx>xmax ) xmax = thisx;
-
         int n_vsE = gr_selected_forFit->GetN();
         gr_selected_forFit->SetPoint( n_vsE, x/scan.d(), y ); // x->x/d (so vs E)
         gr_selected_forFit->SetPointError( n_vsE, xerr/scan.d(), yerr ); 
-        //gr_selected_forFit->SetPoint( n_vsE, x/scan.d(), log(y) ); // x->x/d (so vs E) and y -> log(y) to fit with line
-        //gr_selected_forFit->SetPointError( n_vsE, xerr/scan.d(), yerr/y ); // propag log error -> sigma(y)/y
+
       }
 
-
-      //TF1* f1_exp = new TF1( Form("exp_%s", gr_selected_forFit->GetName()), "exp([0]*x-[1])", 0.9*xmin, 1.1*xmax );
-      //f1_exp->SetLineColor( gr_selected_forFit->GetLineColor() );
-      //gr_selected_forFit->Fit(f1_exp, "R+");
-
-      //TF1* f1_lineLog = new TF1( Form("line_%s", gr_selected_forFit->GetName()), "[0]+[1]*x", 0.9*xmin, 1.1*xmax );
-      //f1_lineLog->SetLineColor( gr_selected_forFit->GetLineColor() );
-      //gr_selected_forFit->Fit(f1_lineLog, "R+");
-
-      //// want to find x of f(x) = 0
-      //// f(x) = mx + q
-      //float m = f1_lineLog->GetParameter(1);
-      //float q = f1_lineLog->GetParameter(0);
-      //float m_err = f1_lineLog->GetParError(1);
-      //float q_err = f1_lineLog->GetParError(0);
-      //float x0 = -q/m;
-      //float x0_err = sqrt( q_err*q_err/(m*m) + q*q*m_err*m_err/(m*m*m*m) );
-      //uc_x0.addDataPoint(x0, x0_err, 0.);
-
-      //uc_x0.addDataPoint(f1_exp->GetParameter(1), f1_exp->GetParError(1), 0.);
 
       //c2->cd();
       //gr_selected_forFit->Draw( "P same" );
@@ -277,14 +249,8 @@ int main( int argc, char* argv[] ) {
     gr_selected_forFit->Fit(f1_exp);
     gr_selected_forFit->Draw( "P same" );
 
-    gr_chi2_vs_iStep->SetPoint( gr_chi2_vs_iStep->GetN(), istep, f1_exp->GetChisquare()/f1_exp->GetNDF() );
+    gr_chi2_vs_istep->SetPoint( gr_chi2_vs_istep->GetN(), this_delta_d, f1_exp->GetChisquare()/f1_exp->GetNDF() );
 
-    //float x0_comb, x0_err_comb;
-    //uc_x0.combine( x0_comb, x0_err_comb );
-
-    //gr_x0_vs_iStep->SetPoint( gr_x0_vs_iStep->GetN(), istep, x0_comb );
-    //gr_x0_err_vs_iStep->SetPoint( gr_x0_err_vs_iStep->GetN(), istep, x0_err_comb/x0_comb );
-    
 
     float gamma_comb, gamma_err_comb;
     uc.combine( gamma_comb, gamma_err_comb );
@@ -321,7 +287,7 @@ int main( int argc, char* argv[] ) {
 
   TFile* outfile = TFile::Open( "test.root", "recreate" );
   outfile->cd();
-  gr_chi2_vs_iStep->Write();
+  gr_chi2_vs_istep->Write();
   outfile->Close();
 
 
