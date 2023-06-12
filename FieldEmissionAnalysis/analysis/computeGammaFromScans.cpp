@@ -122,7 +122,6 @@ int main( int argc, char* argv[] ) {
 
 
   // first loop to scale data points to muA and to get the graphs
-
   for( unsigned i=0; i<scans.size(); ++i ) {
 
     scans[i]->scaleDataPoints( 1E-6 ); // in muA
@@ -222,32 +221,6 @@ int main( int argc, char* argv[] ) {
       }
 
 
-      ////c2->cd();
-      ////gr_selected_forFit->Draw( "P same" );
-      //////graph_vsE->Draw( "P same" );
-
-      //legend->AddEntry( graph_vsE, Form("d = %.1f mm", scans[i]->d()), "P" );
-
-
-      //TGraphErrors* gr_FN = getFNgraph( gr_selected );
-
-      //TF1* f1_line = new TF1( Form("line_%s", gr_FN->GetName()), "[0]+[1]*x" );
-      //f1_line->SetLineColor(gr_FN->GetLineColor());
-      //f1_line->SetLineWidth(2);
-
-      //initializeFunction( f1_line, gr_FN );
-
-      //gr_FN->Fit( f1_line, "Q+" );
-
-      //c3->cd();
-      //gr_FN->Draw("P same");
-//TFile* file = TFile::Open("test.root", "recreate" );
-//file->cd();
-//gr_selected_forFit->Write();
-//gr_FN->Write();
-//file->Close();
-//exit(1);
-
       TF1* f1_line = graphsFN_selected[i]->GetFunction( Form( "line_%s", graphsFN_selected[i]->GetName()) );
       
       float phi = 4.7; // in eV
@@ -282,9 +255,6 @@ int main( int argc, char* argv[] ) {
 
     c3->cd();
 
-    //float xMin_E, xMax_E, yMin_E, yMax_E;
-    //AndCommon::findGraphRanges( gr_selected_forFit, xMin_E, xMax_E, yMin_E, yMax_E );
-
     h2_axes_vsE->Draw();
 
     TF1* f1_exp = new TF1( Form("exp_step%d", istep), "exp([0]+[1]*x)" );
@@ -318,32 +288,14 @@ int main( int argc, char* argv[] ) {
     std::cout << "Combined measurement (no correlations): " << gamma_nocorr << " +/- " << gamma_err_nocorr << std::endl;
 
 
-    //if( istep==0 ) { // only once
-    //  c1->cd();
-    //  legend->Draw("same");
-    //  gPad->RedrawAxis();
-    //  c1->SaveAs( Form("%s/i_vs_v.pdf", outdir.c_str()) );
-    //}
-
     c3->cd();
     //legend->Draw("same");
     gPad->RedrawAxis();
     c3->SaveAs( Form("%s/i_vs_e_step%d.pdf", outdir.c_str(), istep) );
 
-    //c3->cd();
-
-    ////legend->Draw("same");
-    //gPad->RedrawAxis();
-    //c3->SaveAs( Form("%s/fn_step%d.pdf", outdir.c_str(), istep) );
-
-    //delete h2_axesE;
-    //delete legend;
 
   } // steps
 
-
-  //TFile* outfile = TFile::Open( "test.root", "recreate" );
-  //outfile->cd();
 
   TCanvas* c4 = new TCanvas( "c4", "", 600, 600 );
   c4->cd();
@@ -377,31 +329,6 @@ int main( int argc, char* argv[] ) {
   gPad->RedrawAxis();
 
   c4->SaveAs( Form("%s/chi2Scan.pdf", outdir.c_str()) );
-
-
-  c4->Clear();
-  c4->cd();
-
-  //float xMinGamma, xMaxGamma, yMinGamma, yMaxGamma;
-  //AndCommon::findGraphRanges( gr_gamma_vs_istep, xMinGamma, xMaxGamma, yMinGamma, yMaxGamma );
-
-  //TH2D* h2_axesGamma = new TH2D( "axesGamma", "", 10, xMin4, xMax4, 10, 0., yMaxGamma*1.2 );
-  //h2_axesGamma->SetXTitle( "#delta d [mm]" );
-  //h2_axesGamma->SetYTitle( "Enhancement Factor #gamma" );
-  //h2_axesGamma->Draw();
-
-  //gr_gamma_vs_istep->SetMarkerStyle(20);
-  //gr_gamma_vs_istep->SetMarkerColor(kGray+3);
-  //gr_gamma_vs_istep->SetLineColor(kGray+3);
-  //gr_gamma_vs_istep->SetMarkerSize(1.1);
-
-  //gr_gamma_vs_istep->Draw("P same");
-
-  //gPad->RedrawAxis();
-
-  //c4->SaveAs( Form("%s/gammaScan.pdf", outdir.c_str()) );
-
-  //outfile->Close();
 
 
   return 0;
