@@ -36,41 +36,48 @@ int main( int argc, char* argv[] ) {
 
   std::string sampleName( argv[1] );
 
-  std::vector< std::string > scans;
+  std::vector< IVScan* > scans;
 
   if( sampleName == "CNTetchedOLD_AGnew" ) {
 
-    scans.push_back( "CNTetchedOLD_AGnew_d3_20230519_drain.dat" );
-    scans.push_back( "CNTetchedOLD_AGnew_d4_20230519_drain.dat" );
-    scans.push_back( "CNTetchedOLD_AGnew_d5_20230519_drain.dat" );
+    scans.push_back( new IVScan("CNTetchedOLD_AGnew_d3_20230519_drain.dat") );
+    scans.push_back( new IVScan("CNTetchedOLD_AGnew_d4_20230519_drain.dat") );
+    scans.push_back( new IVScan("CNTetchedOLD_AGnew_d5_20230519_drain.dat") );
 
   } else if( sampleName == "CNTetchedOLD_N1new" ) {
 
     //scans.push_back( "CNTetchedOLD_N1new_d3p3_20230517_drain.dat" );
     //scans.push_back( "CNTetchedOLD_N1new_d4p3_20230517_drain_2.dat" );
-    scans.push_back( "CNTetchedOLD_N1new_d4_20230517_drain.dat" );
-    scans.push_back( "CNTetchedOLD_N1new_d4p3_20230517_drain.dat" );
-    scans.push_back( "CNTetchedOLD_N1new_d5_20230517_drain.dat" );
+    scans.push_back( new IVScan("CNTetchedOLD_N1new_d4_20230517_drain.dat"  ) );
+    scans.push_back( new IVScan("CNTetchedOLD_N1new_d4p3_20230517_drain.dat") );
+    scans.push_back( new IVScan("CNTetchedOLD_N1new_d5_20230517_drain.dat"  ) );
 
   } else if( sampleName == "CNTetchedOLD_N2new" ) {
 
-    scans.push_back( "CNTetchedOLD_N2new_d3p3_20230518_drain.dat" );
-    scans.push_back( "CNTetchedOLD_N2new_d4_20230518_drain.dat" );
-    scans.push_back( "CNTetchedOLD_N2new_d3_20230518_drain.dat" );
-    scans.push_back( "CNTetchedOLD_N2new_d3p6_20230518_drain.dat" );
+    scans.push_back( new IVScan("CNTetchedOLD_N2new_d3p3_20230518_drain.dat") );
+    scans.push_back( new IVScan("CNTetchedOLD_N2new_d4_20230518_drain.dat") );
+    scans.push_back( new IVScan("CNTetchedOLD_N2new_d3_20230518_drain.dat") );
+    scans.push_back( new IVScan("CNTetchedOLD_N2new_d3p6_20230518_drain.dat") );
 
   } else if( sampleName == "CNTetchedOLD_Strongnew" ) {
 
-    scans.push_back( "CNTetchedOLD_Strongnew_d3p6_20230519_drain.dat" );
-    scans.push_back( "CNTetchedOLD_Strongnew_d4_20230519_drain.dat" );
-    scans.push_back( "CNTetchedOLD_Strongnew_d5_20230519_drain.dat" );
-    scans.push_back( "CNTetchedOLD_Strongnew_d3_20230519_drain.dat" );
+    scans.push_back( new IVScan("CNTetchedOLD_Strongnew_d3p6_20230519_drain.dat") );
+    scans.push_back( new IVScan("CNTetchedOLD_Strongnew_d4_20230519_drain.dat") );
+    scans.push_back( new IVScan("CNTetchedOLD_Strongnew_d5_20230519_drain.dat") );
+    scans.push_back( new IVScan("CNTetchedOLD_Strongnew_d3_20230519_drain.dat") );
 
   } else if( sampleName == "CNTetchedOLD_N3new" ) {
 
-    scans.push_back( "CNTetchedOLD_N3new_d3_20230519_drain.dat" );
-    scans.push_back( "CNTetchedOLD_N3new_d4_20230519_drain.dat" );
-    scans.push_back( "CNTetchedOLD_N3new_d5_20230519_drain.dat" );
+    scans.push_back( new IVScan("CNTetchedOLD_N3new_d3_20230519_drain.dat") );
+    scans.push_back( new IVScan("CNTetchedOLD_N3new_d4_20230519_drain.dat") );
+    scans.push_back( new IVScan("CNTetchedOLD_N3new_d5_20230519_drain.dat") );
+
+  } else if( sampleName=="CNTArO2Etching_N1" ) {
+
+    scans.push_back( new IVScan("CNTArO2Etching_N1_d2_20221130", -1.) );
+    scans.push_back( new IVScan("CNTArO2Etching_N1_d3_20221130", -1.) );
+    scans.push_back( new IVScan("CNTArO2Etching_N1_d4_20221130", -1.) );
+    scans.push_back( new IVScan("CNTArO2Etching_N1_d5_20221130", -1.) );
 
   } else {
 
@@ -89,56 +96,105 @@ int main( int argc, char* argv[] ) {
   std::vector<int> colors = AndCommon::colors();
 
 
-  TCanvas* c1 = new TCanvas( "c1", "", 600, 600 );
-  TCanvas* c2 = new TCanvas( "c2", "", 600, 600 );
-  TCanvas* c3 = new TCanvas( "c3", "", 600, 600 );
+  std::vector< TGraphErrors* > graphs_selected;
+  std::vector< TGraphErrors* > graphsFN_selected;
 
+
+  //TLegend* legend = new TLegend( 0.2, 0.65, 0.5, 0.9, sampleName.c_str() );
+  //legend->SetTextSize(0.035);
+  //legend->SetFillColor(0);
+
+  TCanvas* c1 = new TCanvas( "c1", "", 600, 600 );
+  c1->cd();
 
   TH2D* h2_axes = new TH2D( "axes", "", 10, 0., 2000., 10, 0., 30. );
   h2_axes->SetXTitle( "#DeltaV [V]" );
   h2_axes->SetYTitle( "I [#muA]" );
+  h2_axes->Draw();
 
-  TH2D* h2_axesE = new TH2D( "axesE", "", 10, 0., 400., 10, 0., 30. );
-  h2_axesE->SetXTitle( "#DeltaV / d [V/mm]" );
-  h2_axesE->SetYTitle( "I [#muA]" );
+  TCanvas* c2 = new TCanvas( "c2", "", 600, 600 );
+  c2->cd();
 
-  TH2D* h2_axesFN = new TH2D( "axesFN", "", 10, 0.0005, 0.0015, 10, -20., 0. );
+  TH2D* h2_axesFN = new TH2D( "axesFN", "", 10, 0.0005, 0.002, 10, -15., 10. );
   h2_axesFN->SetXTitle( IVScanFN::xTitleFN().c_str() );
   h2_axesFN->SetYTitle( IVScanFN::yTitleFN().c_str() );
+  h2_axesFN->Draw();
+
+
+  // first loop to scale data points to muA and to get the graphs
+
+  for( unsigned i=0; i<scans.size(); ++i ) {
+
+    scans[i]->scaleDataPoints( 1E-6 ); // in muA
+
+    TGraphErrors* graph = scans[i]->graph();
+
+    TGraphErrors* gr_selected = selectPointsForFN( *graph );
+    gr_selected->SetMarkerSize(1.6);
+    gr_selected->SetMarkerColor( colors[i] );
+    gr_selected->SetLineColor  ( colors[i] );
+
+    c1->cd();
+    gr_selected->Draw("P same" );
+
+    graphs_selected.push_back( gr_selected );
+  
+    TGraphErrors* gr_FN = getFNgraph( gr_selected );
+
+    TF1* f1_line = new TF1( Form("line_%s", gr_FN->GetName()), "[0]+[1]*x" );
+    f1_line->SetLineColor(gr_FN->GetLineColor());
+    f1_line->SetLineWidth(2);
+
+    initializeFunction( f1_line, gr_FN );
+
+    gr_FN->Fit( f1_line, "Q+" );
+
+    c2->cd();
+    gr_FN->Draw("P same" );
+
+    graphsFN_selected.push_back( gr_FN );
+
+  } // for scans
+
+  c1->cd();
+  gPad->RedrawAxis();
+  c1->SaveAs( Form("%s/i_vs_v.pdf", outdir.c_str()) );
+
+  c2->cd();
+  gPad->RedrawAxis();
+  c2->SaveAs( Form("%s/fn.pdf", outdir.c_str()) );
 
 
   int nsteps = 150;
   float start_delta = -0.5; // in mm, relative to central d
   float stepsize = 0.01; // in mm
 
+  float minChi2 = 99999.;;
+  int step_minChi2 = -1;
+  float gamma_comb_minChi2 = 0.;
+  float gamma_err_comb_minChi2 = 0.;
+
   TGraphErrors* gr_chi2_vs_istep = new TGraphErrors(0);
   gr_chi2_vs_istep->SetName("gr_chi2_vs_istep");
 
 
+  TCanvas* c3 = new TCanvas( "c3", "", 600, 600 );
+
+  TH2D* h2_axes_vsE = new TH2D( "axes_vsE", "", 10, 0., 350., 10, 0., 30. );
+  h2_axes_vsE->SetXTitle( "#DeltaV / d [V/mm]" );
+  h2_axes_vsE->SetYTitle( "I [#muA]" );
+
+
+  //for( int istep=0; istep<3; ++istep ) {
   for( int istep=0; istep<nsteps; ++istep ) {
+
+    c3->Clear();
+
+    h2_axes_vsE->Draw();
 
     float this_delta_d = start_delta + (float)istep*stepsize;
 
-    c1->Clear();
-    c2->Clear();
-    c3->Clear();
-
-    c1->cd();
-    h2_axes->Draw();
-
-    c2->cd();
-    h2_axesE->Draw();
-
-    c3->cd();
-    h2_axesFN->Draw();
-
-
-    TLegend* legend = new TLegend( 0.2, 0.65, 0.5, 0.9, sampleName.c_str() );
-    legend->SetTextSize(0.035);
-    legend->SetFillColor(0);
-
     UncCorr uc;
-    UncCorr uc_x0;
 
     TGraphErrors* gr_selected_forFit = new TGraphErrors(0); // bunch them all together in one graph
     gr_selected_forFit->SetName( Form("gr_selected_forFit_step%d", istep) );
@@ -150,72 +206,53 @@ int main( int argc, char* argv[] ) {
 
     for( unsigned i=0; i<scans.size(); ++i ) {
 
-      IVScan scan(scans[i]);
+      float this_d = scans[i]->d() + this_delta_d;
 
-      scan.scaleDataPoints( 1E-6 ); // in microA
-
-      scan.set_d( scan.d() + this_delta_d );
-
-      TGraphErrors* graph = scan.graph();
-
-      if( istep==0 ) { // only once
-
-        c1->cd();
-        graph->SetMarkerSize( 1.6 );
-        graph->SetMarkerColor( colors[i] );
-        graph->SetLineColor( colors[i] );
-        graph->Draw( "P same" );
-
-      } // if step =0 
-
-      TGraphErrors* graph_vsE = scan.graph_vsE();
-      graph_vsE->SetMarkerSize( 1.6 );
-      graph_vsE->SetMarkerColor( colors[i] );
-      graph_vsE->SetLineColor  ( colors[i] );
-
-      TGraphErrors* gr_selected = selectPointsForFN( *graph );
-      gr_selected->SetMarkerSize(1.6);
-      gr_selected->SetMarkerColor( colors[i] );
-      gr_selected->SetLineColor  ( colors[i] );
-
-
-      for( unsigned iPoint=0; iPoint<gr_selected->GetN(); ++iPoint ) {
+      for( unsigned iPoint=0; iPoint<graphs_selected[i]->GetN(); ++iPoint ) {
 
         double x, y;
-        gr_selected->GetPoint( iPoint, x, y );
-        double xerr = gr_selected->GetErrorX( iPoint );
-        double yerr = gr_selected->GetErrorY( iPoint );
+        graphs_selected[i]->GetPoint( iPoint, x, y );
+        double xerr = graphs_selected[i]->GetErrorX( iPoint );
+        double yerr = graphs_selected[i]->GetErrorY( iPoint );
 
         int n_vsE = gr_selected_forFit->GetN();
-        gr_selected_forFit->SetPoint( n_vsE, x/scan.d(), y ); // x->x/d (so vs E)
-        gr_selected_forFit->SetPointError( n_vsE, xerr/scan.d(), yerr ); 
+        gr_selected_forFit->SetPoint( n_vsE, x/this_d, y ); // x->x/d (so vs E)
+        gr_selected_forFit->SetPointError( n_vsE, xerr/this_d, yerr ); 
 
       }
 
 
-      //c2->cd();
-      //gr_selected_forFit->Draw( "P same" );
-      ////graph_vsE->Draw( "P same" );
+      ////c2->cd();
+      ////gr_selected_forFit->Draw( "P same" );
+      //////graph_vsE->Draw( "P same" );
 
-      //legend->AddEntry( graph_vsE, Form("d = %.1f mm", scan.d()), "P" );
+      //legend->AddEntry( graph_vsE, Form("d = %.1f mm", scans[i]->d()), "P" );
 
 
-      TGraphErrors* gr_FN = getFNgraph( gr_selected );
+      //TGraphErrors* gr_FN = getFNgraph( gr_selected );
 
-      TF1* f1_line = new TF1( Form("line_%s", gr_FN->GetName()), "[0]+[1]*x" );
-      f1_line->SetLineColor(gr_FN->GetLineColor());
-      f1_line->SetLineWidth(2);
+      //TF1* f1_line = new TF1( Form("line_%s", gr_FN->GetName()), "[0]+[1]*x" );
+      //f1_line->SetLineColor(gr_FN->GetLineColor());
+      //f1_line->SetLineWidth(2);
 
-      initializeFunction( f1_line, gr_FN );
+      //initializeFunction( f1_line, gr_FN );
 
-      gr_FN->Fit( f1_line, "+" );
+      //gr_FN->Fit( f1_line, "Q+" );
 
-      c3->cd();
-      gr_FN->Draw("P same");
+      //c3->cd();
+      //gr_FN->Draw("P same");
+//TFile* file = TFile::Open("test.root", "recreate" );
+//file->cd();
+//gr_selected_forFit->Write();
+//gr_FN->Write();
+//file->Close();
+//exit(1);
+
+      TF1* f1_line = graphsFN_selected[i]->GetFunction( Form( "line_%s", graphsFN_selected[i]->GetName()) );
       
       float phi = 4.7; // in eV
       float phi_err = 0.1; // in eV
-      float d = scan.d(); // in mm
+      float d = scans[i]->d(); // in mm
       float d_err_corr = 0.3; // 0.1 for the syst on the position (linear shifter, see logbook_ANDROMeDa entry 24/01/22) plus 0.1 for the uncertainty on the length of the tubes
       float d_err_uncorr = 0.01; // relative uncertainty between scans
       float s = f1_line->GetParameter(1);
@@ -243,13 +280,20 @@ int main( int argc, char* argv[] ) {
     } // for scans
 
 
-    c2->cd();
+    c3->cd();
+
+    //float xMin_E, xMax_E, yMin_E, yMax_E;
+    //AndCommon::findGraphRanges( gr_selected_forFit, xMin_E, xMax_E, yMin_E, yMax_E );
+
+    h2_axes_vsE->Draw();
 
     TF1* f1_exp = new TF1( Form("exp_step%d", istep), "exp([0]+[1]*x)" );
     gr_selected_forFit->Fit(f1_exp);
     gr_selected_forFit->Draw( "P same" );
 
-    gr_chi2_vs_istep->SetPoint( gr_chi2_vs_istep->GetN(), this_delta_d, f1_exp->GetChisquare()/f1_exp->GetNDF() );
+    float thisChi2 = f1_exp->GetChisquare()/f1_exp->GetNDF();
+
+    gr_chi2_vs_istep->SetPoint( gr_chi2_vs_istep->GetN(), this_delta_d, thisChi2 );
 
 
     float gamma_comb, gamma_err_comb;
@@ -257,39 +301,107 @@ int main( int argc, char* argv[] ) {
 
     std::cout << "Combined measurement: " << gamma_comb << " +/- " << gamma_err_comb << std::endl;
 
+    //gr_gamma_vs_istep->SetPoint     ( istep, this_delta_d, gamma_comb );
+    //gr_gamma_vs_istep->SetPointError( istep, 0., gamma_err_comb );
+
+    if( thisChi2<minChi2 ) {
+      minChi2 = thisChi2;
+      step_minChi2 = istep;
+      gamma_comb_minChi2 = gamma_comb;
+      gamma_err_comb_minChi2 = gamma_err_comb;
+    }
+
+
     float gamma_nocorr, gamma_err_nocorr;
     uc.combine( gamma_nocorr, gamma_err_nocorr, false );
 
     std::cout << "Combined measurement (no correlations): " << gamma_nocorr << " +/- " << gamma_err_nocorr << std::endl;
 
 
-    if( istep==0 ) { // only once
-      c1->cd();
-      legend->Draw("same");
-      gPad->RedrawAxis();
-      c1->SaveAs( Form("%s/i_vs_v.pdf", outdir.c_str()) );
-    }
-
-    c2->cd();
-    legend->Draw("same");
-    gPad->RedrawAxis();
-    c2->SaveAs( Form("%s/i_vs_e_step%d.pdf", outdir.c_str(), istep) );
+    //if( istep==0 ) { // only once
+    //  c1->cd();
+    //  legend->Draw("same");
+    //  gPad->RedrawAxis();
+    //  c1->SaveAs( Form("%s/i_vs_v.pdf", outdir.c_str()) );
+    //}
 
     c3->cd();
-    legend->Draw("same");
+    //legend->Draw("same");
     gPad->RedrawAxis();
-    c3->SaveAs( Form("%s/fn_step%d.pdf", outdir.c_str(), istep) );
+    c3->SaveAs( Form("%s/i_vs_e_step%d.pdf", outdir.c_str(), istep) );
 
-    delete legend;
+    //c3->cd();
+
+    ////legend->Draw("same");
+    //gPad->RedrawAxis();
+    //c3->SaveAs( Form("%s/fn_step%d.pdf", outdir.c_str(), istep) );
+
+    //delete h2_axesE;
+    //delete legend;
 
   } // steps
 
 
-  TFile* outfile = TFile::Open( "test.root", "recreate" );
-  outfile->cd();
-  gr_chi2_vs_istep->Write();
-  outfile->Close();
+  //TFile* outfile = TFile::Open( "test.root", "recreate" );
+  //outfile->cd();
 
+  TCanvas* c4 = new TCanvas( "c4", "", 600, 600 );
+  c4->cd();
+
+  float xMin4, xMax4, yMin4, yMax4;
+  AndCommon::findGraphRanges( gr_chi2_vs_istep, xMin4, xMax4, yMin4, yMax4 );
+
+  xMin4 *= 0.9;
+  xMax4 *= 1.1;
+  yMin4 *= 0.9;
+  yMax4 *= 1.1;
+
+  TH2D* h2_axes4 = new TH2D( "axes4", "", 10, xMin4, xMax4, 10, yMin4, yMax4 );
+  h2_axes4->SetXTitle( "#Deltad [mm]" );
+  h2_axes4->SetYTitle( "#chi^{2}" );
+  h2_axes4->Draw();
+
+  gr_chi2_vs_istep->SetMarkerStyle(20);
+  gr_chi2_vs_istep->SetMarkerColor(kGray+3);
+  gr_chi2_vs_istep->SetLineColor(kGray+3);
+  gr_chi2_vs_istep->SetMarkerSize(1.1);
+
+  float xMinChi2 = start_delta + (float)step_minChi2*stepsize;
+  TLine* line_min = new TLine( xMinChi2, yMin4, xMinChi2, minChi2 );
+  line_min->SetLineColor(46);
+  line_min->SetLineWidth(2);
+  line_min->Draw("same");
+
+  gr_chi2_vs_istep->Draw("P same");
+
+  gPad->RedrawAxis();
+
+  c4->SaveAs( Form("%s/chi2Scan.pdf", outdir.c_str()) );
+
+
+  c4->Clear();
+  c4->cd();
+
+  //float xMinGamma, xMaxGamma, yMinGamma, yMaxGamma;
+  //AndCommon::findGraphRanges( gr_gamma_vs_istep, xMinGamma, xMaxGamma, yMinGamma, yMaxGamma );
+
+  //TH2D* h2_axesGamma = new TH2D( "axesGamma", "", 10, xMin4, xMax4, 10, 0., yMaxGamma*1.2 );
+  //h2_axesGamma->SetXTitle( "#delta d [mm]" );
+  //h2_axesGamma->SetYTitle( "Enhancement Factor #gamma" );
+  //h2_axesGamma->Draw();
+
+  //gr_gamma_vs_istep->SetMarkerStyle(20);
+  //gr_gamma_vs_istep->SetMarkerColor(kGray+3);
+  //gr_gamma_vs_istep->SetLineColor(kGray+3);
+  //gr_gamma_vs_istep->SetMarkerSize(1.1);
+
+  //gr_gamma_vs_istep->Draw("P same");
+
+  //gPad->RedrawAxis();
+
+  //c4->SaveAs( Form("%s/gammaScan.pdf", outdir.c_str()) );
+
+  //outfile->Close();
 
 
   return 0;
@@ -309,7 +421,9 @@ TGraphErrors* selectPointsForFN( TGraphErrors graph ) {
   selected->SetMarkerSize ( graph.GetMarkerSize()  );
   selected->SetLineColor  ( graph.GetLineColor()   );
 
-  for( unsigned i = 0; i<5; ++i ) {
+
+  //for( unsigned i = 0; i<2; ++i ) { // for now 5 points
+  for( unsigned i = 0; i<5; ++i ) { // for now 5 points
 
     int iPoint = findHighestVoltage( &graph );
 
@@ -410,30 +524,3 @@ void initializeFunction( TF1* f1_line, TGraphErrors* gr_FN ) {
   }
 
 }
-
-
-
-/*
-
-  if( graphFN_->GetN() > 1 ) {
-
-    TF1* f1_line = new TF1( Form("line_%s", this->name().c_str()), "[0]+[1]*x" );
-    f1_line->SetLineColor(46);
-    f1_line->SetLineWidth(2);
-    graphFN_->Fit( f1_line, "Q+" );
-
-    float phi = 4.7; // in eV
-    float phi_err = 0.1; // in eV
-    float d = this->d(); // in mm
-    float d_err = 0.2; // 0.1 for the syst on the position (linear shifter, see logbook_ANDROMeDa entry 24/01/22) plus 0.1 for the uncertainty on the length of the tubes
-    float s = f1_line->GetParameter(1);
-    float s_err = f1_line->GetParError(1);
-    float b = 6.83E6; // this is 4/3 * sqrt(2m) / hbar = 6.83E6 V^-1/2 mm^-1, from FN theory
-    gamma_ = -b*phi*sqrt(phi)*d/s;
-    gamma_err_ = sqrt( gamma_*gamma_/(s*s)*s_err*s_err + gamma_*gamma_/(d*d)*d_err*d_err + 9.*gamma_*gamma_/(4.*phi*phi)*phi_err*phi_err ); // propagazione
-
-  }
-
-}
-
-*/
