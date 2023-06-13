@@ -23,6 +23,11 @@ TGraphErrors* selectPointsForFN( TGraphErrors graph );
 TGraphErrors* getFNgraph( TGraphErrors* selected );
 void initializeFunction( TF1* f1_line, TGraphErrors* gr_FN );
 int findHighestVoltage( TGraph* graph );
+void findChiSquareMinPlusOne( TGraphErrors* gr_chi2_vs_istep, float minChi2, int& iMinusSigma, int& iPlusSigma );
+
+
+
+
 
 
 
@@ -115,7 +120,7 @@ int main( int argc, char* argv[] ) {
   TCanvas* c2 = new TCanvas( "c2", "", 600, 600 );
   c2->cd();
 
-  TH2D* h2_axesFN = new TH2D( "axesFN", "", 10, 0.0005, 0.002, 10, -15., 10. );
+  TH2D* h2_axesFN = new TH2D( "axesFN", "", 10, 0.0005, 0.002, 10, -15., -5. );
   h2_axesFN->SetXTitle( IVScanFN::xTitleFN().c_str() );
   h2_axesFN->SetYTitle( IVScanFN::yTitleFN().c_str() );
   h2_axesFN->Draw();
@@ -172,9 +177,14 @@ int main( int argc, char* argv[] ) {
   int step_minChi2 = -1;
   float gamma_comb_minChi2 = 0.;
   float gamma_err_comb_minChi2 = 0.;
+  float gamma_nocorr_minChi2 = 0.;
+  float gamma_err_nocorr_minChi2 = 0.;
 
   TGraphErrors* gr_chi2_vs_istep = new TGraphErrors(0);
   gr_chi2_vs_istep->SetName("gr_chi2_vs_istep");
+
+  TGraphErrors* gr_chi2red_vs_istep = new TGraphErrors(0);
+  gr_chi2red_vs_istep->SetName("gr_chi2red_vs_istep");
 
 
   TCanvas* c3 = new TCanvas( "c3", "", 600, 600 );
@@ -225,7 +235,7 @@ int main( int argc, char* argv[] ) {
       
       float phi = 4.7; // in eV
       float phi_err = 0.1; // in eV
-      float d = scans[i]->d(); // in mm
+      float d = this_d;
       float d_err_corr = 0.3; // 0.1 for the syst on the position (linear shifter, see logbook_ANDROMeDa entry 24/01/22) plus 0.1 for the uncertainty on the length of the tubes
       float d_err_uncorr = 0.01; // relative uncertainty between scans
       float s = f1_line->GetParameter(1);
@@ -261,9 +271,11 @@ int main( int argc, char* argv[] ) {
     gr_selected_forFit->Fit(f1_exp);
     gr_selected_forFit->Draw( "P same" );
 
-    float thisChi2 = f1_exp->GetChisquare()/f1_exp->GetNDF();
+    float thisChi2 = f1_exp->GetChisquare();
+    float thisNDF = (float)(f1_exp->GetNDF());
 
-    gr_chi2_vs_istep->SetPoint( gr_chi2_vs_istep->GetN(), this_delta_d, thisChi2 );
+    gr_chi2_vs_istep   ->SetPoint( gr_chi2_vs_istep   ->GetN(), this_delta_d, thisChi2         );
+    gr_chi2red_vs_istep->SetPoint( gr_chi2red_vs_istep->GetN(), this_delta_d, thisChi2/thisNDF );
 
 
     float gamma_comb, gamma_err_comb;
@@ -274,18 +286,21 @@ int main( int argc, char* argv[] ) {
     //gr_gamma_vs_istep->SetPoint     ( istep, this_delta_d, gamma_comb );
     //gr_gamma_vs_istep->SetPointError( istep, 0., gamma_err_comb );
 
-    if( thisChi2<minChi2 ) {
-      minChi2 = thisChi2;
-      step_minChi2 = istep;
-      gamma_comb_minChi2 = gamma_comb;
-      gamma_err_comb_minChi2 = gamma_err_comb;
-    }
-
 
     float gamma_nocorr, gamma_err_nocorr;
     uc.combine( gamma_nocorr, gamma_err_nocorr, false );
 
     std::cout << "Combined measurement (no correlations): " << gamma_nocorr << " +/- " << gamma_err_nocorr << std::endl;
+
+
+    if( thisChi2<minChi2 ) {
+      minChi2 = thisChi2;
+      step_minChi2 = istep;
+      gamma_comb_minChi2 = gamma_comb;
+      gamma_err_comb_minChi2 = gamma_err_comb;
+      gamma_nocorr_minChi2 = gamma_nocorr;
+      gamma_err_nocorr_minChi2 = gamma_err_nocorr;
+    }
 
 
     c3->cd();
@@ -308,9 +323,10 @@ int main( int argc, char* argv[] ) {
   yMin4 *= 0.9;
   yMax4 *= 1.1;
 
-  TH2D* h2_axes4 = new TH2D( "axes4", "", 10, xMin4, xMax4, 10, yMin4, yMax4 );
+  TH2D* h2_axes4 = new TH2D( "axes4", "", 10, xMin4, xMax4, 10, 0., yMax4 );
   h2_axes4->SetXTitle( "#Deltad [mm]" );
-  h2_axes4->SetYTitle( "#chi^{2}" );
+  h2_axes4->SetYTitle( "#chi^{2} / NDF" );
+  //h2_axes4->SetYTitle( "#chi^{2} / NDF" );
   h2_axes4->Draw();
 
   gr_chi2_vs_istep->SetMarkerStyle(20);
@@ -318,17 +334,100 @@ int main( int argc, char* argv[] ) {
   gr_chi2_vs_istep->SetLineColor(kGray+3);
   gr_chi2_vs_istep->SetMarkerSize(1.1);
 
-  float xMinChi2 = start_delta + (float)step_minChi2*stepsize;
-  TLine* line_min = new TLine( xMinChi2, yMin4, xMinChi2, minChi2 );
+  //gr_chi2red_vs_istep->SetMarkerStyle(20);
+  //gr_chi2red_vs_istep->SetMarkerColor(kGray+3);
+  //gr_chi2red_vs_istep->SetLineColor(kGray+3);
+  //gr_chi2red_vs_istep->SetMarkerSize(1.1);
+
+  float delta_d_minChi2 = (float)step_minChi2*stepsize;
+
+  float xMinChi2 = start_delta + delta_d_minChi2;
+  TLine* line_min = new TLine( xMinChi2, 0., xMinChi2, minChi2 );
   line_min->SetLineColor(46);
   line_min->SetLineWidth(2);
   line_min->Draw("same");
 
+  int iMinusSigma, iPlusSigma;
+  findChiSquareMinPlusOne( gr_chi2_vs_istep, minChi2, iMinusSigma, iPlusSigma );
+
+  double xMinusSigma, yMinusSigma;
+  gr_chi2_vs_istep->GetPoint( iMinusSigma, xMinusSigma, yMinusSigma );
+  double xPlusSigma, yPlusSigma;
+  gr_chi2_vs_istep->GetPoint( iPlusSigma, xPlusSigma, yPlusSigma );
+
+  TLine* lineMinusSigma = new TLine( xMinusSigma, 0., xMinusSigma, yMinusSigma );
+  lineMinusSigma->SetLineColor(46);
+  lineMinusSigma->SetLineWidth(2);
+  lineMinusSigma->Draw("same");
+
+  TLine* linePlusSigma = new TLine( xPlusSigma, 0., xPlusSigma, yPlusSigma );
+  linePlusSigma->SetLineColor(46);
+  linePlusSigma->SetLineWidth(2);
+  linePlusSigma->Draw("same");
+
   gr_chi2_vs_istep->Draw("P same");
+
 
   gPad->RedrawAxis();
 
   c4->SaveAs( Form("%s/chi2Scan.pdf", outdir.c_str()) );
+
+
+  float d_err_new = (xPlusSigma-xMinusSigma)/2.;
+
+  std::cout << "-> From Chi2 scan, updated uncertainty on d: " << d_err_new << " mm (was 0.3 mm)" << std::endl;
+
+
+  UncCorr uc;
+
+  // update gamma measurement with new d uncertainty
+  for( unsigned i=0; i<scans.size(); ++i ) {
+
+    float this_d = scans[i]->d() + xMinChi2;
+
+
+    TF1* f1_line = graphsFN_selected[i]->GetFunction( Form( "line_%s", graphsFN_selected[i]->GetName()) );
+    
+    float phi = 4.7; // in eV
+    float phi_err = 0.1; // in eV
+    float d = this_d; // in mm
+    float d_err_corr = d_err_new;
+    float d_err_uncorr = 0.01; // relative uncertainty between scans
+    float s = f1_line->GetParameter(1);
+    float s_err = f1_line->GetParError(1);
+    float b = 6.83E6; // this is 4/3 * sqrt(2m) / hbar = 6.83E6 V^-1/2 mm^-1, from FN theory
+
+    float gamma = -b*phi*sqrt(phi)*d/s;
+
+    float gamma_err2_phi      = 9.*gamma*gamma/(4.*phi*phi)*phi_err*phi_err;
+    float gamma_err2_d_corr   = gamma*gamma/(d*d)*d_err_corr*d_err_corr; 
+    float gamma_err2_d_uncorr = gamma*gamma/(d*d)*d_err_uncorr*d_err_uncorr; 
+    float gamma_err2_s        = gamma*gamma/(s*s)*s_err*s_err;
+
+    //float gamma_err2_tot = gamma_err2_phi + gamma_err2_d_corr + gamma_err2_d_uncorr + gamma_err2_s;
+    //float gamma_err_tot = sqrt( gamma_err2_tot );
+
+    float gamma_err2_tot_uncorr = gamma_err2_d_uncorr + gamma_err2_s;
+    float gamma_err_tot_uncorr = sqrt( gamma_err2_tot_uncorr );
+
+    float gamma_err2_tot_corr = gamma_err2_d_corr + gamma_err2_phi;
+    float gamma_err_tot_corr = sqrt( gamma_err2_tot_corr );
+
+    uc.addDataPoint(gamma, gamma_err_tot_uncorr, gamma_err_tot_corr);
+
+  } // for iscans
+
+  float gamma_comb_new, gamma_err_comb_new;
+  uc.combine( gamma_comb_new, gamma_err_comb_new );
+  
+  std::cout << std::endl << std::endl;
+  std::cout << "---------------------------------------------------" << std::endl;
+  std::cout << "  Found min chi2: " << minChi2 << " at step: " << step_minChi2 << std::endl;
+  std::cout << "  Corresponding gamma: " << gamma_comb_minChi2 << " +/- " << gamma_err_comb_minChi2 << std::endl;
+  std::cout << "  (No correlations) gamma: " << gamma_nocorr_minChi2 << " +/- " << gamma_err_nocorr_minChi2 << std::endl;
+  std::cout << "  (Constraining d to chi2 scan) gamma: " << gamma_comb_new << " +/- " << gamma_err_comb_new << std::endl;
+  std::cout << "---------------------------------------------------" << std::endl;
+  std::cout << std::endl;
 
 
   return 0;
@@ -449,5 +548,28 @@ void initializeFunction( TF1* f1_line, TGraphErrors* gr_FN ) {
     f1_line->SetParameter( 1, (y1-y2)/(x1-x2) );
 
   }
+
+}
+
+
+
+void findChiSquareMinPlusOne( TGraphErrors* gr_chi2_vs_istep, float minChi2, int& iMinusSigma, int& iPlusSigma ) {
+
+  double lastx, lasty, thisx, thisy, lastDeltay=999999.;
+
+  for( unsigned iPoint=0; iPoint<gr_chi2_vs_istep->GetN(); ++iPoint ) {
+
+    gr_chi2_vs_istep->GetPoint( iPoint, thisx, thisy );
+
+    float thisDeltay = thisy-minChi2;
+
+    if( (thisDeltay<1.) && (lastDeltay>1.) ) iMinusSigma = iPoint-1;
+    if( (thisDeltay>1.) && (lastDeltay<1.) ) iPlusSigma  = iPoint;
+
+    lastx = thisx;
+    lasty = thisy;
+    lastDeltay = thisDeltay;
+
+  } // for points
 
 }
