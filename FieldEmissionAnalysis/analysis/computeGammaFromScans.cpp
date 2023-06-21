@@ -34,6 +34,7 @@ void findChiSquareMinPlusOne( TGraphErrors* gr_chi2_vs_istep, float minChi2, int
 int main( int argc, char* argv[] ) {
 
 
+
   if( argc < 2 ) {
     std::cout << "USAGE: ./computeGammaFromScans [sampleName]" << std::endl;
     exit(1);
@@ -43,7 +44,18 @@ int main( int argc, char* argv[] ) {
 
   std::vector< IVScan* > scans;
 
-  if( sampleName == "CNTetchedOLD_AGnew" ) {
+  float imax = 30.;
+  float vmax = 2200.;
+
+  if( sampleName == "CNTArO2Etching_AG" ) {
+
+    scans.push_back( new IVScan("CNTArO2Etching_AG_d3_new.dat", -1.) );
+    scans.push_back( new IVScan("CNTArO2Etching_AG_d4_new.dat", -1.) );
+    scans.push_back( new IVScan("CNTArO2Etching_AG_d5_new.dat", -1.) );
+
+    imax = 5E-6;
+
+  } else if( sampleName == "CNTetchedOLD_AGnew" ) {
 
     scans.push_back( new IVScan("CNTetchedOLD_AGnew_d3_20230519_drain.dat") );
     scans.push_back( new IVScan("CNTetchedOLD_AGnew_d4_20230519_drain.dat") );
@@ -96,7 +108,12 @@ int main( int argc, char* argv[] ) {
   system( Form("mkdir -p %s", outdir.c_str()) );
 
 
-  AndCommon::setStyle();
+  TStyle* style = AndCommon::setStyle();
+  style->SetPadLeftMargin(0.145);
+  style->SetPadRightMargin(0.11);
+  style->SetPadTopMargin(0.07);
+  style->SetTitleYOffset(1.4);
+  style->cd();
 
   std::vector<int> colors = AndCommon::colors();
 
@@ -105,26 +122,22 @@ int main( int argc, char* argv[] ) {
   std::vector< TGraphErrors* > graphsFN_selected;
 
 
-  //TLegend* legend = new TLegend( 0.2, 0.65, 0.5, 0.9, sampleName.c_str() );
-  //legend->SetTextSize(0.035);
-  //legend->SetFillColor(0);
+  TLegend* legend = new TLegend( 0.2, 0.65, 0.5, 0.9, sampleName.c_str() );
+  legend->SetTextSize(0.035);
+  legend->SetFillColor(0);
 
   TCanvas* c1 = new TCanvas( "c1", "", 600, 600 );
   c1->cd();
 
-  TH2D* h2_axes = new TH2D( "axes", "", 10, 0., 2000., 10, 0., 30. );
+  TH2D* h2_axes = new TH2D( "axes", "", 10, 0., vmax, 10, 0., imax );
   h2_axes->SetXTitle( "#DeltaV [V]" );
   h2_axes->SetYTitle( "I [#muA]" );
   h2_axes->Draw();
 
-  TCanvas* c2 = new TCanvas( "c2", "", 600, 600 );
-  c2->cd();
-
-  TH2D* h2_axesFN = new TH2D( "axesFN", "", 10, 0.0005, 0.002, 10, -15., -5. );
-  h2_axesFN->SetXTitle( IVScanFN::xTitleFN().c_str() );
-  h2_axesFN->SetYTitle( IVScanFN::yTitleFN().c_str() );
-  h2_axesFN->Draw();
-
+  float xMinFN = 10.;
+  float xMaxFN = 0.;
+  float yMinFN = 999.;
+  float yMaxFN = -999.;
 
   // first loop to scale data points to muA and to get the graphs
   for( unsigned i=0; i<scans.size(); ++i ) {
@@ -141,32 +154,60 @@ int main( int argc, char* argv[] ) {
     c1->cd();
     gr_selected->Draw("P same" );
 
+    legend->AddEntry( gr_selected, Form("d = %.1f mm", scans[i]->d()), "P" );
+
     graphs_selected.push_back( gr_selected );
   
     TGraphErrors* gr_FN = getFNgraph( gr_selected );
+
+    float xMinFN_this, xMaxFN_this, yMinFN_this, yMaxFN_this;
+    AndCommon::findGraphRanges( gr_FN, xMinFN_this, xMaxFN_this, yMinFN_this, yMaxFN_this );
+
+    if( xMinFN_this < xMinFN ) xMinFN = xMinFN_this;
+    if( yMinFN_this < yMinFN ) yMinFN = yMinFN_this;
+    if( xMaxFN_this > xMaxFN ) xMaxFN = xMaxFN_this;
+    if( yMaxFN_this > yMaxFN ) yMaxFN = yMaxFN_this;
 
     TF1* f1_line = new TF1( Form("line_%s", gr_FN->GetName()), "[0]+[1]*x" );
     f1_line->SetLineColor(gr_FN->GetLineColor());
     f1_line->SetLineWidth(2);
 
-    initializeFunction( f1_line, gr_FN );
+    //initializeFunction( f1_line, gr_FN );
 
     gr_FN->Fit( f1_line, "Q+" );
 
-    c2->cd();
-    gr_FN->Draw("P same" );
+    //c2->cd();
+    //gr_FN->Draw("P same" );
 
     graphsFN_selected.push_back( gr_FN );
 
   } // for scans
 
-  c1->cd();
-  gPad->RedrawAxis();
-  c1->SaveAs( Form("%s/i_vs_v.pdf", outdir.c_str()) );
+
+  TCanvas* c2 = new TCanvas( "c2", "", 600, 600 );
+  c2->cd();
+
+  TH2D* h2_axesFN = new TH2D( "axesFN", "", 10, 0.9*xMinFN, 1.1*xMaxFN, 10, yMinFN-0.5, yMaxFN+2. );
+  h2_axesFN->SetXTitle( IVScanFN::xTitleFN().c_str() );
+  h2_axesFN->SetYTitle( IVScanFN::yTitleFN().c_str() );
+  //h2_axesFN->GetYaxis()->SetMaxDigits(3);
+  h2_axesFN->GetXaxis()->SetNdivisions(505);
+  h2_axesFN->GetYaxis()->SetNdivisions(505);
+  h2_axesFN->Draw();
+
+  legend->Draw("same");
+
+  for( unsigned i=0; i<graphsFN_selected.size(); ++i ) graphsFN_selected[i]->Draw("P same");
+
 
   c2->cd();
   gPad->RedrawAxis();
   c2->SaveAs( Form("%s/fn.pdf", outdir.c_str()) );
+
+  c1->cd();
+  legend->Draw("same");
+  gPad->RedrawAxis();
+  c1->SaveAs( Form("%s/i_vs_v.pdf", outdir.c_str()) );
 
 
   int nsteps = 150;
@@ -189,7 +230,7 @@ int main( int argc, char* argv[] ) {
 
   TCanvas* c3 = new TCanvas( "c3", "", 600, 600 );
 
-  TH2D* h2_axes_vsE = new TH2D( "axes_vsE", "", 10, 0., 350., 10, 0., 30. );
+  TH2D* h2_axes_vsE = new TH2D( "axes_vsE", "", 10, 0., 550., 10, 0., imax );
   h2_axes_vsE->SetXTitle( "#DeltaV / d [V/mm]" );
   h2_axes_vsE->SetYTitle( "I [#muA]" );
 
@@ -208,9 +249,9 @@ int main( int argc, char* argv[] ) {
     TGraphErrors* gr_selected_forFit = new TGraphErrors(0); // bunch them all together in one graph
     gr_selected_forFit->SetName( Form("gr_selected_forFit_step%d", istep) );
     gr_selected_forFit->SetMarkerStyle( 20 );
-    gr_selected_forFit->SetMarkerColor( 46 );
+    gr_selected_forFit->SetMarkerColor( kGray+3 );
     gr_selected_forFit->SetMarkerSize ( 1.6 );
-    gr_selected_forFit->SetLineColor  ( 46 );
+    gr_selected_forFit->SetLineColor  ( kGray+3 );
 
 
     for( unsigned i=0; i<scans.size(); ++i ) {
@@ -268,6 +309,8 @@ int main( int argc, char* argv[] ) {
     h2_axes_vsE->Draw();
 
     TF1* f1_exp = new TF1( Form("exp_step%d", istep), "exp([0]+[1]*x)" );
+    f1_exp->SetLineColor(46);
+
     gr_selected_forFit->Fit(f1_exp);
     gr_selected_forFit->Draw( "P same" );
 
