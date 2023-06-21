@@ -132,6 +132,7 @@ int main( int argc, char* argv[] ) {
   TH2D* h2_axes = new TH2D( "axes", "", 10, 0., vmax, 10, 0., imax );
   h2_axes->SetXTitle( "#DeltaV [V]" );
   h2_axes->SetYTitle( "I [#muA]" );
+  h2_axes->GetXaxis()->SetNdivisions(505);
   h2_axes->Draw();
 
   float xMinFN = 10.;
