@@ -17,9 +17,19 @@ class IVScanFN : public IVScan {
 
   ~IVScanFN();
 
+  TGraphErrors* getFNgraph() const;
+  static TGraphErrors* getFNgraph( TGraphErrors* graph );
 
   TGraphErrors* graphFN() const;
   TF1* lineFN() const;
+
+  static float get_gamma_and_err( float& gamma_err_uncorr, float& gamma_err_corr, float s, float s_err, float d, float d_err=-1. );
+
+  static float phi();
+  static float phi_err();
+  static float b();
+  static float d_err_uncorr();
+  static float d_err_corr();
 
   float gamma() const;
   float gamma_err() const;
