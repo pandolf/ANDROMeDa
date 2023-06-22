@@ -14,13 +14,14 @@
 #include "TF1.h"
 #include "TFile.h"
 #include "TLegend.h"
+#include "TFitResult.h"
 
 
 
 
 
-TGraphErrors* selectPointsForFN( TGraphErrors graph );
-TGraphErrors* getFNgraph( TGraphErrors* selected );
+TGraphErrors* selectPointsForFN( TGraphErrors graph, int nPointsSelected );
+//TGraphErrors* getFNgraph( TGraphErrors* selected );
 void initializeFunction( TF1* f1_line, TGraphErrors* gr_FN );
 int findHighestVoltage( TGraph* graph );
 void findChiSquareMinPlusOne( TGraphErrors* gr_chi2_vs_istep, float minChi2, int& iMinusSigma, int& iPlusSigma );
@@ -46,14 +47,18 @@ int main( int argc, char* argv[] ) {
 
   float imax = 30.;
   float vmax = 2200.;
+  bool scaleToMicroA = true;
+  int nPointsSelect = 5;
 
-  if( sampleName == "CNTArO2Etching_AG" ) {
+  if( sampleName == "CNTArO2Etching_AG_old" ) {
 
-    scans.push_back( new IVScan("CNTArO2Etching_AG_d3_new.dat", -1.) );
-    scans.push_back( new IVScan("CNTArO2Etching_AG_d4_new.dat", -1.) );
-    scans.push_back( new IVScan("CNTArO2Etching_AG_d5_new.dat", -1.) );
+    scans.push_back( new IVScan("CNTArO2Etching_AG_d3_new.dat", -1., 1110., 1230.) );
+    scans.push_back( new IVScan("CNTArO2Etching_AG_d4_new.dat", -1., 1500., 1800.) );
+    scans.push_back( new IVScan("CNTArO2Etching_AG_d5_new.dat", -1., 1930., 2100.) );
 
-    imax = 5E-6;
+    imax = 5.;
+    scaleToMicroA = false;
+    nPointsSelect = -1; // all
 
   } else if( sampleName == "CNTetchedOLD_AGnew" ) {
 
@@ -105,7 +110,7 @@ int main( int argc, char* argv[] ) {
 
 
   std::string outdir("plots/GammaScans/"+sampleName);
-  system( Form("mkdir -p %s", outdir.c_str()) );
+  system( Form("mkdir -p %s/steps", outdir.c_str()) );
 
 
   TStyle* style = AndCommon::setStyle();
@@ -122,7 +127,7 @@ int main( int argc, char* argv[] ) {
   std::vector< TGraphErrors* > graphsFN_selected;
 
 
-  TLegend* legend = new TLegend( 0.2, 0.65, 0.5, 0.9, sampleName.c_str() );
+  TLegend* legend = new TLegend( 0.2, 0.68, 0.5, 0.9, sampleName.c_str() );
   legend->SetTextSize(0.035);
   legend->SetFillColor(0);
 
@@ -131,7 +136,8 @@ int main( int argc, char* argv[] ) {
 
   TH2D* h2_axes = new TH2D( "axes", "", 10, 0., vmax, 10, 0., imax );
   h2_axes->SetXTitle( "#DeltaV [V]" );
-  h2_axes->SetYTitle( "I [#muA]" );
+  if( scaleToMicroA ) h2_axes->SetYTitle( "I [#muA]" );
+  else                h2_axes->SetYTitle( "I [pA]"   );
   h2_axes->GetXaxis()->SetNdivisions(505);
   h2_axes->Draw();
 
@@ -143,11 +149,11 @@ int main( int argc, char* argv[] ) {
   // first loop to scale data points to muA and to get the graphs
   for( unsigned i=0; i<scans.size(); ++i ) {
 
-    scans[i]->scaleDataPoints( 1E-6 ); // in muA
+    if( scaleToMicroA ) scans[i]->scaleDataPoints( 1E-6 ); // in muA
 
     TGraphErrors* graph = scans[i]->graph();
 
-    TGraphErrors* gr_selected = selectPointsForFN( *graph );
+    TGraphErrors* gr_selected = (nPointsSelect>=0) ? selectPointsForFN( *graph, nPointsSelect ) : graph;
     gr_selected->SetMarkerSize(1.6);
     gr_selected->SetMarkerColor( colors[i] );
     gr_selected->SetLineColor  ( colors[i] );
@@ -159,7 +165,16 @@ int main( int argc, char* argv[] ) {
 
     graphs_selected.push_back( gr_selected );
   
-    TGraphErrors* gr_FN = getFNgraph( gr_selected );
+    TGraphErrors* gr_FN = IVScanFN::getFNgraph( gr_selected );
+    gr_FN->SetMarkerColor( colors[i] );
+    gr_FN->SetLineColor  ( colors[i] );
+
+//TFile* file = TFile::Open( "test.root", "recreate" );
+//file->cd();
+//gr_selected->Write();
+//gr_FN->Write();
+//file->Close();
+//exit(1);
 
     float xMinFN_this, xMaxFN_this, yMinFN_this, yMaxFN_this;
     AndCommon::findGraphRanges( gr_FN, xMinFN_this, xMaxFN_this, yMinFN_this, yMaxFN_this );
@@ -169,7 +184,7 @@ int main( int argc, char* argv[] ) {
     if( xMaxFN_this > xMaxFN ) xMaxFN = xMaxFN_this;
     if( yMaxFN_this > yMaxFN ) yMaxFN = yMaxFN_this;
 
-    TF1* f1_line = new TF1( Form("line_%s", gr_FN->GetName()), "[0]+[1]*x" );
+    TF1* f1_line = new TF1( Form("line_%s", gr_FN->GetName()), "[0]+[1]*x");//, 0.9*xMinFN_this, 1.1*xMaxFN_this );
     f1_line->SetLineColor(gr_FN->GetLineColor());
     f1_line->SetLineWidth(2);
 
@@ -215,7 +230,8 @@ int main( int argc, char* argv[] ) {
   float start_delta = -0.5; // in mm, relative to central d
   float stepsize = 0.01; // in mm
 
-  float minChi2 = 99999.;;
+  float minChi2 = 99999.;
+  float NDF = 0.;
   int step_minChi2 = -1;
   float gamma_comb_minChi2 = 0.;
   float gamma_err_comb_minChi2 = 0.;
@@ -231,28 +247,35 @@ int main( int argc, char* argv[] ) {
 
   TCanvas* c3 = new TCanvas( "c3", "", 600, 600 );
 
-  TH2D* h2_axes_vsE = new TH2D( "axes_vsE", "", 10, 0., 550., 10, 0., imax );
-  h2_axes_vsE->SetXTitle( "#DeltaV / d [V/mm]" );
-  h2_axes_vsE->SetYTitle( "I [#muA]" );
+  TH2D* h2_axes_totfit = new TH2D( "axes_totfit", "", 10, 0., vmax/4., 10, 0., imax );
+  //h2_axes_totfit->SetXTitle( IVScanFN::xTitleFN().c_str() );
+  //h2_axes_totfit->SetYTitle( IVScanFN::yTitleFN().c_str() );
+  h2_axes_totfit->SetXTitle( "#DeltaV [V]" );
+  if( scaleToMicroA ) h2_axes_totfit->SetYTitle( "I [#muA]" );
+  else                h2_axes_totfit->SetYTitle( "I [pA]" );
+  h2_axes_totfit->GetXaxis()->SetNdivisions(505);
+  h2_axes_totfit->GetYaxis()->SetNdivisions(505);
 
 
-  //for( int istep=0; istep<3; ++istep ) {
+
+  // scan deltad to find minimum
+
   for( int istep=0; istep<nsteps; ++istep ) {
 
     c3->Clear();
 
-    h2_axes_vsE->Draw();
+    h2_axes_totfit->Draw();
 
     float this_delta_d = start_delta + (float)istep*stepsize;
 
     UncCorr uc;
 
-    TGraphErrors* gr_selected_forFit = new TGraphErrors(0); // bunch them all together in one graph
-    gr_selected_forFit->SetName( Form("gr_selected_forFit_step%d", istep) );
-    gr_selected_forFit->SetMarkerStyle( 20 );
-    gr_selected_forFit->SetMarkerColor( kGray+3 );
-    gr_selected_forFit->SetMarkerSize ( 1.6 );
-    gr_selected_forFit->SetLineColor  ( kGray+3 );
+    TGraphErrors* gr_selected_totfit = new TGraphErrors(0); // bunch them all together in one graph
+    gr_selected_totfit->SetName( Form("gr_selected_totfit_step%d", istep) );
+    gr_selected_totfit->SetMarkerStyle( 20 );
+    gr_selected_totfit->SetMarkerColor( kGray+3 );
+    gr_selected_totfit->SetMarkerSize ( 1.6 );
+    gr_selected_totfit->SetLineColor  ( kGray+3 );
 
 
     for( unsigned i=0; i<scans.size(); ++i ) {
@@ -266,39 +289,47 @@ int main( int argc, char* argv[] ) {
         double xerr = graphs_selected[i]->GetErrorX( iPoint );
         double yerr = graphs_selected[i]->GetErrorY( iPoint );
 
-        int n_vsE = gr_selected_forFit->GetN();
-        gr_selected_forFit->SetPoint( n_vsE, x/this_d, y ); // x->x/d (so vs E)
-        gr_selected_forFit->SetPointError( n_vsE, xerr/this_d, yerr ); 
+        int i_this = gr_selected_totfit->GetN();
+        gr_selected_totfit->SetPoint     ( i_this, x/this_d   , y    ); // x->x/d (so vs E)
+        gr_selected_totfit->SetPointError( i_this, xerr/this_d, yerr ); 
+        //gr_selected_totfit->SetPoint     ( i_this, 1./x, TMath::Log( y / (x*x) ) ); // FN plot
+        //gr_selected_totfit->SetPointError( i_this, xerr/(x*x), yerr/y );
 
       }
 
 
       TF1* f1_line = graphsFN_selected[i]->GetFunction( Form( "line_%s", graphsFN_selected[i]->GetName()) );
       
-      float phi = 4.7; // in eV
-      float phi_err = 0.1; // in eV
-      float d = this_d;
-      float d_err_corr = 0.3; // 0.1 for the syst on the position (linear shifter, see logbook_ANDROMeDa entry 24/01/22) plus 0.1 for the uncertainty on the length of the tubes
-      float d_err_uncorr = 0.01; // relative uncertainty between scans
-      float s = f1_line->GetParameter(1);
-      float s_err = f1_line->GetParError(1);
-      float b = 6.83E6; // this is 4/3 * sqrt(2m) / hbar = 6.83E6 V^-1/2 mm^-1, from FN theory
+      //float phi = 4.7; // in eV
+      //float phi_err = 0.1; // in eV
+      //float d = this_d;
+      //float d_err_corr = 0.3; // 0.1 for the syst on the position (linear shifter, see logbook_ANDROMeDa entry 24/01/22) plus 0.1 for the uncertainty on the length of the tubes
+      //float d_err_uncorr = 0.01; // relative uncertainty between scans
+      //float s = f1_line->GetParameter(1);
+      //float s_err = f1_line->GetParError(1);
+      //float b = 6.83E6; // this is 4/3 * sqrt(2m) / hbar = 6.83E6 V^-1/2 mm^-1, from FN theory
 
-      float gamma = -b*phi*sqrt(phi)*d/s;
+      float gamma_err_tot_uncorr, gamma_err_tot_corr;
+      float gamma = IVScanFN::get_gamma_and_err( gamma_err_tot_uncorr, gamma_err_tot_corr, f1_line->GetParameter(1), f1_line->GetParError(1), this_d );
+      //float gamma_err_tot = sqrt( gamma_err_tot_uncorr*gamma_err_tot_uncorr + gamma_err_tot_corr*gamma_err_tot_corr );
 
-      float gamma_err2_phi      = 9.*gamma*gamma/(4.*phi*phi)*phi_err*phi_err;
-      float gamma_err2_d_corr   = gamma*gamma/(d*d)*d_err_corr*d_err_corr; 
-      float gamma_err2_d_uncorr = gamma*gamma/(d*d)*d_err_uncorr*d_err_uncorr; 
-      float gamma_err2_s        = gamma*gamma/(s*s)*s_err*s_err;
+      //gamma_err_tot = IVScanFN::get_gamma_uncertainty( f1_line->GetParError(1), gamma_err_tot_uncorr, gamma_err_tot_corr );
 
-      //float gamma_err2_tot = gamma_err2_phi + gamma_err2_d_corr + gamma_err2_d_uncorr + gamma_err2_s;
-      //float gamma_err_tot = sqrt( gamma_err2_tot );
+      //float gamma = -b*phi*sqrt(phi)*d/s;
 
-      float gamma_err2_tot_uncorr = gamma_err2_d_uncorr + gamma_err2_s;
-      float gamma_err_tot_uncorr = sqrt( gamma_err2_tot_uncorr );
+      //float gamma_err2_phi      = 9.*gamma*gamma/(4.*phi*phi)*phi_err*phi_err;
+      //float gamma_err2_d_corr   = gamma*gamma/(d*d)*d_err_corr*d_err_corr; 
+      //float gamma_err2_d_uncorr = gamma*gamma/(d*d)*d_err_uncorr*d_err_uncorr; 
+      //float gamma_err2_s        = gamma*gamma/(s*s)*s_err*s_err;
 
-      float gamma_err2_tot_corr = gamma_err2_d_corr + gamma_err2_phi;
-      float gamma_err_tot_corr = sqrt( gamma_err2_tot_corr );
+      ////float gamma_err2_tot = gamma_err2_phi + gamma_err2_d_corr + gamma_err2_d_uncorr + gamma_err2_s;
+      ////float gamma_err_tot = sqrt( gamma_err2_tot );
+
+      //float gamma_err2_tot_uncorr = gamma_err2_d_uncorr + gamma_err2_s;
+      //float gamma_err_tot_uncorr = sqrt( gamma_err2_tot_uncorr );
+
+      //float gamma_err2_tot_corr = gamma_err2_d_corr + gamma_err2_phi;
+      //float gamma_err_tot_corr = sqrt( gamma_err2_tot_corr );
 
       uc.addDataPoint(gamma, gamma_err_tot_uncorr, gamma_err_tot_corr);
 
@@ -307,19 +338,31 @@ int main( int argc, char* argv[] ) {
 
     c3->cd();
 
-    h2_axes_vsE->Draw();
+    h2_axes_totfit->Draw();
 
-    TF1* f1_exp = new TF1( Form("exp_step%d", istep), "exp([0]+[1]*x)" );
-    f1_exp->SetLineColor(46);
+    //TF1* f1_line_totfit = new TF1( Form("line_step%d_totfit", istep), "[0] + [1]*x" );
+    //f1_line_totfit->SetLineColor(46);
+    TF1* f1_exp_totfit = new TF1( Form("exp_step%d_totfit", istep), "exp([0] + [1]*x)" );
+    //TF1* f1_exp_totfit = new TF1( Form("exp_step%d_totfit", istep), "[0]*exp([1]*x)" );
+    f1_exp_totfit->SetLineColor(46);
 
-    gr_selected_forFit->Fit(f1_exp);
-    gr_selected_forFit->Draw( "P same" );
+    float xMin_totfit, xMax_totfit, yMin_totfit, yMax_totfit;
+    AndCommon::findGraphRanges( gr_selected_totfit, xMin_totfit, xMax_totfit, yMin_totfit, yMax_totfit );
 
-    float thisChi2 = f1_exp->GetChisquare();
-    float thisNDF = (float)(f1_exp->GetNDF());
+    f1_exp_totfit->SetParLimits( 1, 0., 10.);
+    //f1_exp_totfit->SetParameter( 0, 0.5*(yMin_totfit+yMax_totfit) );
+    //f1_exp_totfit->SetParameter( 1, (yMax_totfit-yMin_totfit)/(xMax_totfit-xMin_totfit) );
 
-    gr_chi2_vs_istep   ->SetPoint( gr_chi2_vs_istep   ->GetN(), this_delta_d, thisChi2         );
-    gr_chi2red_vs_istep->SetPoint( gr_chi2red_vs_istep->GetN(), this_delta_d, thisChi2/thisNDF );
+    gr_selected_totfit->Fit(f1_exp_totfit, "SQ+");
+    gr_selected_totfit->Draw( "P same" );
+
+    float thisChi2 = f1_exp_totfit->GetChisquare();
+    NDF  = (float)(f1_exp_totfit->GetNDF());
+
+    if( thisChi2<0.0001 ) continue;
+
+    gr_chi2_vs_istep   ->SetPoint( gr_chi2_vs_istep   ->GetN(), this_delta_d, thisChi2     );
+    gr_chi2red_vs_istep->SetPoint( gr_chi2red_vs_istep->GetN(), this_delta_d, thisChi2/NDF );
 
 
     float gamma_comb, gamma_err_comb;
@@ -350,7 +393,7 @@ int main( int argc, char* argv[] ) {
     c3->cd();
     //legend->Draw("same");
     gPad->RedrawAxis();
-    c3->SaveAs( Form("%s/i_vs_e_step%d.pdf", outdir.c_str(), istep) );
+    c3->SaveAs( Form("%s/steps/i_vs_e_step%d.pdf", outdir.c_str(), istep) );
 
 
   } // steps
@@ -369,7 +412,7 @@ int main( int argc, char* argv[] ) {
 
   TH2D* h2_axes4 = new TH2D( "axes4", "", 10, xMin4, xMax4, 10, 0., yMax4 );
   h2_axes4->SetXTitle( "#Deltad [mm]" );
-  h2_axes4->SetYTitle( "#chi^{2} / NDF" );
+  h2_axes4->SetYTitle( Form("#chi^{2} (NDF = %.0f)", NDF) );
   //h2_axes4->SetYTitle( "#chi^{2} / NDF" );
   h2_axes4->Draw();
 
@@ -429,37 +472,45 @@ int main( int argc, char* argv[] ) {
 
     float this_d = scans[i]->d() + xMinChi2;
 
-
     TF1* f1_line = graphsFN_selected[i]->GetFunction( Form( "line_%s", graphsFN_selected[i]->GetName()) );
     
-    float phi = 4.7; // in eV
-    float phi_err = 0.1; // in eV
-    float d = this_d; // in mm
-    float d_err_corr = d_err_new;
-    float d_err_uncorr = 0.01; // relative uncertainty between scans
-    float s = f1_line->GetParameter(1);
-    float s_err = f1_line->GetParError(1);
-    float b = 6.83E6; // this is 4/3 * sqrt(2m) / hbar = 6.83E6 V^-1/2 mm^-1, from FN theory
-
-    float gamma = -b*phi*sqrt(phi)*d/s;
-
-    float gamma_err2_phi      = 9.*gamma*gamma/(4.*phi*phi)*phi_err*phi_err;
-    float gamma_err2_d_corr   = gamma*gamma/(d*d)*d_err_corr*d_err_corr; 
-    float gamma_err2_d_uncorr = gamma*gamma/(d*d)*d_err_uncorr*d_err_uncorr; 
-    float gamma_err2_s        = gamma*gamma/(s*s)*s_err*s_err;
-
-    //float gamma_err2_tot = gamma_err2_phi + gamma_err2_d_corr + gamma_err2_d_uncorr + gamma_err2_s;
-    //float gamma_err_tot = sqrt( gamma_err2_tot );
-
-    float gamma_err2_tot_uncorr = gamma_err2_d_uncorr + gamma_err2_s;
-    float gamma_err_tot_uncorr = sqrt( gamma_err2_tot_uncorr );
-
-    float gamma_err2_tot_corr = gamma_err2_d_corr + gamma_err2_phi;
-    float gamma_err_tot_corr = sqrt( gamma_err2_tot_corr );
+    float gamma_err_tot_uncorr, gamma_err_tot_corr;
+    float gamma = IVScanFN::get_gamma_and_err( gamma_err_tot_uncorr, gamma_err_tot_corr, f1_line->GetParameter(1), f1_line->GetParError(1), this_d, d_err_new );
 
     uc.addDataPoint(gamma, gamma_err_tot_uncorr, gamma_err_tot_corr);
 
-  } // for iscans
+  } // for scans
+
+
+
+//  float phi = 4.7; // in eV
+//  float phi_err = 0.1; // in eV
+//  float d = this_d; // in mm
+//  float d_err_corr = d_err_new;
+//  float d_err_uncorr = 0.01; // relative uncertainty between scans
+//  float s = f1_line->GetParameter(1);
+//  float s_err = f1_line->GetParError(1);
+//  float b = 6.83E6; // this is 4/3 * sqrt(2m) / hbar = 6.83E6 V^-1/2 mm^-1, from FN theory
+
+//  float gamma = -b*phi*sqrt(phi)*d/s;
+
+//  float gamma_err2_phi      = 9.*gamma*gamma/(4.*phi*phi)*phi_err*phi_err;
+//  float gamma_err2_d_corr   = gamma*gamma/(d*d)*d_err_corr*d_err_corr; 
+//  float gamma_err2_d_uncorr = gamma*gamma/(d*d)*d_err_uncorr*d_err_uncorr; 
+//  float gamma_err2_s        = gamma*gamma/(s*s)*s_err*s_err;
+
+//  //float gamma_err2_tot = gamma_err2_phi + gamma_err2_d_corr + gamma_err2_d_uncorr + gamma_err2_s;
+//  //float gamma_err_tot = sqrt( gamma_err2_tot );
+
+//  float gamma_err2_tot_uncorr = gamma_err2_d_uncorr + gamma_err2_s;
+//  float gamma_err_tot_uncorr = sqrt( gamma_err2_tot_uncorr );
+
+//  float gamma_err2_tot_corr = gamma_err2_d_corr + gamma_err2_phi;
+//  float gamma_err_tot_corr = sqrt( gamma_err2_tot_corr );
+
+//  uc.addDataPoint(gamma, gamma_err_tot_uncorr, gamma_err_tot_corr);
+
+//} // for iscans
 
   float gamma_comb_new, gamma_err_comb_new;
   uc.combine( gamma_comb_new, gamma_err_comb_new );
@@ -481,7 +532,7 @@ int main( int argc, char* argv[] ) {
 
 
 
-TGraphErrors* selectPointsForFN( TGraphErrors graph ) {
+TGraphErrors* selectPointsForFN( TGraphErrors graph, int nPointsSelected ) {
 
   TGraphErrors* selected = new TGraphErrors(0);
   selected->SetName( Form("selected_%s", graph.GetName()) );
@@ -492,10 +543,10 @@ TGraphErrors* selectPointsForFN( TGraphErrors graph ) {
   selected->SetLineColor  ( graph.GetLineColor()   );
 
 
-  //for( unsigned i = 0; i<2; ++i ) { // for now 5 points
-  for( unsigned i = 0; i<5; ++i ) { // for now 5 points
+  for( unsigned i = 0; i<nPointsSelected; ++i ) { 
 
-    int iPoint = findHighestVoltage( &graph );
+    int iPoint = i;
+    //int iPoint = findHighestVoltage( &graph );
 
     double x, y;
     graph.GetPoint( iPoint, x, y );
@@ -540,34 +591,34 @@ int findHighestVoltage( TGraph* graph ) {
 
 
 
-TGraphErrors* getFNgraph( TGraphErrors* selected ) {
-
-  TGraphErrors* gr_FN = new TGraphErrors(0);
-  gr_FN->SetName( Form( "fn_%s", selected->GetName()));
-
-  gr_FN->SetMarkerStyle( selected->GetMarkerStyle() );
-  gr_FN->SetMarkerColor( selected->GetMarkerColor() );
-  gr_FN->SetMarkerSize ( selected->GetMarkerSize()  );
-  gr_FN->SetLineColor  ( selected->GetLineColor()   );
-
-
-  for( unsigned iPoint=0; iPoint<selected->GetN(); ++iPoint ) {
-
-    double i, v;
-    selected->GetPoint(iPoint, v, i);
-    i = fabs(i);
-    v = fabs(v);
-    float i_err = selected->GetErrorY( iPoint );
-    float v_err = 1.;
-
-    gr_FN->SetPoint     ( iPoint, 1./v, TMath::Log( i / (v*v) ) );
-    gr_FN->SetPointError( iPoint, v_err/(v*v), i_err/i );
-
-  } // for
-
-  return gr_FN;
-
-}
+//TGraphErrors* getFNgraph( TGraphErrors* selected ) {
+//
+//  TGraphErrors* gr_FN = new TGraphErrors(0);
+//  gr_FN->SetName( Form( "fn_%s", selected->GetName()));
+//
+//  gr_FN->SetMarkerStyle( selected->GetMarkerStyle() );
+//  gr_FN->SetMarkerColor( selected->GetMarkerColor() );
+//  gr_FN->SetMarkerSize ( selected->GetMarkerSize()  );
+//  gr_FN->SetLineColor  ( selected->GetLineColor()   );
+//
+//
+//  for( unsigned iPoint=0; iPoint<selected->GetN(); ++iPoint ) {
+//
+//    double i, v;
+//    selected->GetPoint(iPoint, v, i);
+//    i = fabs(i);
+//    v = fabs(v);
+//    float i_err = selected->GetErrorY( iPoint );
+//    float v_err = 1.;
+//
+//    gr_FN->SetPoint     ( iPoint, 1./v, TMath::Log( i / (v*v) ) );
+//    gr_FN->SetPointError( iPoint, v_err/(v*v), i_err/i );
+//
+//  } // for
+//
+//  return gr_FN;
+//
+//}
 
 
 
