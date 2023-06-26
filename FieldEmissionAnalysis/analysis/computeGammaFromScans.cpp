@@ -60,6 +60,22 @@ int main( int argc, char* argv[] ) {
     scaleToMicroA = false;
     nPointsSelect = -1; // all
 
+  } else if( sampleName == "CNTArO2Etching_N1" ) {
+
+    //sampleName = "Mild Ar/O_{2} Etching";
+    //scans.push_back( new IVScan("CNTArO2Etching_N1_d2_20221130", -1.) );
+    scans.push_back( new IVScan("CNTArO2Etching_N1_d3_20221130", -1., 278., 400.) );
+    scans.push_back( new IVScan("CNTArO2Etching_N1_d4_20221130", -1., 381., 500.) );
+    scans.push_back( new IVScan("CNTArO2Etching_N1_d5_20221130", -1., 472., 600.) );
+    //scans.push_back( new IVScan("CNTArO2Etching_N1_d3_20221130", -1.) );//, 250., 400.) );
+    //scans.push_back( new IVScan("CNTArO2Etching_N1_d4_20221130", -1.) );//, 350., 500.) );
+    //scans.push_back( new IVScan("CNTArO2Etching_N1_d5_20221130", -1.) );//, 450., 600.) );
+
+    imax = 5.;
+    vmax = 700.;
+    scaleToMicroA = false;
+    nPointsSelect = -1; // all
+
   } else if( sampleName == "CNTetchedOLD_AGnew" ) {
 
     scans.push_back( new IVScan("CNTetchedOLD_AGnew_d3_20230519_drain.dat") );
@@ -203,7 +219,7 @@ int main( int argc, char* argv[] ) {
   TCanvas* c2 = new TCanvas( "c2", "", 600, 600 );
   c2->cd();
 
-  TH2D* h2_axesFN = new TH2D( "axesFN", "", 10, 0.9*xMinFN, 1.1*xMaxFN, 10, yMinFN-0.5, yMaxFN+2. );
+  TH2D* h2_axesFN = new TH2D( "axesFN", "", 10, 0.9*xMinFN, 1.1*xMaxFN, 10, yMinFN-0.8, yMaxFN+2. );
   h2_axesFN->SetXTitle( IVScanFN::xTitleFN().c_str() );
   h2_axesFN->SetYTitle( IVScanFN::yTitleFN().c_str() );
   //h2_axesFN->GetYaxis()->SetMaxDigits(3);
@@ -250,12 +266,17 @@ int main( int argc, char* argv[] ) {
   TH2D* h2_axes_totfit = new TH2D( "axes_totfit", "", 10, 0., vmax/4., 10, 0., imax );
   //h2_axes_totfit->SetXTitle( IVScanFN::xTitleFN().c_str() );
   //h2_axes_totfit->SetYTitle( IVScanFN::yTitleFN().c_str() );
-  h2_axes_totfit->SetXTitle( "#DeltaV [V]" );
+  h2_axes_totfit->SetXTitle( "#DeltaV/d [V/mm]" );
   if( scaleToMicroA ) h2_axes_totfit->SetYTitle( "I [#muA]" );
   else                h2_axes_totfit->SetYTitle( "I [pA]" );
   h2_axes_totfit->GetXaxis()->SetNdivisions(505);
   h2_axes_totfit->GetYaxis()->SetNdivisions(505);
 
+
+  // define fitting function outside the loop so that it remembers parameter values from previous fit
+  // (this drastically improves convergence probability)
+  TF1* f1_exp_totfit = new TF1( "exp_step_totfit", "exp([0] + [1]*x)" );
+  f1_exp_totfit->SetLineColor(46);
 
 
   // scan deltad to find minimum
@@ -278,9 +299,16 @@ int main( int argc, char* argv[] ) {
     gr_selected_totfit->SetLineColor  ( kGray+3 );
 
 
+    TPaveText* label_d = new TPaveText( 0.2, 0.7, 0.5, 0.85, "brNDC" );
+    label_d->SetTextSize( 0.035 );
+    label_d->SetFillColor( 0 );
+    label_d->SetTextAlign( 11 );
+
     for( unsigned i=0; i<scans.size(); ++i ) {
 
       float this_d = scans[i]->d() + this_delta_d;
+
+      label_d->AddText( Form("d_{%d} = %.2f mm", i, this_d) );
 
       for( unsigned iPoint=0; iPoint<graphs_selected[i]->GetN(); ++iPoint ) {
 
@@ -340,11 +368,9 @@ int main( int argc, char* argv[] ) {
 
     h2_axes_totfit->Draw();
 
-    //TF1* f1_line_totfit = new TF1( Form("line_step%d_totfit", istep), "[0] + [1]*x" );
-    //f1_line_totfit->SetLineColor(46);
-    TF1* f1_exp_totfit = new TF1( Form("exp_step%d_totfit", istep), "exp([0] + [1]*x)" );
+    //TF1* f1_exp_totfit = new TF1( Form("exp_step%d_totfit", istep), "exp([0] + [1]*x)" );
     //TF1* f1_exp_totfit = new TF1( Form("exp_step%d_totfit", istep), "[0]*exp([1]*x)" );
-    f1_exp_totfit->SetLineColor(46);
+    //f1_exp_totfit->SetLineColor(46);
 
     float xMin_totfit, xMax_totfit, yMin_totfit, yMax_totfit;
     AndCommon::findGraphRanges( gr_selected_totfit, xMin_totfit, xMax_totfit, yMin_totfit, yMax_totfit );
@@ -356,10 +382,17 @@ int main( int argc, char* argv[] ) {
     gr_selected_totfit->Fit(f1_exp_totfit, "SQ+");
     gr_selected_totfit->Draw( "P same" );
 
+    label_d->Draw("same");
+
     float thisChi2 = f1_exp_totfit->GetChisquare();
     NDF  = (float)(f1_exp_totfit->GetNDF());
 
-    if( thisChi2<0.0001 ) continue;
+    c3->cd();
+    //legend->Draw("same");
+    gPad->RedrawAxis();
+    c3->SaveAs( Form("%s/steps/i_vs_e_step%d.pdf", outdir.c_str(), istep) );
+
+    if( thisChi2<0.000001 ) continue;
 
     gr_chi2_vs_istep   ->SetPoint( gr_chi2_vs_istep   ->GetN(), this_delta_d, thisChi2     );
     gr_chi2red_vs_istep->SetPoint( gr_chi2red_vs_istep->GetN(), this_delta_d, thisChi2/NDF );
@@ -390,11 +423,6 @@ int main( int argc, char* argv[] ) {
     }
 
 
-    c3->cd();
-    //legend->Draw("same");
-    gPad->RedrawAxis();
-    c3->SaveAs( Form("%s/steps/i_vs_e_step%d.pdf", outdir.c_str(), istep) );
-
 
   } // steps
 
@@ -411,7 +439,7 @@ int main( int argc, char* argv[] ) {
   yMax4 *= 1.1;
 
   TH2D* h2_axes4 = new TH2D( "axes4", "", 10, xMin4, xMax4, 10, 0., yMax4 );
-  h2_axes4->SetXTitle( "#Deltad [mm]" );
+  h2_axes4->SetXTitle( "#Deltad_{0} [mm]" );
   h2_axes4->SetYTitle( Form("#chi^{2} (NDF = %.0f)", NDF) );
   //h2_axes4->SetYTitle( "#chi^{2} / NDF" );
   h2_axes4->Draw();
@@ -454,19 +482,27 @@ int main( int argc, char* argv[] ) {
 
   gr_chi2_vs_istep->Draw("P same");
 
+  float d_err_new = (xPlusSigma-xMinusSigma)/2.;
+
+  TPaveText* label_d_err = new TPaveText( 0.6, 0.2, 0.8, 0.3, "brNDC" );
+  label_d_err->SetTextSize( 0.035 );
+  label_d_err->SetFillColor(0);
+  label_d_err->AddText( Form("#sigma(d_{0}) = %.2f mm", d_err_new) );
+  label_d_err->Draw("same");
+
 
   gPad->RedrawAxis();
 
   c4->SaveAs( Form("%s/chi2Scan.pdf", outdir.c_str()) );
 
 
-  float d_err_new = (xPlusSigma-xMinusSigma)/2.;
-
+  std::cout << std::endl << std::endl;
   std::cout << "-> From Chi2 scan, updated uncertainty on d: " << d_err_new << " mm (was 0.3 mm)" << std::endl;
 
 
   UncCorr uc;
 
+  std::cout << std::endl << "At optimal point:" << std::endl;
   // update gamma measurement with new d uncertainty
   for( unsigned i=0; i<scans.size(); ++i ) {
 
@@ -476,6 +512,9 @@ int main( int argc, char* argv[] ) {
     
     float gamma_err_tot_uncorr, gamma_err_tot_corr;
     float gamma = IVScanFN::get_gamma_and_err( gamma_err_tot_uncorr, gamma_err_tot_corr, f1_line->GetParameter(1), f1_line->GetParError(1), this_d, d_err_new );
+
+    std::cout << std::endl;
+    std::cout << "Scan " << i << " (d = " << this_d << ")" << std::endl;
 
     uc.addDataPoint(gamma, gamma_err_tot_uncorr, gamma_err_tot_corr);
 
