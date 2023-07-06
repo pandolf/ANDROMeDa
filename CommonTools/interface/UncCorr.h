@@ -37,10 +37,10 @@ class UncCorr {
   void addDataPoint( float mean, float err_uncorr, float err_corr );
   void addDataPoint( const DataPoint& d );
 
-  TMatrixD* getCorrelationMatrix() const;
+  TMatrixD* getCorrelationMatrix( bool correlations=true ) const;
   std::vector<float> getWeights( TMatrixD* corrV_inv );
 
-  void combine( float& mean, float& err );
+  void combine( float& mean, float& err, bool correlations=true );
 
 
  private:
