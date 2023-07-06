@@ -28,22 +28,24 @@ void UncCorr::addDataPoint( const DataPoint& d ) {
 
   datapoints_.push_back(d);
 
+  std::cout << "-> Added data point: " << d.mean << " +/- " << d.err_uncorr << " (uncorr) +/- " << d.err_corr << " (corr)" << std::endl;
+
 }
 
 
 
-void UncCorr::combine( float& mean, float& err ) {
+void UncCorr::combine( float& mean, float& err, bool correlations ) {
 
 
-  TMatrixD* corrV = getCorrelationMatrix();
+  TMatrixD* corrV = getCorrelationMatrix(correlations);
 
   TMatrixD* corrV_inv = new TMatrixD(*corrV);
   corrV_inv->Invert();
 
   std::vector<float> weights = getWeights( corrV_inv );
 
-  for( unsigned i=0; i<weights.size(); ++i )
-    std::cout << "w[" << i << "]: " << weights[i] << std::endl;
+  //for( unsigned i=0; i<weights.size(); ++i )
+  //  std::cout << "w[" << i << "]: " << weights[i] << std::endl;
 
 
   int dim = datapoints_.size();
@@ -56,14 +58,14 @@ void UncCorr::combine( float& mean, float& err ) {
 
 
   double* corrV_elem = corrV->GetMatrixArray();
-  std::cout << "Corr V: " << std::endl;
-  for( unsigned i=0; i<dim*dim; ++i )
-    std::cout << "elem " << i << ": " << corrV_elem[i] << std::endl;
+  //std::cout << "Corr V: " << std::endl;
+  //for( unsigned i=0; i<dim*dim; ++i )
+  //  std::cout << "elem " << i << ": " << corrV_elem[i] << std::endl;
 
-  double* corrVinv_elem = corrV_inv->GetMatrixArray();
-  std::cout << "Corr V-1: " << std::endl;
-  for( unsigned i=0; i<dim*dim; ++i )
-    std::cout << "elem " << i << ": " << corrVinv_elem[i] << std::endl;
+  //double* corrVinv_elem = corrV_inv->GetMatrixArray();
+  //std::cout << "Corr V-1: " << std::endl;
+  //for( unsigned i=0; i<dim*dim; ++i )
+  //  std::cout << "elem " << i << ": " << corrVinv_elem[i] << std::endl;
 
 
   float err2 = 0.;
@@ -78,7 +80,7 @@ void UncCorr::combine( float& mean, float& err ) {
 
 
 
-TMatrixD* UncCorr::getCorrelationMatrix() const {
+TMatrixD* UncCorr::getCorrelationMatrix( bool correlations ) const {
 
   int dim = datapoints_.size();
 
@@ -99,7 +101,10 @@ TMatrixD* UncCorr::getCorrelationMatrix() const {
 
       } else {
 
-        dataarray[index] = datapoints_[i].err_corr*datapoints_[j].err_corr;
+        if( correlations )
+          dataarray[index] = datapoints_[i].err_corr*datapoints_[j].err_corr;
+        else
+          dataarray[index] = 0.;
 
       } // else
 
