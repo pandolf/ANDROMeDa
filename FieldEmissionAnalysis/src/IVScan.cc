@@ -40,7 +40,7 @@ TGraphErrors* IVScan::graph_vsE() const {
     double yerr = this->graph()->GetErrorY( iPoint );
 
     graph_vsE->SetPoint( iPoint, x/this->d(), y );
-    graph_vsE->SetPointError( iPoint, xerr, yerr );
+    graph_vsE->SetPointError( iPoint, xerr/this->d(), yerr );
 
   } // for points
 
