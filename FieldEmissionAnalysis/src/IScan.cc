@@ -9,6 +9,7 @@
 #include "TString.h"
 #include "TMath.h"
 #include "TF1.h"
+#include "TFile.h"
 
 
 
@@ -31,7 +32,7 @@ IScan::IScan( const std::string& name, float scale, float xMin, float xMax ) {
 
   readFile( getDataFileName(name_), xMin, xMax );
 
-  scaleDataPoints( scale );
+  if( scale!=1 ) scaleDataPoints( scale );
 
   setColor(46);
 
@@ -102,6 +103,7 @@ void IScan::set_p( float p ) {
 
 void IScan::set_d( float d ) {
 
+  std::cout << "IScan::set_d() Setting d = " << d << std::endl;
   d_ = d;
 
 }
