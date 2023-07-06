@@ -63,8 +63,8 @@ int main( int argc, char* argv[] ) {
 
     xMin = 0.2E-3;
     xMax = 1.5E-3;
-    yMin = -9.999;
-    yMax = 5.;
+    yMin = -7.499;
+    yMax = 3.;
     
     legendTitle = "As Grown (No Etching)";
 
@@ -83,7 +83,7 @@ int main( int argc, char* argv[] ) {
     legendTitle = "As Grown (No Etching)";
 
 
-  } else if( batchName == "CNTArO2Etching_N1" ) {
+  } else if( batchName == "CNTArO2Etching_N1_old" ) {
 
     scanNames.push_back( "CNTArO2Etching_N1_d3_20221130" );
     scanNames.push_back( "CNTArO2Etching_N1_d4_20221130" );
@@ -96,6 +96,19 @@ int main( int argc, char* argv[] ) {
 
     legendTitle = "Ar/O_{2} Etching N.1";
 
+  } else if( batchName == "CNTArO2Etching_N1" ) {
+
+    scanNames.push_back( "CNTArO2Etching_N1_d3_20221221" );
+    scanNames.push_back( "CNTArO2Etching_N1_d4_20221221" );
+    scanNames.push_back( "CNTArO2Etching_N1_d5_20221221" );
+
+    xMin = 0.3E-3;
+    xMax = 1.4E-3;
+    yMin = -7.999;
+    yMax = 4.999;
+
+    legendTitle = "Ar/O_{2} Etching N.1";
+
   } else if( batchName == "CNTArO2Etching_N6" ) {
 
     scanNames.push_back( "CNTArO2Etching_N6_d3_20221219_2" );
@@ -103,9 +116,9 @@ int main( int argc, char* argv[] ) {
     scanNames.push_back( "CNTArO2Etching_N6_d5_20221219_2" );
 
     xMin = 1.2E-3;
-    xMax = 4.2E-3;
+    xMax = 4.8E-3;
     yMin = -19.999;
-    yMax = 5.;
+    yMax = 4.999;
     
     legendTitle = "Ar/O_{2} Etching N.6";
 
@@ -121,6 +134,18 @@ int main( int argc, char* argv[] ) {
     yMax = 5.;
     
     legendTitle = "Ar/O_{2} Etching N.6";
+
+  } else if( batchName == "CNTetchedOLD_N1new" ) {
+
+    scanNames.push_back( "CNTetchedOLD_N1new_d4_20230517_drain" );
+    scanNames.push_back( "CNTetchedOLD_N1new_d5_20230517_drain" );
+
+    xMin = 1.2E-3;
+    xMax = 4.2E-3;
+    yMin = -9.999;
+    yMax = 5.;
+    
+    legendTitle = "Ar/O_{2} Etching N.1";
 
   } else {
 
