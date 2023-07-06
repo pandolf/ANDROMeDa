@@ -15,6 +15,7 @@
 #include "TFile.h"
 #include "TLegend.h"
 #include "TFitResult.h"
+#include "TLine.h"
 
 
 
@@ -49,6 +50,7 @@ int main( int argc, char* argv[] ) {
   float vmax = 2200.;
   bool scaleToMicroA = true;
   int nPointsSelect = 5;
+  std::string legendName = "xxx";
 
   if( sampleName == "CNTArO2Etching_AG_old" ) {
 
@@ -56,6 +58,7 @@ int main( int argc, char* argv[] ) {
     scans.push_back( new IVScan("CNTArO2Etching_AG_d4_new.dat", -1., 1500., 1800.) );
     scans.push_back( new IVScan("CNTArO2Etching_AG_d5_new.dat", -1., 1930., 2100.) );
 
+    legendName = "No etching (as grown)";
     imax = 5.;
     scaleToMicroA = false;
     nPointsSelect = -1; // all
@@ -71,6 +74,7 @@ int main( int argc, char* argv[] ) {
     //scans.push_back( new IVScan("CNTArO2Etching_N1_d4_20221130", -1.) );//, 350., 500.) );
     //scans.push_back( new IVScan("CNTArO2Etching_N1_d5_20221130", -1.) );//, 450., 600.) );
 
+    legendName = "Mild Ar/O_{2} etching";
     imax = 5.;
     vmax = 700.;
     scaleToMicroA = false;
@@ -124,6 +128,8 @@ int main( int argc, char* argv[] ) {
 
   }
 
+  if( legendName == "xxx" ) legendName = sampleName;
+
 
   std::string outdir("plots/GammaScans/"+sampleName);
   system( Form("mkdir -p %s/steps", outdir.c_str()) );
@@ -143,25 +149,6 @@ int main( int argc, char* argv[] ) {
   std::vector< TGraphErrors* > graphsFN_selected;
 
 
-  TLegend* legend = new TLegend( 0.2, 0.68, 0.5, 0.9, sampleName.c_str() );
-  legend->SetTextSize(0.035);
-  legend->SetFillColor(0);
-
-  TCanvas* c1 = new TCanvas( "c1", "", 600, 600 );
-  c1->cd();
-
-  TH2D* h2_axes = new TH2D( "axes", "", 10, 0., vmax, 10, 0., imax );
-  h2_axes->SetXTitle( "#DeltaV [V]" );
-  if( scaleToMicroA ) h2_axes->SetYTitle( "I [#muA]" );
-  else                h2_axes->SetYTitle( "I [pA]"   );
-  h2_axes->GetXaxis()->SetNdivisions(505);
-  h2_axes->Draw();
-
-  float xMinFN = 10.;
-  float xMaxFN = 0.;
-  float yMinFN = 999.;
-  float yMaxFN = -999.;
-
   // first loop to scale data points to muA and to get the graphs
   for( unsigned i=0; i<scans.size(); ++i ) {
 
@@ -173,11 +160,6 @@ int main( int argc, char* argv[] ) {
     gr_selected->SetMarkerSize(1.6);
     gr_selected->SetMarkerColor( colors[i] );
     gr_selected->SetLineColor  ( colors[i] );
-
-    c1->cd();
-    gr_selected->Draw("P same" );
-
-    legend->AddEntry( gr_selected, Form("d = %.1f mm", scans[i]->d()), "P" );
 
     graphs_selected.push_back( gr_selected );
   
@@ -191,14 +173,6 @@ int main( int argc, char* argv[] ) {
 //gr_FN->Write();
 //file->Close();
 //exit(1);
-
-    float xMinFN_this, xMaxFN_this, yMinFN_this, yMaxFN_this;
-    AndCommon::findGraphRanges( gr_FN, xMinFN_this, xMaxFN_this, yMinFN_this, yMaxFN_this );
-
-    if( xMinFN_this < xMinFN ) xMinFN = xMinFN_this;
-    if( yMinFN_this < yMinFN ) yMinFN = yMinFN_this;
-    if( xMaxFN_this > xMaxFN ) xMaxFN = xMaxFN_this;
-    if( yMaxFN_this > yMaxFN ) yMaxFN = yMaxFN_this;
 
     TF1* f1_line = new TF1( Form("line_%s", gr_FN->GetName()), "[0]+[1]*x");//, 0.9*xMinFN_this, 1.1*xMaxFN_this );
     f1_line->SetLineColor(gr_FN->GetLineColor());
@@ -215,31 +189,6 @@ int main( int argc, char* argv[] ) {
 
   } // for scans
 
-
-  TCanvas* c2 = new TCanvas( "c2", "", 600, 600 );
-  c2->cd();
-
-  TH2D* h2_axesFN = new TH2D( "axesFN", "", 10, 0.9*xMinFN, 1.1*xMaxFN, 10, yMinFN-0.8, yMaxFN+2. );
-  h2_axesFN->SetXTitle( IVScanFN::xTitleFN().c_str() );
-  h2_axesFN->SetYTitle( IVScanFN::yTitleFN().c_str() );
-  //h2_axesFN->GetYaxis()->SetMaxDigits(3);
-  h2_axesFN->GetXaxis()->SetNdivisions(505);
-  h2_axesFN->GetYaxis()->SetNdivisions(505);
-  h2_axesFN->Draw();
-
-  legend->Draw("same");
-
-  for( unsigned i=0; i<graphsFN_selected.size(); ++i ) graphsFN_selected[i]->Draw("P same");
-
-
-  c2->cd();
-  gPad->RedrawAxis();
-  c2->SaveAs( Form("%s/fn.pdf", outdir.c_str()) );
-
-  c1->cd();
-  legend->Draw("same");
-  gPad->RedrawAxis();
-  c1->SaveAs( Form("%s/i_vs_v.pdf", outdir.c_str()) );
 
 
   int nsteps = 150;
@@ -388,7 +337,6 @@ int main( int argc, char* argv[] ) {
     NDF  = (float)(f1_exp_totfit->GetNDF());
 
     c3->cd();
-    //legend->Draw("same");
     gPad->RedrawAxis();
     c3->SaveAs( Form("%s/steps/i_vs_e_step%d.pdf", outdir.c_str(), istep) );
 
@@ -500,13 +448,50 @@ int main( int argc, char* argv[] ) {
   std::cout << "-> From Chi2 scan, updated uncertainty on d: " << d_err_new << " mm (was 0.3 mm)" << std::endl;
 
 
+
+  TLegend* legend = new TLegend( 0.2, 0.68, 0.5, 0.9, legendName.c_str() );
+  legend->SetTextSize(0.035);
+  legend->SetFillColor(0);
+
+  TCanvas* c1 = new TCanvas( "c1", "", 600, 600 );
+  c1->cd();
+
+  TH2D* h2_axes = new TH2D( "axes", "", 10, 0., vmax, 10, 0., imax );
+  h2_axes->SetXTitle( "#DeltaV [V]" );
+  if( scaleToMicroA ) h2_axes->SetYTitle( "I [#muA]" );
+  else                h2_axes->SetYTitle( "I [pA]"   );
+  h2_axes->GetXaxis()->SetNdivisions(505);
+  h2_axes->Draw();
+
+  float xMinFN = 10.;
+  float xMaxFN = 0.;
+  float yMinFN = 999.;
+  float yMaxFN = -999.;
+
+
   UncCorr uc;
 
   std::cout << std::endl << "At optimal point:" << std::endl;
-  // update gamma measurement with new d uncertainty
+
+  // plot I vs V and FN plots with optimal d values
+  // plus update gamma measurement with new d uncertainty
   for( unsigned i=0; i<scans.size(); ++i ) {
 
     float this_d = scans[i]->d() + xMinChi2;
+
+    c1->cd();
+    graphs_selected[i]->Draw("P same" );
+
+    legend->AddEntry( graphs_selected[i], Form("d = %.2f mm", this_d), "P" );
+
+    float xMinFN_this, xMaxFN_this, yMinFN_this, yMaxFN_this;
+    AndCommon::findGraphRanges( graphsFN_selected[i], xMinFN_this, xMaxFN_this, yMinFN_this, yMaxFN_this );
+
+    if( xMinFN_this < xMinFN ) xMinFN = xMinFN_this;
+    if( yMinFN_this < yMinFN ) yMinFN = yMinFN_this;
+    if( xMaxFN_this > xMaxFN ) xMaxFN = xMaxFN_this;
+    if( yMaxFN_this > yMaxFN ) yMaxFN = yMaxFN_this;
+
 
     TF1* f1_line = graphsFN_selected[i]->GetFunction( Form( "line_%s", graphsFN_selected[i]->GetName()) );
     
@@ -520,6 +505,31 @@ int main( int argc, char* argv[] ) {
 
   } // for scans
 
+
+  TCanvas* c2 = new TCanvas( "c2", "", 600, 600 );
+  c2->cd();
+
+  TH2D* h2_axesFN = new TH2D( "axesFN", "", 10, 0.9*xMinFN, 1.1*xMaxFN, 10, yMinFN-0.8, yMaxFN+2. );
+  h2_axesFN->SetXTitle( IVScanFN::xTitleFN().c_str() );
+  h2_axesFN->SetYTitle( IVScanFN::yTitleFN().c_str() );
+  //h2_axesFN->GetYaxis()->SetMaxDigits(3);
+  h2_axesFN->GetXaxis()->SetNdivisions(505);
+  h2_axesFN->GetYaxis()->SetNdivisions(505);
+  h2_axesFN->Draw();
+
+  legend->Draw("same");
+
+  for( unsigned i=0; i<graphsFN_selected.size(); ++i ) graphsFN_selected[i]->Draw("P same");
+
+
+  c2->cd();
+  gPad->RedrawAxis();
+  c2->SaveAs( Form("%s/fn.pdf", outdir.c_str()) );
+
+  c1->cd();
+  legend->Draw("same");
+  gPad->RedrawAxis();
+  c1->SaveAs( Form("%s/i_vs_v.pdf", outdir.c_str()) );
 
 
 //  float phi = 4.7; // in eV
