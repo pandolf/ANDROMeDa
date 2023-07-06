@@ -177,6 +177,19 @@ int main( int argc, char* argv[] ) {
       ymax = 50E5;
       xmax = 1300.;
 
+    } else if( saveName=="CNTetchedOLD_N1new" ) {
+
+      scan1 = "CNTetchedOLD_N1new_d4_20230517_drain";
+      scan2 = "CNTetchedOLD_N1new_d5_20230517_drain";
+      scale1 = -1.;
+      scale2 = -1.;
+      //legendTitle = "LNGS HdM";
+      legend1 = "d = 4 mm";
+      legend2 = "d = 5 mm";
+      ymin = 0.1;
+      ymax = 50E5;
+      xmax = 1300.;
+
     } // if saveName
 
   } else {
