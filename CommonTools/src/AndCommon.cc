@@ -8,6 +8,7 @@
 #include "TColor.h"
 #include "TCanvas.h"
 #include "TH2D.h"
+#include "TLine.h"
 
 
 
@@ -426,6 +427,11 @@ TStyle* AndCommon::setStyle() {
 
 
 void AndCommon::findGraphRanges( TGraph* graph, float& xMin, float& xMax, float& yMin, float& yMax ) {
+
+  //xMin =  9999999999.;
+  //xMax = -9999999999.;
+  //yMin =  9999999999.;
+  //yMax = -9999999999.;
 
   for( unsigned iPoint=0; iPoint<graph->GetN(); ++iPoint ) {
 
