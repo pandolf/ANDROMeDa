@@ -59,7 +59,7 @@ int main( int argc, char* argv[] ) {
     scans.push_back( new IVScan("CNTArO2Etching_AG_d5_new.dat", -1., 1930., 2100.) );
 
     legendName = "No etching (as grown)";
-    imax = 5.;
+    imax = 7.;
     scaleToMicroA = false;
     nPointsSelect = -1; // all
 
@@ -75,7 +75,7 @@ int main( int argc, char* argv[] ) {
     //scans.push_back( new IVScan("CNTArO2Etching_N1_d5_20221130", -1.) );//, 450., 600.) );
 
     legendName = "Mild Ar/O_{2} etching";
-    imax = 5.;
+    imax = 7.;
     vmax = 700.;
     scaleToMicroA = false;
     nPointsSelect = -1; // all
@@ -148,11 +148,16 @@ int main( int argc, char* argv[] ) {
   std::vector< TGraphErrors* > graphs_selected;
   std::vector< TGraphErrors* > graphsFN_selected;
 
+  float d1 = 99999.;
 
   // first loop to scale data points to muA and to get the graphs
   for( unsigned i=0; i<scans.size(); ++i ) {
 
     if( scaleToMicroA ) scans[i]->scaleDataPoints( 1E-6 ); // in muA
+
+    float this_d = scans[i]->d();
+
+    if( this_d < d1 ) d1 = this_d; // find d1, ie the minimal d
 
     TGraphErrors* graph = scans[i]->graph();
 
@@ -167,12 +172,6 @@ int main( int argc, char* argv[] ) {
     gr_FN->SetMarkerColor( colors[i] );
     gr_FN->SetLineColor  ( colors[i] );
 
-//TFile* file = TFile::Open( "test.root", "recreate" );
-//file->cd();
-//gr_selected->Write();
-//gr_FN->Write();
-//file->Close();
-//exit(1);
 
     TF1* f1_line = new TF1( Form("line_%s", gr_FN->GetName()), "[0]+[1]*x");//, 0.9*xMinFN_this, 1.1*xMaxFN_this );
     f1_line->SetLineColor(gr_FN->GetLineColor());
@@ -191,8 +190,8 @@ int main( int argc, char* argv[] ) {
 
 
 
-  int nsteps = 150;
-  float start_delta = -0.5; // in mm, relative to central d
+  int nsteps = 120;
+  float start_delta = -0.7; // in mm, relative to central d
   float stepsize = 0.01; // in mm
 
   float minChi2 = 99999.;
@@ -215,9 +214,9 @@ int main( int argc, char* argv[] ) {
   TH2D* h2_axes_totfit = new TH2D( "axes_totfit", "", 10, 0., vmax/4., 10, 0., imax );
   //h2_axes_totfit->SetXTitle( IVScanFN::xTitleFN().c_str() );
   //h2_axes_totfit->SetYTitle( IVScanFN::yTitleFN().c_str() );
-  h2_axes_totfit->SetXTitle( "#DeltaV/d [V/mm]" );
-  if( scaleToMicroA ) h2_axes_totfit->SetYTitle( "I [#muA]" );
-  else                h2_axes_totfit->SetYTitle( "I [pA]" );
+  h2_axes_totfit->SetXTitle( "#DeltaV/d (V/mm)" );
+  if( scaleToMicroA ) h2_axes_totfit->SetYTitle( "I (#muA)" );
+  else                h2_axes_totfit->SetYTitle( "I (pA)" );
   h2_axes_totfit->GetXaxis()->SetNdivisions(505);
   h2_axes_totfit->GetYaxis()->SetNdivisions(505);
 
@@ -340,10 +339,10 @@ int main( int argc, char* argv[] ) {
     gPad->RedrawAxis();
     c3->SaveAs( Form("%s/steps/i_vs_e_step%d.pdf", outdir.c_str(), istep) );
 
-    if( thisChi2<0.000001 ) continue;
+    if( thisChi2<0.00001 ) continue;
 
-    gr_chi2_vs_istep   ->SetPoint( gr_chi2_vs_istep   ->GetN(), this_delta_d, thisChi2     );
-    gr_chi2red_vs_istep->SetPoint( gr_chi2red_vs_istep->GetN(), this_delta_d, thisChi2/NDF );
+    gr_chi2_vs_istep   ->SetPoint( gr_chi2_vs_istep   ->GetN(), d1 + this_delta_d, thisChi2     );
+    gr_chi2red_vs_istep->SetPoint( gr_chi2red_vs_istep->GetN(), d1 + this_delta_d, thisChi2/NDF );
 
 
     float gamma_comb, gamma_err_comb;
@@ -386,8 +385,8 @@ int main( int argc, char* argv[] ) {
   yMin4 *= 0.9;
   yMax4 *= 1.1;
 
-  TH2D* h2_axes4 = new TH2D( "axes4", "", 10, xMin4, xMax4, 10, 0., yMax4 );
-  h2_axes4->SetXTitle( "#Deltad_{0} [mm]" );
+  TH2D* h2_axes4 = new TH2D( "axes4", "", 10, xMin4, xMax4, 10, 0., 150. );
+  h2_axes4->SetXTitle( "d_{1} (mm)" );
   h2_axes4->SetYTitle( Form("#chi^{2} (NDF = %.0f)", NDF) );
   //h2_axes4->SetYTitle( "#chi^{2} / NDF" );
   h2_axes4->Draw();
@@ -402,10 +401,10 @@ int main( int argc, char* argv[] ) {
   //gr_chi2red_vs_istep->SetLineColor(kGray+3);
   //gr_chi2red_vs_istep->SetMarkerSize(1.1);
 
-  float delta_d_minChi2 = (float)step_minChi2*stepsize;
+  float delta_d_minChi2 = start_delta + (float)step_minChi2*stepsize;
 
-  float xMinChi2 = start_delta + delta_d_minChi2;
-  TLine* line_min = new TLine( xMinChi2, 0., xMinChi2, minChi2 );
+  float d1_minChi2 = d1 + delta_d_minChi2;
+  TLine* line_min = new TLine( d1_minChi2, 0., d1_minChi2, minChi2 );
   line_min->SetLineColor(46);
   line_min->SetLineWidth(2);
   line_min->Draw("same");
@@ -421,11 +420,13 @@ int main( int argc, char* argv[] ) {
   TLine* lineMinusSigma = new TLine( xMinusSigma, 0., xMinusSigma, yMinusSigma );
   lineMinusSigma->SetLineColor(46);
   lineMinusSigma->SetLineWidth(2);
+  lineMinusSigma->SetLineStyle(2);
   lineMinusSigma->Draw("same");
 
   TLine* linePlusSigma = new TLine( xPlusSigma, 0., xPlusSigma, yPlusSigma );
   linePlusSigma->SetLineColor(46);
   linePlusSigma->SetLineWidth(2);
+  linePlusSigma->SetLineStyle(2);
   linePlusSigma->Draw("same");
 
   gr_chi2_vs_istep->Draw("P same");
@@ -435,7 +436,8 @@ int main( int argc, char* argv[] ) {
   TPaveText* label_d_err = new TPaveText( 0.6, 0.2, 0.8, 0.3, "brNDC" );
   label_d_err->SetTextSize( 0.035 );
   label_d_err->SetFillColor(0);
-  label_d_err->AddText( Form("#sigma(d_{0}) = %.2f mm", d_err_new) );
+  label_d_err->AddText( Form("d_{1} = (%.2f #pm %.2f) mm", d1_minChi2, d_err_new) );
+  //label_d_err->AddText( Form("#sigma(d_{0}) = %.2f mm", d_err_new) );
   label_d_err->Draw("same");
 
 
@@ -457,9 +459,9 @@ int main( int argc, char* argv[] ) {
   c1->cd();
 
   TH2D* h2_axes = new TH2D( "axes", "", 10, 0., vmax, 10, 0., imax );
-  h2_axes->SetXTitle( "#DeltaV [V]" );
-  if( scaleToMicroA ) h2_axes->SetYTitle( "I [#muA]" );
-  else                h2_axes->SetYTitle( "I [pA]"   );
+  h2_axes->SetXTitle( "#DeltaV (V)" );
+  if( scaleToMicroA ) h2_axes->SetYTitle( "I (#muA)" );
+  else                h2_axes->SetYTitle( "I (pA)"   );
   h2_axes->GetXaxis()->SetNdivisions(505);
   h2_axes->Draw();
 
@@ -469,6 +471,8 @@ int main( int argc, char* argv[] ) {
   float yMaxFN = -999.;
 
 
+  std::string textableline = legendName;
+
   UncCorr uc;
 
   std::cout << std::endl << "At optimal point:" << std::endl;
@@ -477,7 +481,7 @@ int main( int argc, char* argv[] ) {
   // plus update gamma measurement with new d uncertainty
   for( unsigned i=0; i<scans.size(); ++i ) {
 
-    float this_d = scans[i]->d() + xMinChi2;
+    float this_d = scans[i]->d() + delta_d_minChi2;
 
     c1->cd();
     graphs_selected[i]->Draw("P same" );
@@ -502,6 +506,9 @@ int main( int argc, char* argv[] ) {
     std::cout << "Scan " << i << " (d = " << this_d << ")" << std::endl;
 
     uc.addDataPoint(gamma, gamma_err_tot_uncorr, gamma_err_tot_corr);
+
+    std::string thisText(Form(" & $%.0f \\pm %.0f \\pm %.0f$", gamma, gamma_err_tot_uncorr, gamma_err_tot_corr));
+    textableline = textableline + thisText;
 
   } // for scans
 
@@ -573,6 +580,13 @@ int main( int argc, char* argv[] ) {
   std::cout << "---------------------------------------------------" << std::endl;
   std::cout << std::endl;
 
+
+  textableline = textableline + (std::string)(Form(" & $%.0f \\pm %.0f $", gamma_comb_new, gamma_err_comb_new));
+  textableline = textableline + " \\\\";
+
+  std::cout << std::endl;
+  std::cout << textableline << std::endl;
+  std::cout << std::endl;
 
   return 0;
 
