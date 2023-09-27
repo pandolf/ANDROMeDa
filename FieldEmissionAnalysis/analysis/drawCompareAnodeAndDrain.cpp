@@ -12,13 +12,14 @@
 #include "TF1.h"
 #include "TFile.h"
 #include "TLegend.h"
+#include "TLine.h"
 
 
 
 
 
 
-void draw_AvsD( TGraphErrors* graph_anode, TGraphErrors* graph_drain, const std::string& legendName, const std::string& saveName, const std::string& label );
+void draw_AvsD( TGraphErrors* graph_anode, TGraphErrors* graph_drain, float xMax, const std::string& legendName, const std::string& saveName, const std::string& label );
 TGraphErrors* invertCurrent( TGraphErrors* graph );
 
 
@@ -33,14 +34,18 @@ int main( int argc, char* argv[] ) {
 
 
   for( unsigned i=3; i<=5; ++ i ) {
+  //for( unsigned i=3; i<=5; ++ i ) {
 
     float d(i);
 
-    IVScan ivs_anode(Form("CNTArO2Etching_AG_d%d_new"      , i));
-    IVScan ivs_drain(Form("CNTArO2Etching_AG_d%d_new_drain", i));
+    IVScan ivs_anode(Form("CNTetchedOLD_Strongnew_d%d_20230927"      , i));
+    IVScan ivs_drain(Form("CNTetchedOLD_Strongnew_d%d_20230927_drain"  , i));
+    //IVScan ivs_anode(Form("CNTArO2Etching_AG_d%d_new"      , i));
+    //IVScan ivs_drain(Form("CNTArO2Etching_AG_d%d_new_drain", i));
     //IVScan ivs_drain(Form("CNTArO2Etching_AG_d%d_new_drain_2", i));
 
-    draw_AvsD( ivs_anode.graph(), ivs_drain.graph(), Form("d = %.1f mm", d), Form("d%d", i), "CNT as grown (no etching)" );
+    draw_AvsD( ivs_anode.graph(), ivs_drain.graph(), 500+100.*i, Form("d = %.1f mm", d), Form("d%d", i), "CNT strong O_{2} etching" );
+    //draw_AvsD( ivs_anode.graph(), ivs_drain.graph(), Form("d = %.1f mm", d), Form("d%d", i), "CNT as grown (no etching)" );
 
   }
 
@@ -50,15 +55,15 @@ int main( int argc, char* argv[] ) {
 
 
 
-void draw_AvsD( TGraphErrors* graph_anode, TGraphErrors* graph_drain, const std::string& legendName, const std::string& saveName, const std::string& label ) {
+void draw_AvsD( TGraphErrors* graph_anode, TGraphErrors* graph_drain, float xMax, const std::string& legendName, const std::string& saveName, const std::string& label ) {
 
   TCanvas* c1 = new TCanvas( "c1", "", 800, 600 );
   c1->cd();
 
   int xMin = 0.;
-  int xMax = 2200.;
+  //int xMax = 500.;
 
-  TH2D* h2_axes = new TH2D( "axes", "", 10, xMin, xMax, 10, -3.5, 1. );
+  TH2D* h2_axes = new TH2D( "axes", "", 10, xMin, xMax, 10, -200., 1. );
   h2_axes->SetXTitle( "|#DeltaV(CNT-anode)| [V]" );
   h2_axes->SetYTitle( "I [pA]" );
   h2_axes->Draw();
