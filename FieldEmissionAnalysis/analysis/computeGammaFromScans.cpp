@@ -103,10 +103,24 @@ int main( int argc, char* argv[] ) {
 
   } else if( sampleName == "CNTetchedOLD_Strongnew" ) {
 
-    scans.push_back( new IVScan("CNTetchedOLD_Strongnew_d3p6_20230519_drain.dat") );
-    scans.push_back( new IVScan("CNTetchedOLD_Strongnew_d4_20230519_drain.dat") );
-    scans.push_back( new IVScan("CNTetchedOLD_Strongnew_d5_20230519_drain.dat") );
-    scans.push_back( new IVScan("CNTetchedOLD_Strongnew_d3_20230519_drain.dat") );
+    scans.push_back( new IVScan("CNTetchedOLD_Strongnew_d3_20230927_drain.dat") );
+    scans.push_back( new IVScan("CNTetchedOLD_Strongnew_d4_20230927_drain.dat") );
+    scans.push_back( new IVScan("CNTetchedOLD_Strongnew_d5_20230927_drain.dat") );
+
+    //scans.push_back( new IVScan("CNTetchedOLD_Strongnew_d4_20230927.dat") );
+    //scans.push_back( new IVScan("CNTetchedOLD_Strongnew_d5_20230927.dat") );
+    //scans.push_back( new IVScan("CNTetchedOLD_Strongnew_d3_20230927.dat") );
+
+    legendName = "Strong Ar etching";
+    imax = 350.;
+    vmax = 700.;
+    scaleToMicroA = false;
+    nPointsSelect = -1; // all
+
+    //scans.push_back( new IVScan("CNTetchedOLD_Strongnew_d3p6_20230519_drain.dat") );
+    //scans.push_back( new IVScan("CNTetchedOLD_Strongnew_d4_20230519_drain.dat") );
+    //scans.push_back( new IVScan("CNTetchedOLD_Strongnew_d5_20230519_drain.dat") );
+    //scans.push_back( new IVScan("CNTetchedOLD_Strongnew_d3_20230519_drain.dat") );
 
   } else if( sampleName == "CNTetchedOLD_N3new" ) {
 
@@ -150,8 +164,12 @@ int main( int argc, char* argv[] ) {
 
   float d1 = 99999.;
 
+  std::cout << " -> Selecting points from graphs..." << std::endl << std::endl;
+
   // first loop to scale data points to muA and to get the graphs
   for( unsigned i=0; i<scans.size(); ++i ) {
+
+    std::cout << "    Scan: " << scans[i]->name() << std::endl;
 
     if( scaleToMicroA ) scans[i]->scaleDataPoints( 1E-6 ); // in muA
 
@@ -162,6 +180,7 @@ int main( int argc, char* argv[] ) {
     TGraphErrors* graph = scans[i]->graph();
 
     TGraphErrors* gr_selected = (nPointsSelect>=0) ? selectPointsForFN( *graph, nPointsSelect ) : graph;
+    std::cout << "    selected points: " << gr_selected->GetN() << std::endl;
     gr_selected->SetMarkerSize(1.6);
     gr_selected->SetMarkerColor( colors[i] );
     gr_selected->SetLineColor  ( colors[i] );
@@ -231,6 +250,10 @@ int main( int argc, char* argv[] ) {
 
   for( int istep=0; istep<nsteps; ++istep ) {
 
+    std::cout << std::endl << std::endl;
+    std::cout << "------------------------" << std::endl << std::endl;
+    std::cout << " -> STARTING STEP: " << istep << std::endl << std::endl;
+
     c3->Clear();
 
     h2_axes_totfit->Draw();
@@ -272,7 +295,6 @@ int main( int argc, char* argv[] ) {
         //gr_selected_totfit->SetPointError( i_this, xerr/(x*x), yerr/y );
 
       }
-
 
       TF1* f1_line = graphsFN_selected[i]->GetFunction( Form( "line_%s", graphsFN_selected[i]->GetName()) );
       
