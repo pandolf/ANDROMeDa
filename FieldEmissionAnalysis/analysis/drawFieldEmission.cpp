@@ -183,7 +183,7 @@ IVScanFN analyzeFN( const std::string& name ) {
   }
 
 
-  IVScanFN ivs( name, scale, hvMin, hvMax );
+  IVScanFN ivs( name, scale );
 
   
 
