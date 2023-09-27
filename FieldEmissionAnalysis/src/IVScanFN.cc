@@ -12,7 +12,7 @@
 
 
 
-IVScanFN::IVScanFN( const std::string& name, float scale, float xMin, float xMax ) : IVScan( name, scale, xMin, xMax ) {
+IVScanFN::IVScanFN( const std::string& name, float scale ) : IVScan( name, scale ) {
 
   gamma_ = 0.;
   gamma_err_ = 0.;

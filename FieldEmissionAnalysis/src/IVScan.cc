@@ -14,7 +14,7 @@
 
 
 
-IVScan::IVScan( const std::string& name, float scale, float xMin, float xMax ) : IScan(name, scale, xMin, xMax) {
+IVScan::IVScan( const std::string& name, float scale ) : IScan(name, scale) {
 
 
 }

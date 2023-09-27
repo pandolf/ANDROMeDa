@@ -13,7 +13,7 @@ class IVScanFN : public IVScan {
 
  public:
 
-  IVScanFN( const std::string& name, float scale=1., float xMin=-99999., float xMax=99999. );
+  IVScanFN( const std::string& name, float scale=1. );
 
   ~IVScanFN();
 

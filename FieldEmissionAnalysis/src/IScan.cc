@@ -15,7 +15,7 @@
 
 
 
-IScan::IScan( const std::string& name, float scale, float xMin, float xMax ) {
+IScan::IScan( const std::string& name, float scale ) {
 
   name_ = AndCommon::removePathAndSuffix(name);
 
@@ -30,7 +30,7 @@ IScan::IScan( const std::string& name, float scale, float xMin, float xMax ) {
   graph_->SetMarkerStyle(20);
 
 
-  readFile( getDataFileName(name_), xMin, xMax );
+  readFile( getDataFileName(name_) );
 
   if( scale!=1 ) scaleDataPoints( scale );
 
@@ -152,21 +152,38 @@ void IScan::readCommentLine( const std::vector< std::string >& words ) {
 }
 
 
-void IScan::readDataLine( const std::vector< std::string >& words, float xMin, float xMax ) {
+void IScan::readDataLine( const std::vector< std::string >& words, bool& addToGraph ) {
 
-  float x = std::atof( words[0].c_str() );
+  float x    = std::atof( words[0].c_str() );
+  float y    = std::atof( words[1].c_str() );
+  float yerr = std::atof( words[2].c_str() );
 
-  if( x>xMin && x<xMax ) {
+  bool stopAddingAfterThisOne = false;
 
-    std::vector<float> v_i;
-    for( unsigned iw=1; iw<words.size(); ++iw ) {
-      if( words[iw][0] == '#' ) break; // ignore from comment onwards
-      v_i.push_back( std::atof(words[iw].c_str()) );
+  if( words.size()>3 ) {
+
+    if( words[3] == "first" ) {
+      delete graph_; // erase and restart from scratch
+      graph_ = new TGraphErrors(0);
+      graph_->SetName( Form("gr_%s", name_.c_str()) );
+      graph_->SetMarkerSize(1.8);
+      graph_->SetMarkerStyle(20); 
+      addToGraph = true;
+    } else if( words[3] == "last"  ) {
+      stopAddingAfterThisOne = true;
+    } else {
+      std::cout << "Didn't recognize word: " << words[3] << " (only 'first' and 'last' admitted)" << std::endl;
     }
 
-    addPointToGraph( x, v_i );
+  }
 
-  } // if x
+  if( addToGraph ) {
+    int iPoint = this->graph()->GetN();
+    this->graph()->SetPoint     ( iPoint, x , y    );
+    this->graph()->SetPointError( iPoint, 1., yerr ); // err on x (=hv) is 1 V
+  }
+
+  if( stopAddingAfterThisOne ) addToGraph = false;
 
 }
 
@@ -192,26 +209,26 @@ void IScan::scaleDataPoints( float scale ) {
 }
 
 
-void IScan::addPointToGraph( float hv, std::vector<float> i_meas ) {
+//void IScan::addPointToGraph( float hv, std::vector<float> i_meas ) {
+//
+//  float mean, rms;
+//  getMeanRMS( i_meas, mean, rms );
+//
+//  int iPoint = this->graph()->GetN();
+//  this->graph()->SetPoint     ( iPoint, hv, mean );
+//  this->graph()->SetPointError( iPoint, 1., rms  );
+//
+//}
 
-  float mean, rms;
-  getMeanRMS( i_meas, mean, rms );
-
-  int iPoint = this->graph()->GetN();
-  this->graph()->SetPoint     ( iPoint, hv, mean );
-  this->graph()->SetPointError( iPoint, 1., rms  );
-
-}
 
 
-
-void IScan::readFile( const std::string& name, float xMin, float xMax ) {
+void IScan::readFile( const std::string& name ) {
 
 
   std::string fileName = (name=="") ? getDataFileName(name_) : getDataFileName(name);
 
   std::cout << "-> Opening data file: " << fileName << std::endl;
-  if( xMin > -50000. && xMax < 50000 ) std::cout << "-> Will add only data points with " << xMin << " < x < " << xMax << std::endl;
+  //if( xMin > -50000. && xMax < 50000 ) std::cout << "-> Will add only data points with " << xMin << " < x < " << xMax << std::endl;
 
   std::ifstream ifs( fileName.c_str() );
 
@@ -223,6 +240,8 @@ void IScan::readFile( const std::string& name, float xMin, float xMax ) {
   std::string line;
 
   if( ifs.good() ) {
+
+    bool addToGraph = true; // default: all points
 
     while( getline(ifs,line) ) {
 
@@ -242,7 +261,8 @@ void IScan::readFile( const std::string& name, float xMin, float xMax ) {
 
       }
 
-      readDataLine( words, xMin, xMax );
+      readDataLine( words, addToGraph );
+      //readDataLine( words, xMin, xMax );
 
 
     }  // while get lines
@@ -255,35 +275,35 @@ void IScan::readFile( const std::string& name, float xMin, float xMax ) {
 
 
 
-void IScan::getMeanRMS( std::vector<float> v, float& mean, float& rms ) {
-
-  mean = 0.;
-  rms = 0.;
-
-  if( v.size()<2 ) {
-
-    std::cout << "[IScan::getMeanRMS] Data vector size < 2" << std::endl;
-    exit(2);
-
-  } else if( v.size()==2 ) { // first is mean second is RMS
-
-    mean = v[0];
-    rms  = v[1];
-
-  } else { // just a number of measurements
-
-    for( unsigned i=0; i<v.size(); ++i )
-      mean += v[i];
-    
-    mean /= (float)(v.size());
-
-
-    for( unsigned i=0; i<v.size(); ++i ) 
-      rms += (v[i] - mean)*(v[i] - mean);
-    rms /= (float)(v.size()-1);
-    rms = sqrt(rms);
-
-  }  // if
-
-}
+//void IScan::getMeanRMS( std::vector<float> v, float& mean, float& rms ) {
+//
+//  mean = 0.;
+//  rms = 0.;
+//
+//  if( v.size()<2 ) {
+//
+//    std::cout << "[IScan::getMeanRMS] Data vector size < 2" << std::endl;
+//    exit(2);
+//
+//  } else if( v.size()==2 ) { // first is mean second is RMS
+//
+//    mean = v[0];
+//    rms  = v[1];
+//
+//  } else { // just a number of measurements
+//
+//    for( unsigned i=0; i<v.size(); ++i )
+//      mean += v[i];
+//    
+//    mean /= (float)(v.size());
+//
+//
+//    for( unsigned i=0; i<v.size(); ++i ) 
+//      rms += (v[i] - mean)*(v[i] - mean);
+//    rms /= (float)(v.size()-1);
+//    rms = sqrt(rms);
+//
+//  }  // if
+//
+//}
 
