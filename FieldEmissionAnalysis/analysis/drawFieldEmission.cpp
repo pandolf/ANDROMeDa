@@ -45,6 +45,11 @@ int main( int argc, char* argv[] ) {
     scans.push_back( analyzeFN( "CNTArO2Etching_N1_d3_20221130" ) );
     scans.push_back( analyzeFN( "CNTArO2Etching_N1_d2_20221130" ) );
 
+  } else if( name == "CNTetchedOLD_N1new" ) {
+
+    scans.push_back( analyzeFN( "CNTetchedOLD_N1new_d5_20230517_drain" ) );
+    scans.push_back( analyzeFN( "CNTetchedOLD_N1new_d4_20230517_drain" ) );
+
   } else {
 
     scans.push_back( analyzeFN(name) );
@@ -139,8 +144,41 @@ IVScanFN analyzeFN( const std::string& name ) {
 
     //hvMin = 730.; // first component
     //hvMax = 900.;
-    hvMin = 680.; // second component
-    hvMax = 880.;
+    //hvMin = 680.; // second component
+    //hvMax = 880.;
+
+  } else if( name=="CNTetchedOLD_Strongnew_d3_20230927_2" ) {
+
+    hvMin = 190.;
+    hvMax = 255.;
+
+  } else if( name=="CNTetchedOLD_Strongnew_d4_20230927" ) {
+
+    hvMin = 340.;
+    //hvMax = 255.;
+
+  } else if( name=="CNTetchedOLD_Strongnew_d5_20230927" ) {
+
+    hvMin = 390.;
+    hvMax = 510.;
+
+  } else if( name=="CNTetchedOLD_Strongnew_d3_20230927_drain" ) {
+
+    //hvMin = 390.;
+    //hvMax = 510.;
+    scale = +1.;
+
+  } else if( name=="CNTetchedOLD_Strongnew_d4_20230927_drain" ) {
+
+    //hvMin = 390.;
+    //hvMax = 510.;
+    scale = +1.;
+
+  } else if( name=="CNTetchedOLD_Strongnew_d5_20230927_drain" ) {
+
+    //hvMin = 390.;
+    //hvMax = 510.;
+    scale = +1.;
 
   }
 
