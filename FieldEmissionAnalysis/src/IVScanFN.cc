@@ -12,7 +12,7 @@
 
 
 
-IVScanFN::IVScanFN( const std::string& name, float scale ) : IVScan( name, scale ) {
+IVScanFN::IVScanFN( const std::string& name, float scale, float xMin, float xMax ) : IVScan( name, scale, xMin, xMax ) {
 
   gamma_ = 0.;
   gamma_err_ = 0.;
@@ -41,6 +41,7 @@ TGraphErrors* IVScanFN::graphFN() const {
 }
 
 
+
 float IVScanFN::gamma() const {
 
   return gamma_;
@@ -55,8 +56,6 @@ float IVScanFN::gamma_err() const {
 }
 
 
-
-
 void IVScanFN::setColor( int color ) {
 
   IVScan::setColor(color);
@@ -64,7 +63,7 @@ void IVScanFN::setColor( int color ) {
   graphFN_->SetMarkerColor( color );
   graphFN_->SetLineColor( color );
 
-  graphFN_->GetFunction( Form("line_%s", this->name().c_str()) )->SetLineColor( color );
+  graphFN_->GetFunction( Form("lineFN_%s", this->name().c_str()) )->SetLineColor( color );
 
 }
 
@@ -90,7 +89,7 @@ void IVScanFN::set_graphFN() {
 
   if( graphFN_->GetN() > 1 ) {
 
-    TF1* f1_line = new TF1( Form("line_%s", this->name().c_str()), "[0]+[1]*x" );
+    TF1* f1_line = new TF1( Form("lineFN_%s", this->name().c_str()), "[0]+[1]*x" );
     f1_line->SetLineColor(46);
     f1_line->SetLineWidth(2);
     graphFN_->Fit( f1_line, "Q+" );
@@ -119,13 +118,13 @@ void IVScanFN::set_graphFN() {
 
 TGraphErrors* IVScanFN::getFNgraph() const {
 
-  return IVScanFN::getFNgraph( this->graph() );
+  return IVScanFN::getFNgraph( this->graph(), this->xMin(), this->xMax() );
 
 }
 
 
 
-TGraphErrors* IVScanFN::getFNgraph( TGraphErrors* graph ) {
+TGraphErrors* IVScanFN::getFNgraph( TGraphErrors* graph, float xMin, float xMax ) {
 
   TGraphErrors* graphFN = new TGraphErrors(0);
   graphFN->SetName( Form("grFN_%s", graph->GetName()) );
@@ -142,8 +141,11 @@ TGraphErrors* IVScanFN::getFNgraph( TGraphErrors* graph ) {
     float i_err = graph->GetErrorY( iPoint );
     float v_err = 1.;
 
-    graphFN->SetPoint     ( iPoint, 1./v, TMath::Log( i / (v*v) ) );
-    graphFN->SetPointError( iPoint, v_err/(v*v), i_err/i );
+    if( (v>xMin) && (v<xMax) ) {
+      int iPointFN = graphFN->GetN();
+      graphFN->SetPoint     ( iPointFN, 1./v, TMath::Log( i / (v*v) ) );
+      graphFN->SetPointError( iPointFN, v_err/(v*v), i_err/i );
+    }
 
   } // for
 
@@ -154,12 +156,14 @@ TGraphErrors* IVScanFN::getFNgraph( TGraphErrors* graph ) {
 
 
 
-float IVScanFN::get_gamma_and_err( float& gamma_err_tot_uncorr, float& gamma_err_tot_corr, float s, float s_err, float d, float derrcorr ) {
+float IVScanFN::get_gamma_and_err( float& gamma_err_tot_uncorr, float& gamma_err_tot_corr, float s, float s_err, float d, float derrcorr ) { // derrcorr is by default = -1
 
   float gamma = -b()*phi()*sqrt(phi())*d/s;
 
+  if( derrcorr<0. ) derrcorr = d_err_corr();
+
   float gamma_err2_phi      = (9./4.)*gamma*gamma/(phi()*phi())*phi_err()*phi_err();
-  float gamma_err2_d_corr   = (derrcorr<0.) ? gamma*gamma/(d*d)*d_err_corr()*d_err_corr() : gamma*gamma/(d*d)*derrcorr*derrcorr; 
+  float gamma_err2_d_corr   = gamma*gamma/(d*d)*derrcorr*derrcorr; 
   float gamma_err2_d_uncorr = gamma*gamma/(d*d)*d_err_uncorr()*d_err_uncorr(); 
   float gamma_err2_s        = gamma*gamma/(s*s)*s_err*s_err;
 
@@ -216,7 +220,7 @@ float IVScanFN::d_err_corr() {
 
 TF1* IVScanFN::lineFN() const {
 
-  return graphFN_->GetFunction(Form("line_%s", this->name().c_str()));
+  return graphFN_->GetFunction(Form("lineFN_%s", this->name().c_str()));
 
 }
 
