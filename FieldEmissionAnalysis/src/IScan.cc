@@ -15,7 +15,7 @@
 
 
 
-IScan::IScan( const std::string& name, float scale ) {
+IScan::IScan( const std::string& name, float scale, float xMin, float xMax ) {
 
   name_ = AndCommon::removePathAndSuffix(name);
 
@@ -29,6 +29,8 @@ IScan::IScan( const std::string& name, float scale ) {
   graph_->SetMarkerSize(1.8);
   graph_->SetMarkerStyle(20);
 
+  xMin_ = xMin;
+  xMax_ = xMax;
 
   readFile( getDataFileName(name_) );
 
@@ -116,6 +118,35 @@ void IScan::setColor( int color ) {
 
 }
 
+
+float IScan::xMin() const {
+
+  return xMin_;
+
+}
+
+
+float IScan::xMax() const {
+
+  return xMax_;
+
+}
+
+
+void IScan::set_xMin( float xMin ) {
+
+  xMin_ = xMin;
+
+}
+
+
+void IScan::set_xMax( float xMax ) {
+
+  xMax_ = xMax;
+
+}
+
+
   
 
 std::string IScan::getDataFileName( const std::string& dataName ) {
@@ -158,34 +189,14 @@ void IScan::readDataLine( const std::vector< std::string >& words, bool& addToGr
   float y    = std::atof( words[1].c_str() );
   float yerr = std::atof( words[2].c_str() );
 
-  bool stopAddingAfterThisOne = false;
-
-  if( words.size()>3 ) {
-
-    if( words[3] == "first" ) {
-      delete graph_; // erase and restart from scratch
-      graph_ = new TGraphErrors(0);
-      graph_->SetName( Form("gr_%s", name_.c_str()) );
-      graph_->SetMarkerSize(1.8);
-      graph_->SetMarkerStyle(20); 
-      addToGraph = true;
-    } else if( words[3] == "last"  ) {
-      stopAddingAfterThisOne = true;
-    } else {
-      std::cout << "Didn't recognize word: " << words[3] << " (only 'first' and 'last' admitted)" << std::endl;
-    }
-
-  }
-
-  if( addToGraph ) {
+  if( (x > xMin_) && (x < xMax_) ) {
     int iPoint = this->graph()->GetN();
     this->graph()->SetPoint     ( iPoint, x , y    );
     this->graph()->SetPointError( iPoint, 1., yerr ); // err on x (=hv) is 1 V
   }
 
-  if( stopAddingAfterThisOne ) addToGraph = false;
-
 }
+
 
 
 
