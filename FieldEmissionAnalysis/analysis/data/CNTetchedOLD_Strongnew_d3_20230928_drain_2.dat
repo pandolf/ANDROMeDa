@@ -1,0 +1,10 @@
+#d 3
+#p 4E-6
+# wrt to the previous measurement, made it emit at ~500uA for 10 minutes, then repeated the measurement
+
+6 -0.10 0.03
+101 -0.03 0.17
+174 -0.11 0.12
+202 0.11 0.27
+225 8.55 1.25
+251 1693 84
