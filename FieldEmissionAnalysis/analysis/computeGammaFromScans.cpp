@@ -44,7 +44,7 @@ int main( int argc, char* argv[] ) {
 
   std::string sampleName( argv[1] );
 
-  std::vector< IVScan* > scans;
+  std::vector< IVScanFN* > scans;
 
   float imax = 30.;
   float vmax = 2200.;
@@ -54,9 +54,9 @@ int main( int argc, char* argv[] ) {
 
   if( sampleName == "CNTArO2Etching_AG_old" ) {
 
-    scans.push_back( new IVScan("CNTArO2Etching_AG_d3_new.dat", -1., 1110., 1230.) );
-    scans.push_back( new IVScan("CNTArO2Etching_AG_d4_new.dat", -1., 1500., 1800.) );
-    scans.push_back( new IVScan("CNTArO2Etching_AG_d5_new.dat", -1., 1930., 2100.) );
+    scans.push_back( new IVScanFN("CNTArO2Etching_AG_d3_new.dat", -1., 1110., 1230.) );
+    scans.push_back( new IVScanFN("CNTArO2Etching_AG_d4_new.dat", -1., 1500., 1800.) );
+    scans.push_back( new IVScanFN("CNTArO2Etching_AG_d5_new.dat", -1., 1930., 2100.) );
 
     legendName = "No etching (as grown)";
     imax = 7.;
@@ -66,13 +66,13 @@ int main( int argc, char* argv[] ) {
   } else if( sampleName == "CNTArO2Etching_N1" ) {
 
     //sampleName = "Mild Ar/O_{2} Etching";
-    //scans.push_back( new IVScan("CNTArO2Etching_N1_d2_20221130", -1.) );
-    scans.push_back( new IVScan("CNTArO2Etching_N1_d3_20221130", -1., 278., 400.) );
-    scans.push_back( new IVScan("CNTArO2Etching_N1_d4_20221130", -1., 381., 500.) );
-    scans.push_back( new IVScan("CNTArO2Etching_N1_d5_20221130", -1., 472., 600.) );
-    //scans.push_back( new IVScan("CNTArO2Etching_N1_d3_20221130", -1.) );//, 250., 400.) );
-    //scans.push_back( new IVScan("CNTArO2Etching_N1_d4_20221130", -1.) );//, 350., 500.) );
-    //scans.push_back( new IVScan("CNTArO2Etching_N1_d5_20221130", -1.) );//, 450., 600.) );
+    //scans.push_back( new IVScanFN("CNTArO2Etching_N1_d2_20221130", -1.) );
+    scans.push_back( new IVScanFN("CNTArO2Etching_N1_d3_20221130", -1., 278., 400.) );
+    scans.push_back( new IVScanFN("CNTArO2Etching_N1_d4_20221130", -1., 381., 500.) );
+    scans.push_back( new IVScanFN("CNTArO2Etching_N1_d5_20221130", -1., 472., 600.) );
+    //scans.push_back( new IVScanFN("CNTArO2Etching_N1_d3_20221130", -1.) );//, 250., 400.) );
+    //scans.push_back( new IVScanFN("CNTArO2Etching_N1_d4_20221130", -1.) );//, 350., 500.) );
+    //scans.push_back( new IVScanFN("CNTArO2Etching_N1_d5_20221130", -1.) );//, 450., 600.) );
 
     legendName = "Mild Ar/O_{2} etching";
     imax = 7.;
@@ -82,58 +82,58 @@ int main( int argc, char* argv[] ) {
 
   } else if( sampleName == "CNTetchedOLD_AGnew" ) {
 
-    scans.push_back( new IVScan("CNTetchedOLD_AGnew_d3_20230519_drain.dat") );
-    scans.push_back( new IVScan("CNTetchedOLD_AGnew_d4_20230519_drain.dat") );
-    scans.push_back( new IVScan("CNTetchedOLD_AGnew_d5_20230519_drain.dat") );
+    scans.push_back( new IVScanFN("CNTetchedOLD_AGnew_d3_20230519_drain.dat") );
+    scans.push_back( new IVScanFN("CNTetchedOLD_AGnew_d4_20230519_drain.dat") );
+    scans.push_back( new IVScanFN("CNTetchedOLD_AGnew_d5_20230519_drain.dat") );
 
   } else if( sampleName == "CNTetchedOLD_N1new" ) {
 
     //scans.push_back( "CNTetchedOLD_N1new_d3p3_20230517_drain.dat" );
     //scans.push_back( "CNTetchedOLD_N1new_d4p3_20230517_drain_2.dat" );
-    scans.push_back( new IVScan("CNTetchedOLD_N1new_d4_20230517_drain.dat"  ) );
-    scans.push_back( new IVScan("CNTetchedOLD_N1new_d4p3_20230517_drain.dat") );
-    scans.push_back( new IVScan("CNTetchedOLD_N1new_d5_20230517_drain.dat"  ) );
+    scans.push_back( new IVScanFN("CNTetchedOLD_N1new_d4_20230517_drain.dat"  ) );
+    scans.push_back( new IVScanFN("CNTetchedOLD_N1new_d4p3_20230517_drain.dat") );
+    scans.push_back( new IVScanFN("CNTetchedOLD_N1new_d5_20230517_drain.dat"  ) );
 
   } else if( sampleName == "CNTetchedOLD_N2new" ) {
 
-    scans.push_back( new IVScan("CNTetchedOLD_N2new_d3p3_20230518_drain.dat") );
-    scans.push_back( new IVScan("CNTetchedOLD_N2new_d4_20230518_drain.dat") );
-    scans.push_back( new IVScan("CNTetchedOLD_N2new_d3_20230518_drain.dat") );
-    scans.push_back( new IVScan("CNTetchedOLD_N2new_d3p6_20230518_drain.dat") );
+    scans.push_back( new IVScanFN("CNTetchedOLD_N2new_d3p3_20230518_drain.dat") );
+    scans.push_back( new IVScanFN("CNTetchedOLD_N2new_d4_20230518_drain.dat") );
+    scans.push_back( new IVScanFN("CNTetchedOLD_N2new_d3_20230518_drain.dat") );
+    scans.push_back( new IVScanFN("CNTetchedOLD_N2new_d3p6_20230518_drain.dat") );
 
   } else if( sampleName == "CNTetchedOLD_Strongnew" ) {
 
-    scans.push_back( new IVScan("CNTetchedOLD_Strongnew_d3_20230927_drain.dat") );
-    scans.push_back( new IVScan("CNTetchedOLD_Strongnew_d4_20230927_drain.dat") );
-    scans.push_back( new IVScan("CNTetchedOLD_Strongnew_d5_20230927_drain.dat") );
+    scans.push_back( new IVScanFN("CNTetchedOLD_Strongnew_d3_20230927_drain.dat") );
+    scans.push_back( new IVScanFN("CNTetchedOLD_Strongnew_d4_20230927_drain.dat") );
+    scans.push_back( new IVScanFN("CNTetchedOLD_Strongnew_d5_20230927_drain.dat") );
 
-    //scans.push_back( new IVScan("CNTetchedOLD_Strongnew_d4_20230927.dat") );
-    //scans.push_back( new IVScan("CNTetchedOLD_Strongnew_d5_20230927.dat") );
-    //scans.push_back( new IVScan("CNTetchedOLD_Strongnew_d3_20230927.dat") );
+    //scans.push_back( new IVScanFN("CNTetchedOLD_Strongnew_d4_20230927.dat") );
+    //scans.push_back( new IVScanFN("CNTetchedOLD_Strongnew_d5_20230927.dat") );
+    //scans.push_back( new IVScanFN("CNTetchedOLD_Strongnew_d3_20230927.dat") );
 
-    legendName = "Strong Ar etching";
+    legendName = "Strong O_{2} etching";
     imax = 350.;
-    vmax = 700.;
+    vmax = 650.;
     scaleToMicroA = false;
     nPointsSelect = -1; // all
 
-    //scans.push_back( new IVScan("CNTetchedOLD_Strongnew_d3p6_20230519_drain.dat") );
-    //scans.push_back( new IVScan("CNTetchedOLD_Strongnew_d4_20230519_drain.dat") );
-    //scans.push_back( new IVScan("CNTetchedOLD_Strongnew_d5_20230519_drain.dat") );
-    //scans.push_back( new IVScan("CNTetchedOLD_Strongnew_d3_20230519_drain.dat") );
+    //scans.push_back( new IVScanFN("CNTetchedOLD_Strongnew_d3p6_20230519_drain.dat") );
+    //scans.push_back( new IVScanFN("CNTetchedOLD_Strongnew_d4_20230519_drain.dat") );
+    //scans.push_back( new IVScanFN("CNTetchedOLD_Strongnew_d5_20230519_drain.dat") );
+    //scans.push_back( new IVScanFN("CNTetchedOLD_Strongnew_d3_20230519_drain.dat") );
 
   } else if( sampleName == "CNTetchedOLD_N3new" ) {
 
-    scans.push_back( new IVScan("CNTetchedOLD_N3new_d3_20230519_drain.dat") );
-    scans.push_back( new IVScan("CNTetchedOLD_N3new_d4_20230519_drain.dat") );
-    scans.push_back( new IVScan("CNTetchedOLD_N3new_d5_20230519_drain.dat") );
+    scans.push_back( new IVScanFN("CNTetchedOLD_N3new_d3_20230519_drain.dat") );
+    scans.push_back( new IVScanFN("CNTetchedOLD_N3new_d4_20230519_drain.dat") );
+    scans.push_back( new IVScanFN("CNTetchedOLD_N3new_d5_20230519_drain.dat") );
 
   } else if( sampleName=="CNTArO2Etching_N1" ) {
 
-    scans.push_back( new IVScan("CNTArO2Etching_N1_d2_20221130", -1.) );
-    scans.push_back( new IVScan("CNTArO2Etching_N1_d3_20221130", -1.) );
-    scans.push_back( new IVScan("CNTArO2Etching_N1_d4_20221130", -1.) );
-    scans.push_back( new IVScan("CNTArO2Etching_N1_d5_20221130", -1.) );
+    scans.push_back( new IVScanFN("CNTArO2Etching_N1_d2_20221130", -1.) );
+    scans.push_back( new IVScanFN("CNTArO2Etching_N1_d3_20221130", -1.) );
+    scans.push_back( new IVScanFN("CNTArO2Etching_N1_d4_20221130", -1.) );
+    scans.push_back( new IVScanFN("CNTArO2Etching_N1_d5_20221130", -1.) );
 
   } else {
 
@@ -166,46 +166,62 @@ int main( int argc, char* argv[] ) {
 
   std::cout << " -> Selecting points from graphs..." << std::endl << std::endl;
 
-  // first loop to scale data points to muA and to get the graphs
+
   for( unsigned i=0; i<scans.size(); ++i ) {
 
-    std::cout << "    Scan: " << scans[i]->name() << std::endl;
-
-    if( scaleToMicroA ) scans[i]->scaleDataPoints( 1E-6 ); // in muA
+    scans[i]->setColor( colors[i] );
 
     float this_d = scans[i]->d();
-
     if( this_d < d1 ) d1 = this_d; // find d1, ie the minimal d
 
-    TGraphErrors* graph = scans[i]->graph();
+    TGraphErrors* graph   = scans[i]->graph();
+    TGraphErrors* graphFN = scans[i]->graphFN();
 
-    TGraphErrors* gr_selected = (nPointsSelect>=0) ? selectPointsForFN( *graph, nPointsSelect ) : graph;
-    std::cout << "    selected points: " << gr_selected->GetN() << std::endl;
-    gr_selected->SetMarkerSize(1.6);
-    gr_selected->SetMarkerColor( colors[i] );
-    gr_selected->SetLineColor  ( colors[i] );
+    TGraphErrors* thisgraph = new TGraphErrors( *graph );
+    graphs_selected.push_back( thisgraph );
 
-    graphs_selected.push_back( gr_selected );
-  
-    TGraphErrors* gr_FN = IVScanFN::getFNgraph( gr_selected );
-    gr_FN->SetMarkerColor( colors[i] );
-    gr_FN->SetLineColor  ( colors[i] );
+    TGraphErrors* thisgraphFN = new TGraphErrors( *graphFN );
+    graphsFN_selected.push_back( thisgraphFN );
+
+  }
 
 
-    TF1* f1_line = new TF1( Form("line_%s", gr_FN->GetName()), "[0]+[1]*x");//, 0.9*xMinFN_this, 1.1*xMaxFN_this );
-    f1_line->SetLineColor(gr_FN->GetLineColor());
-    f1_line->SetLineWidth(2);
+//// first loop to scale data points to muA and to get the graphs
+//for( unsigned i=0; i<scans.size(); ++i ) {
 
-    //initializeFunction( f1_line, gr_FN );
+//  std::cout << "    Scan: " << scans[i]->name() << std::endl;
 
-    gr_FN->Fit( f1_line, "Q+" );
+//  if( scaleToMicroA ) scans[i]->scaleDataPoints( 1E-6 ); // in muA
 
-    //c2->cd();
-    //gr_FN->Draw("P same" );
 
-    graphsFN_selected.push_back( gr_FN );
+//  TGraphErrors* graph = scans[i]->graph();
 
-  } // for scans
+//  TGraphErrors* gr_selected = (nPointsSelect>=0) ? selectPointsForFN( *graph, nPointsSelect ) : graph;
+//  std::cout << "    selected points: " << gr_selected->GetN() << std::endl;
+//  gr_selected->SetMarkerSize(1.6);
+//  gr_selected->SetMarkerColor( colors[i] );
+//  gr_selected->SetLineColor  ( colors[i] );
+
+//
+//  TGraphErrors* gr_FN = IVScanFN::getFNgraph( gr_selected );
+//  gr_FN->SetMarkerColor( colors[i] );
+//  gr_FN->SetLineColor  ( colors[i] );
+
+
+//  TF1* f1_line = new TF1( Form("line_%s", gr_FN->GetName()), "[0]+[1]*x");//, 0.9*xMinFN_this, 1.1*xMaxFN_this );
+//  f1_line->SetLineColor(gr_FN->GetLineColor());
+//  f1_line->SetLineWidth(2);
+
+//  //initializeFunction( f1_line, gr_FN );
+
+//  gr_FN->Fit( f1_line, "Q+" );
+
+//  //c2->cd();
+//  //gr_FN->Draw("P same" );
+
+//  graphsFN_selected.push_back( gr_FN );
+
+//} // for scans
 
 
 
@@ -296,7 +312,7 @@ int main( int argc, char* argv[] ) {
 
       }
 
-      TF1* f1_line = graphsFN_selected[i]->GetFunction( Form( "line_%s", graphsFN_selected[i]->GetName()) );
+      TF1* f1_line = graphsFN_selected[i]->GetFunction( Form( "lineFN_%s", (scans[i]->name()).c_str()) );
       
       //float phi = 4.7; // in eV
       //float phi_err = 0.1; // in eV
@@ -308,7 +324,9 @@ int main( int argc, char* argv[] ) {
       //float b = 6.83E6; // this is 4/3 * sqrt(2m) / hbar = 6.83E6 V^-1/2 mm^-1, from FN theory
 
       float gamma_err_tot_uncorr, gamma_err_tot_corr;
-      float gamma = IVScanFN::get_gamma_and_err( gamma_err_tot_uncorr, gamma_err_tot_corr, f1_line->GetParameter(1), f1_line->GetParError(1), this_d );
+      TString name_tstr(scans[i]->name() );
+      float derrcorr = ( name_tstr.Contains("20230927") ) ? 0.5 : -1.; // set 0.5 mm uncertainty on relative d because setup had bad parallax
+      float gamma = IVScanFN::get_gamma_and_err( gamma_err_tot_uncorr, gamma_err_tot_corr, f1_line->GetParameter(1), f1_line->GetParError(1), this_d, derrcorr );
       //float gamma_err_tot = sqrt( gamma_err_tot_uncorr*gamma_err_tot_uncorr + gamma_err_tot_corr*gamma_err_tot_corr );
 
       //gamma_err_tot = IVScanFN::get_gamma_uncertainty( f1_line->GetParError(1), gamma_err_tot_uncorr, gamma_err_tot_corr );
@@ -497,7 +515,9 @@ int main( int argc, char* argv[] ) {
 
   UncCorr uc;
 
-  std::cout << std::endl << "At optimal point:" << std::endl;
+  std::cout << std::endl << std::endl;;
+  std::cout << std::endl << "##############################################################################" << std::endl << std::endl;
+  std::cout << "         At optimal point:" << std::endl;
 
   // plot I vs V and FN plots with optimal d values
   // plus update gamma measurement with new d uncertainty
@@ -519,13 +539,14 @@ int main( int argc, char* argv[] ) {
     if( yMaxFN_this > yMaxFN ) yMaxFN = yMaxFN_this;
 
 
-    TF1* f1_line = graphsFN_selected[i]->GetFunction( Form( "line_%s", graphsFN_selected[i]->GetName()) );
+    TF1* f1_line = graphsFN_selected[i]->GetFunction( Form( "lineFN_%s", (scans[i]->name()).c_str() ) );
     
     float gamma_err_tot_uncorr, gamma_err_tot_corr;
     float gamma = IVScanFN::get_gamma_and_err( gamma_err_tot_uncorr, gamma_err_tot_corr, f1_line->GetParameter(1), f1_line->GetParError(1), this_d, d_err_new );
 
     std::cout << std::endl;
-    std::cout << "Scan " << i << " (d = " << this_d << ")" << std::endl;
+    std::cout << "         Scan " << i << " (d = " << this_d << ")" << std::endl;
+    std::cout << "         ";
 
     uc.addDataPoint(gamma, gamma_err_tot_uncorr, gamma_err_tot_corr);
 
@@ -534,6 +555,7 @@ int main( int argc, char* argv[] ) {
 
   } // for scans
 
+  std::cout << std::endl << "##############################################################################" << std::endl << std::endl;
 
   TCanvas* c2 = new TCanvas( "c2", "", 600, 600 );
   c2->cd();
