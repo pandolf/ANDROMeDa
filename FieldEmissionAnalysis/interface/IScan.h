@@ -12,10 +12,9 @@ class IScan {
 
  public:
 
-  IScan( const std::string& name, float scale=1. );
+  IScan( const std::string& name, float scale=1., float xMin=-99999., float xMax=99999. );
 
   virtual ~IScan();
-
 
   virtual void readFile( const std::string& name="" );
   virtual void readCommentLine( const std::vector< std::string >& words );
@@ -39,6 +38,13 @@ class IScan {
   void set_p( float p );
   void set_d( float d );
 
+  float xMin() const;
+  float xMax() const;
+
+  void set_xMin( float xMin );
+  void set_xMax( float xMax );
+
+
   virtual void set_graph( TGraphErrors* graph );
 
   virtual void setColor( int color );
@@ -53,6 +59,9 @@ class IScan {
 
   float p_; // pressure in mbar
   float d_; // distance between anode and cathode in mm
+
+  float xMin_;
+  float xMax_;
 
   std::string getDataFileName( const std::string& dataName );
 
