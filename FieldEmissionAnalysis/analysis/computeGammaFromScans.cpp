@@ -103,9 +103,13 @@ int main( int argc, char* argv[] ) {
 
   } else if( sampleName == "CNTetchedOLD_Strongnew" ) {
 
-    scans.push_back( new IVScanFN("CNTetchedOLD_Strongnew_d3_20230927_drain.dat") );
-    scans.push_back( new IVScanFN("CNTetchedOLD_Strongnew_d4_20230927_drain.dat") );
-    scans.push_back( new IVScanFN("CNTetchedOLD_Strongnew_d5_20230927_drain.dat") );
+    scans.push_back( new IVScanFN("CNTetchedOLD_Strongnew_d3_20231006_drain.dat") );
+    scans.push_back( new IVScanFN("CNTetchedOLD_Strongnew_d4_20231006_drain.dat") );
+    scans.push_back( new IVScanFN("CNTetchedOLD_Strongnew_d5_20231006_drain.dat") );
+
+    //scans.push_back( new IVScanFN("CNTetchedOLD_Strongnew_d3_20230927_drain.dat") );
+    //scans.push_back( new IVScanFN("CNTetchedOLD_Strongnew_d4_20230927_drain.dat") );
+    //scans.push_back( new IVScanFN("CNTetchedOLD_Strongnew_d5_20230927_drain.dat") );
 
     //scans.push_back( new IVScanFN("CNTetchedOLD_Strongnew_d4_20230927.dat") );
     //scans.push_back( new IVScanFN("CNTetchedOLD_Strongnew_d5_20230927.dat") );
