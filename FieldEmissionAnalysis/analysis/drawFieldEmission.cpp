@@ -180,10 +180,31 @@ IVScanFN analyzeFN( const std::string& name ) {
     //hvMax = 510.;
     scale = +1.;
 
+  } else if( name=="CNTetchedOLD_Strongnew_d3_20231002_drain_2" ) {
+
+    hvMin = 359.;
+    //hvMax = 510.;
+    scale = +1.;
+
+  } else if( name=="CNTetchedOLD_Strongnew_d4_20231002_drain_2" ) {
+
+    hvMin = 560.;
+    //hvMax = 510.;
+    scale = +1.;
+
+  } else if( name=="CNTetchedOLD_Strongnew_d5_20231006_drain" ) {
+
+    //hvMin = 560.;
+    hvMax = 460.;
+    scale = +1.;
+
   }
 
 
-  IVScanFN ivs( name, scale );
+  TString name_tstr(name);
+  if( name_tstr.Contains("drain") ) scale = +1.;
+
+  IVScanFN ivs( name, scale, hvMin, hvMax );
 
   
 
