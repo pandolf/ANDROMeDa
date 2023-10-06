@@ -239,7 +239,9 @@ void IScan::readFile( const std::string& name ) {
   std::string fileName = (name=="") ? getDataFileName(name_) : getDataFileName(name);
 
   std::cout << "-> Opening data file: " << fileName << std::endl;
-  //if( xMin > -50000. && xMax < 50000 ) std::cout << "-> Will add only data points with " << xMin << " < x < " << xMax << std::endl;
+  if( xMin_ > -50000. && xMax_ < 50000 ) std::cout << "-> Will add only data points with " << xMin_ << " < x < " << xMax_ << std::endl;
+  else if( xMin_ > -50000. ) std::cout << "-> Will add only data points with x > " << xMin_ << std::endl;
+  else if( xMax_ <  50000. ) std::cout << "-> Will add only data points with x < " << xMax_ << std::endl;
 
   std::ifstream ifs( fileName.c_str() );
 
@@ -256,11 +258,20 @@ void IScan::readFile( const std::string& name ) {
 
     while( getline(ifs,line) ) {
 
-      //TString line_tstr(line);
-      //line_tstr.ReplaceAll( "\t", " " );
-      //line = (std::string)(line_tstr.Data());
-      std::vector<std::string> words = AndCommon::splitString( line, " " );
+      // first convert tabs into spaces
+      TString line_tstr(line);
+      line_tstr.ReplaceAll( "\t", " " );
+      line = (std::string)(line_tstr.Data());
 
+      // then remove double spaces (up to 10):
+      for( unsigned ii=0; ii<10; ii++ ) { 
+        TString line_tstr_ii(line);
+        line_tstr_ii.ReplaceAll( "  ", " " );
+        line = (std::string)(line_tstr_ii.Data());
+      }
+
+      std::vector<std::string> words = AndCommon::splitString( line, " " );
+      
       if( words.size()<2 ) continue;
 
 
@@ -271,8 +282,13 @@ void IScan::readFile( const std::string& name ) {
         continue;
 
       }
+      
 
-      readDataLine( words, addToGraph );
+      // ignore commented sections:
+      std::string line_nocomm = (std::string)(AndCommon::splitString( line, "#" ))[0];
+      std::vector<std::string> words_nocomm = AndCommon::splitString( line_nocomm, " " );
+
+      readDataLine( words_nocomm, addToGraph );
       //readDataLine( words, xMin, xMax );
 
 
