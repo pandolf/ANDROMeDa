@@ -86,26 +86,30 @@ int main( int argc, char* argv[] ) {
     scans.push_back( new IVScanFN("CNTetchedOLD_AGnew_d4_20230519_drain.dat") );
     scans.push_back( new IVScanFN("CNTetchedOLD_AGnew_d5_20230519_drain.dat") );
 
-  } else if( sampleName == "CNTetchedOLD_N1new" ) {
+  } else if( sampleName == "CNTArO2Etching_N1new" ) {
 
-    //scans.push_back( "CNTetchedOLD_N1new_d3p3_20230517_drain.dat" );
-    //scans.push_back( "CNTetchedOLD_N1new_d4p3_20230517_drain_2.dat" );
-    scans.push_back( new IVScanFN("CNTetchedOLD_N1new_d4_20230517_drain.dat"  ) );
-    scans.push_back( new IVScanFN("CNTetchedOLD_N1new_d4p3_20230517_drain.dat") );
-    scans.push_back( new IVScanFN("CNTetchedOLD_N1new_d5_20230517_drain.dat"  ) );
+    //scans.push_back( "CNTArO2Etching_N1new_d3p3_20230517_drain.dat" );
+    //scans.push_back( "CNTArO2Etching_N1new_d4p3_20230517_drain_2.dat" );
+    scans.push_back( new IVScanFN("CNTArO2Etching_N1new_d4_20230517_drain.dat"  ) );
+    scans.push_back( new IVScanFN("CNTArO2Etching_N1new_d4p3_20230517_drain.dat") );
+    scans.push_back( new IVScanFN("CNTArO2Etching_N1new_d5_20230517_drain.dat"  ) );
 
-  } else if( sampleName == "CNTetchedOLD_N2new" ) {
+  } else if( sampleName == "CNTArO2Etching_N2new" ) {
 
-    scans.push_back( new IVScanFN("CNTetchedOLD_N2new_d3p3_20230518_drain.dat") );
-    scans.push_back( new IVScanFN("CNTetchedOLD_N2new_d4_20230518_drain.dat") );
-    scans.push_back( new IVScanFN("CNTetchedOLD_N2new_d3_20230518_drain.dat") );
-    scans.push_back( new IVScanFN("CNTetchedOLD_N2new_d3p6_20230518_drain.dat") );
+    scans.push_back( new IVScanFN("CNTArO2Etching_N2new_d3p3_20230518_drain.dat") );
+    scans.push_back( new IVScanFN("CNTArO2Etching_N2new_d4_20230518_drain.dat") );
+    scans.push_back( new IVScanFN("CNTArO2Etching_N2new_d3_20230518_drain.dat") );
+    scans.push_back( new IVScanFN("CNTArO2Etching_N2new_d3p6_20230518_drain.dat") );
 
   } else if( sampleName == "CNTetchedOLD_Strongnew" ) {
 
-    scans.push_back( new IVScanFN("CNTetchedOLD_Strongnew_d3_20231006_drain.dat") );
-    scans.push_back( new IVScanFN("CNTetchedOLD_Strongnew_d4_20231006_drain.dat") );
-    scans.push_back( new IVScanFN("CNTetchedOLD_Strongnew_d5_20231006_drain.dat") );
+    //scans.push_back( new IVScanFN("CNTetchedOLD_Strongnew_d3_20231006_drain.dat") );
+    //scans.push_back( new IVScanFN("CNTetchedOLD_Strongnew_d4_20231006_drain.dat") );
+    //scans.push_back( new IVScanFN("CNTetchedOLD_Strongnew_d5_20231006_drain.dat") );
+
+    //scans.push_back( new IVScanFN("CNTetchedOLD_Strongnew_d3p5_20231012_drain.dat") );
+    scans.push_back( new IVScanFN("CNTetchedOLD_Strongnew_d4_20231012_drain.dat") );
+    scans.push_back( new IVScanFN("CNTetchedOLD_Strongnew_d5_20231012_drain.dat") );
 
     //scans.push_back( new IVScanFN("CNTetchedOLD_Strongnew_d3_20230927_drain.dat") );
     //scans.push_back( new IVScanFN("CNTetchedOLD_Strongnew_d4_20230927_drain.dat") );
@@ -126,11 +130,23 @@ int main( int argc, char* argv[] ) {
     //scans.push_back( new IVScanFN("CNTetchedOLD_Strongnew_d5_20230519_drain.dat") );
     //scans.push_back( new IVScanFN("CNTetchedOLD_Strongnew_d3_20230519_drain.dat") );
 
-  } else if( sampleName == "CNTetchedOLD_N3new" ) {
+  } else if( sampleName == "CNTetchedOLD_Strongnew_mod" ) {
 
-    scans.push_back( new IVScanFN("CNTetchedOLD_N3new_d3_20230519_drain.dat") );
-    scans.push_back( new IVScanFN("CNTetchedOLD_N3new_d4_20230519_drain.dat") );
-    scans.push_back( new IVScanFN("CNTetchedOLD_N3new_d5_20230519_drain.dat") );
+    scans.push_back( new IVScanFN("CNTetchedOLD_Strongnew_d3_20230927_mod.dat", -1.) );
+    scans.push_back( new IVScanFN("CNTetchedOLD_Strongnew_d4_20230927.dat"    , -1.) );
+    scans.push_back( new IVScanFN("CNTetchedOLD_Strongnew_d5_20230927.dat"    , -1.) );
+
+    legendName = "Strong O_{2} etching";
+    imax = 350.;
+    vmax = 650.;
+    scaleToMicroA = false;
+    nPointsSelect = -1; // all
+
+  } else if( sampleName == "CNTArO2Etching_N3new" ) {
+
+    scans.push_back( new IVScanFN("CNTArO2Etching_N3new_d3_20230519_drain.dat") );
+    scans.push_back( new IVScanFN("CNTArO2Etching_N3new_d4_20230519_drain.dat") );
+    scans.push_back( new IVScanFN("CNTArO2Etching_N3new_d5_20230519_drain.dat") );
 
   } else if( sampleName=="CNTArO2Etching_N1" ) {
 
@@ -230,7 +246,7 @@ int main( int argc, char* argv[] ) {
 
 
   int nsteps = 120;
-  float start_delta = -0.7; // in mm, relative to central d
+  float start_delta = -1.3; // in mm, relative to central d
   float stepsize = 0.01; // in mm
 
   float minChi2 = 99999.;
@@ -318,40 +334,15 @@ int main( int argc, char* argv[] ) {
 
       TF1* f1_line = graphsFN_selected[i]->GetFunction( Form( "lineFN_%s", (scans[i]->name()).c_str()) );
       
-      //float phi = 4.7; // in eV
-      //float phi_err = 0.1; // in eV
-      //float d = this_d;
-      //float d_err_corr = 0.3; // 0.1 for the syst on the position (linear shifter, see logbook_ANDROMeDa entry 24/01/22) plus 0.1 for the uncertainty on the length of the tubes
-      //float d_err_uncorr = 0.01; // relative uncertainty between scans
-      //float s = f1_line->GetParameter(1);
-      //float s_err = f1_line->GetParError(1);
-      //float b = 6.83E6; // this is 4/3 * sqrt(2m) / hbar = 6.83E6 V^-1/2 mm^-1, from FN theory
-
       float gamma_err_tot_uncorr, gamma_err_tot_corr;
       TString name_tstr(scans[i]->name() );
       float derrcorr = ( name_tstr.Contains("20230927") ) ? 0.5 : -1.; // set 0.5 mm uncertainty on relative d because setup had bad parallax
       float gamma = IVScanFN::get_gamma_and_err( gamma_err_tot_uncorr, gamma_err_tot_corr, f1_line->GetParameter(1), f1_line->GetParError(1), this_d, derrcorr );
-      //float gamma_err_tot = sqrt( gamma_err_tot_uncorr*gamma_err_tot_uncorr + gamma_err_tot_corr*gamma_err_tot_corr );
-
-      //gamma_err_tot = IVScanFN::get_gamma_uncertainty( f1_line->GetParError(1), gamma_err_tot_uncorr, gamma_err_tot_corr );
-
-      //float gamma = -b*phi*sqrt(phi)*d/s;
-
-      //float gamma_err2_phi      = 9.*gamma*gamma/(4.*phi*phi)*phi_err*phi_err;
-      //float gamma_err2_d_corr   = gamma*gamma/(d*d)*d_err_corr*d_err_corr; 
-      //float gamma_err2_d_uncorr = gamma*gamma/(d*d)*d_err_uncorr*d_err_uncorr; 
-      //float gamma_err2_s        = gamma*gamma/(s*s)*s_err*s_err;
-
-      ////float gamma_err2_tot = gamma_err2_phi + gamma_err2_d_corr + gamma_err2_d_uncorr + gamma_err2_s;
-      ////float gamma_err_tot = sqrt( gamma_err2_tot );
-
-      //float gamma_err2_tot_uncorr = gamma_err2_d_uncorr + gamma_err2_s;
-      //float gamma_err_tot_uncorr = sqrt( gamma_err2_tot_uncorr );
-
-      //float gamma_err2_tot_corr = gamma_err2_d_corr + gamma_err2_phi;
-      //float gamma_err_tot_corr = sqrt( gamma_err2_tot_corr );
 
       uc.addDataPoint(gamma, gamma_err_tot_uncorr, gamma_err_tot_corr);
+
+      gr_gamma_vs_istep[i]->SetPoint( gr_gamma_vs_istep[istep]->GetN(), d1 + this_delta_d, gamma );
+
 
     } // for scans
 
@@ -367,11 +358,12 @@ int main( int argc, char* argv[] ) {
     float xMin_totfit, xMax_totfit, yMin_totfit, yMax_totfit;
     AndCommon::findGraphRanges( gr_selected_totfit, xMin_totfit, xMax_totfit, yMin_totfit, yMax_totfit );
 
+    f1_exp_totfit->SetRange( 0.9999*xMin_totfit, 1.00001*xMax_totfit );
     f1_exp_totfit->SetParLimits( 1, 0., 10.);
-    //f1_exp_totfit->SetParameter( 0, 0.5*(yMin_totfit+yMax_totfit) );
-    //f1_exp_totfit->SetParameter( 1, (yMax_totfit-yMin_totfit)/(xMax_totfit-xMin_totfit) );
+    f1_exp_totfit->SetParameter( 0, -30. );
+    f1_exp_totfit->SetParameter( 1, 0.2 );
 
-    gr_selected_totfit->Fit(f1_exp_totfit, "SQ+");
+    gr_selected_totfit->Fit(f1_exp_totfit, "R+");
     gr_selected_totfit->Draw( "P same" );
 
     label_d->Draw("same");
@@ -387,7 +379,6 @@ int main( int argc, char* argv[] ) {
 
     gr_chi2_vs_istep   ->SetPoint( gr_chi2_vs_istep   ->GetN(), d1 + this_delta_d, thisChi2     );
     gr_chi2red_vs_istep->SetPoint( gr_chi2red_vs_istep->GetN(), d1 + this_delta_d, thisChi2/NDF );
-
 
     float gamma_comb, gamma_err_comb;
     uc.combine( gamma_comb, gamma_err_comb );

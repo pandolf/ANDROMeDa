@@ -45,10 +45,10 @@ int main( int argc, char* argv[] ) {
     scans.push_back( analyzeFN( "CNTArO2Etching_N1_d3_20221130" ) );
     scans.push_back( analyzeFN( "CNTArO2Etching_N1_d2_20221130" ) );
 
-  } else if( name == "CNTetchedOLD_N1new" ) {
+  } else if( name == "CNTArO2Etching_N1new" ) {
 
-    scans.push_back( analyzeFN( "CNTetchedOLD_N1new_d5_20230517_drain" ) );
-    scans.push_back( analyzeFN( "CNTetchedOLD_N1new_d4_20230517_drain" ) );
+    scans.push_back( analyzeFN( "CNTArO2Etching_N1new_d5_20230517_drain" ) );
+    scans.push_back( analyzeFN( "CNTArO2Etching_N1new_d4_20230517_drain" ) );
 
   } else {
 
