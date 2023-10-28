@@ -36,6 +36,7 @@ class IScan {
   float t() const;
   std::string hv() const;
   float dz() const;
+  float verr() const;
   int n() const;
 
   void set_name( const std::string& name );
@@ -44,13 +45,14 @@ class IScan {
   void set_t ( float t );
   void set_hv( const std::string& hv );
   void set_dz( float dz );
+  void set_verr( float verr );
   void set_n ( int n );
 
-  float xMin() const;
-  float xMax() const;
+  float vMin() const;
+  float vMax() const;
 
-  void set_xMin( float xMin );
-  void set_xMax( float xMax );
+  void set_vMin( float vMin );
+  void set_vMax( float vMax );
 
 
   virtual void set_graph( TGraphErrors* graph );
@@ -65,15 +67,16 @@ class IScan {
 
   TGraphErrors* graph_; // graph of I(nA) vs V(V)
 
-  float p_;  // pressure in mbar
-  float d_;  // distance between anode and cathode in mm
-  float t_;  // temperature in K
+  float p_;    // pressure in mbar
+  float d_;    // distance between anode and cathode in mm
+  float t_;    // temperature in K
   std::string hv_; // power supply model
-  float dz_; // uncertainty on delta(d) in mm
-  int n_;    // number of points used in current measurement
+  float dz_;   // uncertainty on delta(d) in mm
+  float verr_; // voltage uncertainty
+  int n_;      // number of points used in current measurement
 
-  float xMin_;
-  float xMax_;
+  float vMin_; // will consider only data points with voltage > vMin_ Volts
+  float vMax_; // will consider only data points with voltage < vMax_ Volts
 
   std::string getDataFileName( const std::string& dataName );
 
