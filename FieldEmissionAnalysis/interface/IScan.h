@@ -33,10 +33,18 @@ class IScan {
   float pressure() const;
   float p() const;
   float d() const;
+  float t() const;
+  std::string hv() const;
+  float dz() const;
+  int n() const;
 
   void set_name( const std::string& name );
-  void set_p( float p );
-  void set_d( float d );
+  void set_p ( float p );
+  void set_d ( float d );
+  void set_t ( float t );
+  void set_hv( const std::string& hv );
+  void set_dz( float dz );
+  void set_n ( int n );
 
   float xMin() const;
   float xMax() const;
@@ -57,8 +65,12 @@ class IScan {
 
   TGraphErrors* graph_; // graph of I(nA) vs V(V)
 
-  float p_; // pressure in mbar
-  float d_; // distance between anode and cathode in mm
+  float p_;  // pressure in mbar
+  float d_;  // distance between anode and cathode in mm
+  float t_;  // temperature in K
+  std::string hv_; // power supply model
+  float dz_; // uncertainty on delta(d) in mm
+  int n_;    // number of points used in current measurement
 
   float xMin_;
   float xMax_;

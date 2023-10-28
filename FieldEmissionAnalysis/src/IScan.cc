@@ -23,6 +23,10 @@ IScan::IScan( const std::string& name, float scale, float xMin, float xMax ) {
 
   p_ = 0.;
   d_ = -1.;
+  t_ = 300.;
+  hv_ = "caen472";
+  dz_ = 0.1; // mm
+  n_ = 1; 
 
   graph_ = new TGraphErrors(0);
   graph_->SetName( Form("gr_%s", name_.c_str()) );
@@ -87,6 +91,35 @@ float IScan::d() const {
 }
 
 
+float IScan::t() const {
+
+  return t_;
+
+}
+
+
+std::string IScan::hv() const {
+
+  return hv_;
+
+}
+
+
+float IScan::dz() const {
+
+  return dz_;
+
+}
+
+
+int IScan::n() const {
+
+  return n_;
+
+}
+
+
+
 
 void IScan::set_graph( TGraphErrors* graph ) {
 
@@ -103,10 +136,37 @@ void IScan::set_p( float p ) {
 }
 
 
+void IScan::set_t( float t ) {
+
+  t_ = t;
+
+}
+
+
 void IScan::set_d( float d ) {
 
   std::cout << "IScan::set_d() Setting d = " << d << std::endl;
   d_ = d;
+
+}
+
+
+void IScan::set_hv( const std::string& hv ) {
+
+  hv_ = hv;
+
+}
+
+
+void IScan::set_dz( float dz ) {
+
+  dz_ = dz;
+
+}
+
+void IScan::set_n( int n ) {
+
+  n_ = n;
 
 }
 
@@ -179,6 +239,22 @@ void IScan::readCommentLine( const std::vector< std::string >& words ) {
     d_ = std::atof(words[words.size()-1].c_str());
     std::cout << "-> Distance d = " << d_ << " mm" << std::endl;
   }
+  if( (words[0]=="#t") || (words[0]=="#" && words[1]=="t") ) {
+    t_ = std::atof(words[words.size()-1].c_str());
+    std::cout << "-> Temperature = " << t_ << " K" << std::endl;
+  }
+  if( (words[0]=="#hv") || (words[0]=="#" && words[1]=="hv") ) {
+    hv_ = words[words.size()-1];
+    std::cout << "-> Power supply: " << hv_ << std::endl;
+  }
+  if( (words[0]=="#dz") || (words[0]=="#" && words[1]=="dz") ) {
+    dz_ = std::atof(words[words.size()-1].c_str());
+    std::cout << "-> Uncertainty on delta(d) = " << dz_ << " mm" << std::endl;
+  }
+  if( (words[0]=="#n") || (words[0]=="#" && words[1]=="n") ) {
+    n_ = std::atoi(words[words.size()-1].c_str());
+    std::cout << "-> Number of points in current measurements = " << n_ << std::endl;
+  }
 
 }
 
@@ -188,11 +264,20 @@ void IScan::readDataLine( const std::vector< std::string >& words, bool& addToGr
   float x    = std::atof( words[0].c_str() );
   float y    = std::atof( words[1].c_str() );
   float yerr = std::atof( words[2].c_str() );
+  float xerr = 0.;
+  if( hv_ == "caen472" )
+    xerr = 1.;
+  else if( hv_ == "keithley6487" ) 
+    xerr = 0.1;
+  else {
+    std::cout << "[Iscan::readDataLine] Warning!! Unknown power supply model: " << hv_ << std::endl;
+    std::cout << " -> Setting uncertainty on V = 1 Volt!" << std::endl;
+  }
 
   if( (x > xMin_) && (x < xMax_) ) {
     int iPoint = this->graph()->GetN();
-    this->graph()->SetPoint     ( iPoint, x , y    );
-    this->graph()->SetPointError( iPoint, 1., yerr ); // err on x (=hv) is 1 V
+    this->graph()->SetPoint     ( iPoint, x   , y    );
+    this->graph()->SetPointError( iPoint, xerr, yerr ); 
   }
 
 }
