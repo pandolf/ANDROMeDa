@@ -323,12 +323,11 @@ int main( int argc, char* argv[] ) {
         graphs_selected[i]->GetPoint( iPoint, x, y );
         double xerr = graphs_selected[i]->GetErrorX( iPoint );
         double yerr = graphs_selected[i]->GetErrorY( iPoint );
+        yerr = yerr / sqrt(scans[i]->n()); // uncertainty on the mean of n measurements
 
         int i_this = gr_selected_totfit->GetN();
         gr_selected_totfit->SetPoint     ( i_this, x/this_d   , y    ); // x->x/d (so vs E)
-        gr_selected_totfit->SetPointError( i_this, xerr/this_d, yerr ); 
-        //gr_selected_totfit->SetPoint     ( i_this, 1./x, TMath::Log( y / (x*x) ) ); // FN plot
-        //gr_selected_totfit->SetPointError( i_this, xerr/(x*x), yerr/y );
+        gr_selected_totfit->SetPointError( i_this, xerr/this_d, yerr );
 
       }
 
@@ -350,10 +349,6 @@ int main( int argc, char* argv[] ) {
     c3->cd();
 
     h2_axes_totfit->Draw();
-
-    //TF1* f1_exp_totfit = new TF1( Form("exp_step%d_totfit", istep), "exp([0] + [1]*x)" );
-    //TF1* f1_exp_totfit = new TF1( Form("exp_step%d_totfit", istep), "[0]*exp([1]*x)" );
-    //f1_exp_totfit->SetLineColor(46);
 
     float xMin_totfit, xMax_totfit, yMin_totfit, yMax_totfit;
     AndCommon::findGraphRanges( gr_selected_totfit, xMin_totfit, xMax_totfit, yMin_totfit, yMax_totfit );
