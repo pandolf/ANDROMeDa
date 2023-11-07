@@ -237,16 +237,39 @@ IVScanFN analyzeFN( const std::string& name ) {
   yMin = 0.9*yMin;
   yMax = 1.1*yMax;
 
-  TH2D* h2_axes = new TH2D( "axes", "", 10, 0., xMax, 10, 0., yMax );
+  if( name_tstr.Contains( "INRiM" ) ) {
+    xMin = 170.;
+    xMax = 220.;
+    yMin = -1.9999;
+    yMax = 5.;
+  } else {
+    xMin = 0.;
+    yMin = 0.;
+  }
+
+
+  TH2D* h2_axes = new TH2D( "axes", "", 10, xMin, xMax, 10, yMin, yMax );
   h2_axes->SetXTitle( "-#DeltaV (V)" );
   h2_axes->SetYTitle( "I (pA)" );
   h2_axes->Draw();
 
-  TPaveText* pd_text = new TPaveText( 0.2, 0.75, 0.5, 0.85, "brNDC" );
+  TLine* line_zero = new TLine( xMin, 0., xMax, 0. );
+  line_zero->Draw("P same");
+
+  TLine* line_one  = new TLine( xMin, 1., xMax, 1. );
+  line_one->SetLineStyle(2);
+  if( name_tstr.Contains( "INRiM" ) ) line_one->Draw("P same");
+
+  TPaveText* pd_text = new TPaveText( 0.2, 0.7, 0.5, 0.85, "brNDC" );
   pd_text->SetFillColor(0);
   pd_text->SetTextSize(0.038);
+  pd_text->SetTextAlign(13);
   pd_text->SetTextColor(kGray+3);
   //pd_text->AddText( Form("p = %s mbar", AndCommon::scientific(ivs.p(), 0).c_str()) );
+  if( name_tstr.Contains( "INRiM" ) ) 
+    pd_text->AddText( Form("INRiM") );
+  if( ivs.t() < 200 )
+    pd_text->AddText( Form("T = %.1f K"  , ivs.t()) );
   pd_text->AddText( Form("d = %.1f mm"  , ivs.d()) );
   pd_text->Draw("Same");
 
@@ -256,6 +279,8 @@ IVScanFN analyzeFN( const std::string& name ) {
   graph->SetLineColor  (46);
 
   graph->Draw("P same");
+
+  gPad->RedrawAxis();
 
   c1->SaveAs( Form("%s/iv.pdf", outdir.c_str()) );
 
