@@ -68,6 +68,15 @@ int main( int argc, char* argv[] ) {
       scans.push_back( "CNTArO2Etching_N1_d4_20221130" );
       scans.push_back( "CNTArO2Etching_N1_d5_20221130" );
 
+    } else if( batchName=="CNTetchedOLD_N1new" ) {
+
+      sampleName = "Mild Ar/O_{2} Etching";
+      xMax = 1300.;
+      xMax_E = 500.;
+      yMax_cross = 700.;
+      scans.push_back( "CNTetchedOLD_N1new_d3p3_20230517_drain" );
+      scans.push_back( "CNTetchedOLD_N1new_d4p3_20230517_drain" );
+
     } else {
 
       scans.push_back( std::string(argv[1]) );
@@ -90,8 +99,10 @@ int main( int argc, char* argv[] ) {
   c1->cd();
 
   float xMin = 0.;
+  float yMin = -30000000.;
+  float yMax = 0.6;
 
-  TH2D* h2_axes = new TH2D( "axes", "", 10, xMin, xMax, 10, -3., 0.6 );
+  TH2D* h2_axes = new TH2D( "axes", "", 10, xMin, xMax, 10, yMin, yMax );
   h2_axes->SetXTitle( "-#DeltaV(CNT-anode) [V]" );
   h2_axes->SetYTitle( "I(anode) [pA]" );
   h2_axes->Draw();
@@ -111,7 +122,7 @@ int main( int argc, char* argv[] ) {
 
 
 
-  TH2D* h2_axes_E = new TH2D( "axes_E", "", 10, xMin, xMax_E, 10, -3., 0.6 );
+  TH2D* h2_axes_E = new TH2D( "axes_E", "", 10, xMin, xMax_E, 10, yMin, yMax );
   h2_axes_E->SetXTitle( "E [V/mm]" );
   h2_axes_E->SetYTitle( "I(anode) [pA]" );
   h2_axes_E->Draw();
@@ -144,6 +155,9 @@ int main( int argc, char* argv[] ) {
   for ( unsigned i=0; i<scans.size(); ++i ) {
 
     IVScan* ivs = new IVScan( scans[i] );
+
+    TString scanName(scans[i]);
+    if( scanName.Contains("drain") ) ivs->scaleDataPoints( -1. );
 
     TGraphErrors* graph = ivs->graph();
 
