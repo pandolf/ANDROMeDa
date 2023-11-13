@@ -13,12 +13,13 @@ class IVScanFN : public IVScan {
 
  public:
 
-  IVScanFN( const std::string& name, float scale=1., float xMin = -99999., float xMax = 99999. );
+  IVScanFN( const std::string& name, float scale=1., float vMin = -99999., float vMax = 99999. );
 
   ~IVScanFN();
 
   TGraphErrors* getFNgraph() const;
-  static TGraphErrors* getFNgraph( TGraphErrors* graph, float xMin = -99999., float xMax = 99999. );
+  static TGraphErrors* getFNgraph( const IScan* scan );
+  static TGraphErrors* getFNgraph( TGraphErrors* graph, float vMin = -99999., float vMax = 99999., int n = 1, float verr = 0.1 );
 
   TGraphErrors* graphFN() const;
   TF1* lineFN() const;
@@ -37,10 +38,6 @@ class IVScanFN : public IVScan {
   virtual void set_graph( TGraphErrors* graph );
   virtual void setColor( int color );
 
-  static float xMinFN();
-  static float xMaxFN();
-  static float yMinFN();
-  static float yMaxFN();
   static std::string xTitleFN();
   static std::string yTitleFN();
 
