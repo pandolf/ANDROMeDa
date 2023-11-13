@@ -238,8 +238,13 @@ IVScanFN analyzeFN( const std::string& name ) {
   yMax = 1.1*yMax;
 
   if( name_tstr.Contains( "INRiM" ) ) {
-    xMin = 170.;
-    xMax = 220.;
+    if( ivs.d() < 0.9 ) {
+      xMin = 0.;
+      xMax = 70.;
+    } else {
+      xMin = 170.;
+      xMax = 220.;
+    }
     yMin = -1.9999;
     yMax = 5.;
   } else {
