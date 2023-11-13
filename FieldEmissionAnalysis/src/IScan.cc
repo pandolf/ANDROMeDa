@@ -262,11 +262,15 @@ void IScan::readCommentLine( const std::vector< std::string >& words ) {
   if( (words[0]=="#hv") || (words[0]=="#" && words[1]=="hv") ) {
     hv_ = words[words.size()-1];
     std::cout << "-> Power supply: " << hv_ << std::endl;
-    if( hv_ == "caenN472" )
+    if( hv_ == "caenN472" ) {
+      std::cout << "[IScan::readCommentLine] Recognized power supply CAEN N472 " << std::endl;
+      std::cout << " -> Setting voltage uncertainty to 1 V" << std::endl;
       verr_ = 1.;
-    else if( hv_ == "keithley6487" ) 
+    } else if( hv_ == "keithley6487" )  {
       verr_ = 0.1;
-    else {
+      std::cout << "[IScan::readCommentLine] Recognized power supply Keithley 6487 " << std::endl;
+      std::cout << " -> Setting voltage uncertainty to 0.1 V" << std::endl;
+    } else {
       std::cout << "[IScan::readCommentLine] Warning!! Unknown power supply model: " << hv_ << std::endl;
       std::cout << " -> Setting voltage uncertainty to 1 Volt!" << std::endl;
       verr_ = 1.;
@@ -368,6 +372,15 @@ void IScan::readFile( const std::string& name ) {
       line_tstr.ReplaceAll( "\t", " " );
       line = (std::string)(line_tstr.Data());
 
+      std::string line_clean;
+      for( unsigned i=0; i<line.size(); ++i ) {
+        int char_i = (int)(line[i]);
+        if( char_i > 31 ) { // remove all weird formatting chars
+          line_clean.push_back( line[i] );
+        }
+      } // for
+      line = line_clean;
+
       // then remove double spaces (up to 10):
       for( unsigned ii=0; ii<10; ii++ ) { 
         TString line_tstr_ii(line);
@@ -376,7 +389,7 @@ void IScan::readFile( const std::string& name ) {
       }
 
       std::vector<std::string> words = AndCommon::splitString( line, " " );
-      
+
       if( words.size()<2 ) continue;
 
 
