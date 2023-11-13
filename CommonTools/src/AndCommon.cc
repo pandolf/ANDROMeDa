@@ -304,6 +304,8 @@ std::string AndCommon::scientific( float x, int decimals ) {
 std::vector<std::string> AndCommon::splitString( const std::string& s, const std::string& divider ) {
 
   std::string s_copy(s);
+  while( s_copy[s_copy.size()-1]==divider )
+    s_copy.erase( s_copy.size()-1, s_copy.size() ); // if trailing char is divider, remove it
 
   size_t pos = 0;
   std::vector<std::string> words;
