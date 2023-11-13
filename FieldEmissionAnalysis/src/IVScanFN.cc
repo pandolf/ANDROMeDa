@@ -118,13 +118,21 @@ void IVScanFN::set_graphFN() {
 
 TGraphErrors* IVScanFN::getFNgraph() const {
 
-  return IVScanFN::getFNgraph( this->graph(), this->xMin(), this->xMax() );
+  return IVScanFN::getFNgraph( this->graph(), this->vMin(), this->vMax(), this->n(), this->verr() );
+
+}
+
+
+TGraphErrors* IVScanFN::getFNgraph( const IScan* scan ) {
+
+  return IVScanFN::getFNgraph( scan->graph(), scan->vMin(), scan->vMax(), scan->n(), scan->verr() );
 
 }
 
 
 
-TGraphErrors* IVScanFN::getFNgraph( TGraphErrors* graph, float xMin, float xMax ) {
+TGraphErrors* IVScanFN::getFNgraph( TGraphErrors* graph, float vMin, float vMax, int n, float verr ) {
+
 
   TGraphErrors* graphFN = new TGraphErrors(0);
   graphFN->SetName( Form("grFN_%s", graph->GetName()) );
@@ -139,12 +147,12 @@ TGraphErrors* IVScanFN::getFNgraph( TGraphErrors* graph, float xMin, float xMax 
     i = fabs(i);
     v = fabs(v);
     float i_err = graph->GetErrorY( iPoint );
-    float v_err = 1.;
+    i_err = i_err / sqrt(n); // uncertainty on mean
 
-    if( (v>xMin) && (v<xMax) ) {
+    if( (v>vMin) && (v<vMax) ) {
       int iPointFN = graphFN->GetN();
       graphFN->SetPoint     ( iPointFN, 1./v, TMath::Log( i / (v*v) ) );
-      graphFN->SetPointError( iPointFN, v_err/(v*v), i_err/i );
+      graphFN->SetPointError( iPointFN, verr/(v*v), i_err/i );
     }
 
   } // for
@@ -224,34 +232,6 @@ TF1* IVScanFN::lineFN() const {
 
 }
 
-
-
-float IVScanFN::xMinFN() {
-
-  return 0.00025;
-
-}
-
-
-float IVScanFN::xMaxFN() {
-
-  return 0.0007;
-
-}
-
-
-float IVScanFN::yMinFN() {
-
-  return -20.;
-
-}
-
-
-float IVScanFN::yMaxFN() {
-
-  return 0.;
-
-}
 
 
 std::string IVScanFN::xTitleFN() {
