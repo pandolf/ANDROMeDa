@@ -63,6 +63,21 @@ std::string IScan::name() const {
 
 
 
+std::string IScan::sampleName() const {
+
+  return sampleName_;
+
+}
+
+
+std::string IScan::lab() const {
+
+  return lab_;
+
+}
+
+
+
 TGraphErrors* IScan::graph() const {
 
   return graph_;
@@ -127,6 +142,20 @@ int IScan::n() const {
 }
 
 
+
+
+void IScan::set_sampleName( const std::string& sampleName ) {
+
+  sampleName_ = sampleName;
+
+}
+
+
+void IScan::set_lab( const std::string& lab ) {
+
+  lab_ = lab;
+
+}
 
 
 void IScan::set_graph( TGraphErrors* graph ) {
@@ -247,19 +276,27 @@ std::string IScan::getDataFileName( const std::string& dataName ) {
 
 void IScan::readCommentLine( const std::vector< std::string >& words ) {
 
-  if( (words[0]=="#p") || (words[0]=="#" && words[1]=="p") ) {
+  if( words[0]=="#s" ) {
+    sampleName_ = words[words.size()-1];
+    std::cout << "-> Sample name: " << sampleName_ << std::endl;
+  }
+  if( words[0]=="#lab" ) {
+    lab_ = words[words.size()-1];
+    std::cout << "-> Lab: " << lab_ << std::endl;
+  }
+  if( words[0]=="#p" ) {
     p_ = std::atof(words[words.size()-1].c_str());
     std::cout << "-> Pressure p = " << p_ << " mbar" << std::endl;
   }
-  if( (words[0]=="#d") || (words[0]=="#" && words[1]=="d") ) {
+  if( words[0]=="#d" ) {
     d_ = std::atof(words[words.size()-1].c_str());
     std::cout << "-> Distance d = " << d_ << " mm" << std::endl;
   }
-  if( (words[0]=="#t") || (words[0]=="#" && words[1]=="t") ) {
+  if( words[0]=="#t" ) {
     t_ = std::atof(words[words.size()-1].c_str());
     std::cout << "-> Temperature = " << t_ << " K" << std::endl;
   }
-  if( (words[0]=="#hv") || (words[0]=="#" && words[1]=="hv") ) {
+  if( words[0]=="#hv" ) {
     hv_ = words[words.size()-1];
     std::cout << "-> Power supply: " << hv_ << std::endl;
     if( hv_ == "caenN472" ) {
@@ -276,15 +313,15 @@ void IScan::readCommentLine( const std::vector< std::string >& words ) {
       verr_ = 1.;
     }
   }
-  if( (words[0]=="#dz") || (words[0]=="#" && words[1]=="dz") ) {
+  if( words[0]=="#dz" ) {
     dz_ = std::atof(words[words.size()-1].c_str());
     std::cout << "-> Uncertainty on delta(d) = " << dz_ << " mm" << std::endl;
   }
-  if( (words[0]=="#verr") || (words[0]=="#" && words[1]=="verr") ) {
+  if( words[0]=="#verr" ) {
     verr_ = std::atof(words[words.size()-1].c_str());
     std::cout << "-> Voltage uncertainty = " << verr_ << " V" << std::endl;
   }
-  if( (words[0]=="#n") || (words[0]=="#" && words[1]=="n") ) {
+  if( words[0]=="#N" ) {
     n_ = std::atoi(words[words.size()-1].c_str());
     std::cout << "-> Number of points in current measurements = " << n_ << std::endl;
   }
