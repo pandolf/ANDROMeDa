@@ -27,6 +27,8 @@ class IScan {
   //void getMeanRMS( std::vector<float> v, float& mean, float& rms );
 
   std::string name() const;
+  std::string sampleName() const;
+  std::string lab() const;
 
   TGraphErrors* graph() const;  // I vs something
 
@@ -40,6 +42,8 @@ class IScan {
   int n() const;
 
   void set_name( const std::string& name );
+  void set_sampleName( const std::string& sampleName );
+  void set_lab( const std::string& lab );
   void set_p ( float p );
   void set_d ( float d );
   void set_t ( float t );
@@ -63,7 +67,11 @@ class IScan {
 
  private:
 
-  std::string name_;
+  std::string name_; // scan name
+
+  std::string sampleName_; // CNT sample name
+
+  std::string lab_; 
 
   TGraphErrors* graph_; // graph of I(nA) vs V(V)
 
