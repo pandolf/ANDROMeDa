@@ -66,147 +66,152 @@ int main( int argc, char* argv[] ) {
 IVScanFN analyzeFN( const std::string& name ) {
 
 
-  float hvMin = -1.;
-  float hvMax = 3000.;
+  //float hvMin = -1.;
+  //float hvMax = 3000.;
+
+  //if( name=="CNTArO2Etching_N1_d5_20221130" ) {
+
+  //  hvMin = 480.;
+  //  hvMax = 560.;
+  //  scale = -1.;
+
+  //} else if( name=="CNTArO2Etching_N1_d4_20221130" ) {
+
+  //  hvMin = 385.;
+  //  hvMax = 440.;
+  //  scale = -1.;
+
+  //} else if( name=="CNTArO2Etching_N1_d3_20221130" ) {
+
+  //  hvMin = 280.;
+  //  hvMax = 350.;
+  //  scale = -1.;
+
+  //} else if( name=="CNTArO2Etching_N1_d2_20221130" ) {
+
+  //  hvMin = 175.;
+  //  hvMax = 350.;
+  //  scale = -1.;
+
+  //} else if( name=="CNTArO2Etching_AG_d5_new" ) {
+
+  //  hvMin = 1930.;
+  //  hvMax = 2100.;
+  //  scale = -1.;
+
+  //} else if( name=="CNTArO2Etching_AG_d4_new" ) {
+
+  //  hvMin = 1500.;
+  //  hvMax = 1800.;
+  //  scale = -1.;
+
+  //} else if( name=="CNTArO2Etching_AG_d3_new" ) {
+
+  //  hvMin = 1110.;
+  //  hvMax = 1230.;
+  //  scale = -1.;
+
+  //} else if( name=="CNTArO2Etching_AG_d4_20221214" ) {
+
+  //  hvMin = 789.;
+  //  hvMax = 3000.;
+  //  scale = -1.;
+
+  //} else if( name=="CNTArO2Etching_AG2_d3_20221215" ) {
+
+  //  hvMin = 210.;
+  //  hvMax = 3000.;
+  //  scale = -1.;
+
+  //} else if( name=="CNTetchedOLD_N6bis_whopper_LNGS_d1_t1_20230228_drain" ) {
+
+  //  //hvMin = 730.; // first component
+  //  //hvMax = 900.;
+  //  hvMin = 1030.; // second component
+  //  hvMax = 1500.;
+  //  scale = +1.;
+
+  //} else if( name=="CNTetchedOLD_N6bis_LNGS_HdM_d1p5_t30_20230315_drain" ) {
+
+  //  //hvMin = 730.; // first component
+  //  //hvMax = 900.;
+  //  hvMin = 590.; // second component
+  //  hvMax = 770.;
+  //  scale = +1.;
+
+  //} else if( name=="CNTetchedOLD_AG2_LNGS_HdM_d1p5_t20_20230404" ) {
+
+  //  //hvMin = 730.; // first component
+  //  //hvMax = 900.;
+  //  //hvMin = 680.; // second component
+  //  //hvMax = 880.;
+
+  //} else if( name=="CNTetchedOLD_Strongnew_d3_20230927_2" ) {
+
+  //  hvMin = 190.;
+  //  hvMax = 255.;
+
+  //} else if( name=="CNTetchedOLD_Strongnew_d4_20230927" ) {
+
+  //  hvMin = 340.;
+  //  //hvMax = 255.;
+
+  //} else if( name=="CNTetchedOLD_Strongnew_d5_20230927" ) {
+
+  //  hvMin = 390.;
+  //  hvMax = 510.;
+
+  //} else if( name=="CNTetchedOLD_Strongnew_d3_20230927_drain" ) {
+
+  //  //hvMin = 390.;
+  //  //hvMax = 510.;
+  //  scale = +1.;
+
+  //} else if( name=="CNTetchedOLD_Strongnew_d4_20230927_drain" ) {
+
+  //  //hvMin = 390.;
+  //  //hvMax = 510.;
+  //  scale = +1.;
+
+  //} else if( name=="CNTetchedOLD_Strongnew_d5_20230927_drain" ) {
+
+  //  //hvMin = 390.;
+  //  //hvMax = 510.;
+  //  scale = +1.;
+
+  //} else if( name=="CNTetchedOLD_Strongnew_d3_20231002_drain_2" ) {
+
+  //  hvMin = 359.;
+  //  //hvMax = 510.;
+  //  scale = +1.;
+
+  //} else if( name=="CNTetchedOLD_Strongnew_d4_20231002_drain_2" ) {
+
+  //  hvMin = 560.;
+  //  //hvMax = 510.;
+  //  scale = +1.;
+
+  //} else if( name=="CNTetchedOLD_Strongnew_d5_20231006_drain" ) {
+
+  //  //hvMin = 560.;
+  //  hvMax = 460.;
+  //  scale = +1.;
+
+  //}
+
+
   float scale = -1.;
-
-  if( name=="CNTArO2Etching_N1_d5_20221130" ) {
-
-    hvMin = 480.;
-    hvMax = 560.;
-    scale = -1.;
-
-  } else if( name=="CNTArO2Etching_N1_d4_20221130" ) {
-
-    hvMin = 385.;
-    hvMax = 440.;
-    scale = -1.;
-
-  } else if( name=="CNTArO2Etching_N1_d3_20221130" ) {
-
-    hvMin = 280.;
-    hvMax = 350.;
-    scale = -1.;
-
-  } else if( name=="CNTArO2Etching_N1_d2_20221130" ) {
-
-    hvMin = 175.;
-    hvMax = 350.;
-    scale = -1.;
-
-  } else if( name=="CNTArO2Etching_AG_d5_new" ) {
-
-    hvMin = 1930.;
-    hvMax = 2100.;
-    scale = -1.;
-
-  } else if( name=="CNTArO2Etching_AG_d4_new" ) {
-
-    hvMin = 1500.;
-    hvMax = 1800.;
-    scale = -1.;
-
-  } else if( name=="CNTArO2Etching_AG_d3_new" ) {
-
-    hvMin = 1110.;
-    hvMax = 1230.;
-    scale = -1.;
-
-  } else if( name=="CNTArO2Etching_AG_d4_20221214" ) {
-
-    hvMin = 789.;
-    hvMax = 3000.;
-    scale = -1.;
-
-  } else if( name=="CNTArO2Etching_AG2_d3_20221215" ) {
-
-    hvMin = 210.;
-    hvMax = 3000.;
-    scale = -1.;
-
-  } else if( name=="CNTetchedOLD_N6bis_whopper_LNGS_d1_t1_20230228_drain" ) {
-
-    //hvMin = 730.; // first component
-    //hvMax = 900.;
-    hvMin = 1030.; // second component
-    hvMax = 1500.;
-    scale = +1.;
-
-  } else if( name=="CNTetchedOLD_N6bis_LNGS_HdM_d1p5_t30_20230315_drain" ) {
-
-    //hvMin = 730.; // first component
-    //hvMax = 900.;
-    hvMin = 590.; // second component
-    hvMax = 770.;
-    scale = +1.;
-
-  } else if( name=="CNTetchedOLD_AG2_LNGS_HdM_d1p5_t20_20230404" ) {
-
-    //hvMin = 730.; // first component
-    //hvMax = 900.;
-    //hvMin = 680.; // second component
-    //hvMax = 880.;
-
-  } else if( name=="CNTetchedOLD_Strongnew_d3_20230927_2" ) {
-
-    hvMin = 190.;
-    hvMax = 255.;
-
-  } else if( name=="CNTetchedOLD_Strongnew_d4_20230927" ) {
-
-    hvMin = 340.;
-    //hvMax = 255.;
-
-  } else if( name=="CNTetchedOLD_Strongnew_d5_20230927" ) {
-
-    hvMin = 390.;
-    hvMax = 510.;
-
-  } else if( name=="CNTetchedOLD_Strongnew_d3_20230927_drain" ) {
-
-    //hvMin = 390.;
-    //hvMax = 510.;
-    scale = +1.;
-
-  } else if( name=="CNTetchedOLD_Strongnew_d4_20230927_drain" ) {
-
-    //hvMin = 390.;
-    //hvMax = 510.;
-    scale = +1.;
-
-  } else if( name=="CNTetchedOLD_Strongnew_d5_20230927_drain" ) {
-
-    //hvMin = 390.;
-    //hvMax = 510.;
-    scale = +1.;
-
-  } else if( name=="CNTetchedOLD_Strongnew_d3_20231002_drain_2" ) {
-
-    hvMin = 359.;
-    //hvMax = 510.;
-    scale = +1.;
-
-  } else if( name=="CNTetchedOLD_Strongnew_d4_20231002_drain_2" ) {
-
-    hvMin = 560.;
-    //hvMax = 510.;
-    scale = +1.;
-
-  } else if( name=="CNTetchedOLD_Strongnew_d5_20231006_drain" ) {
-
-    //hvMin = 560.;
-    hvMax = 460.;
-    scale = +1.;
-
-  }
-
+  float iMin = 0.5; // default: compute FN only between 0.5 pA
+  float iMax = 10.; //          and 10 pA
 
   TString name_tstr(name);
   if( name_tstr.Contains("drain") ) scale = +1.;
 
-  IVScanFN ivs( name, scale, hvMin, hvMax );
+  IVScanFN ivs( name, scale, iMin, iMax );
 
-  
+
+
+  // ***** FIRST STEP: draw I vs V
 
   TGraphErrors* graph = ivs.graph();
 
@@ -229,39 +234,39 @@ IVScanFN analyzeFN( const std::string& name ) {
   //float xMax = 1.1*hvMax;
 
 
-  float xMin, xMax, yMin, yMax;
-  AndCommon::findGraphRanges( graph, xMin, xMax, yMin, yMax );
+  float xMin_iv, xMax_iv, yMin_iv, yMax_iv;
+  AndCommon::findGraphRanges( graph, xMin_iv, xMax_iv, yMin_iv, yMax_iv );
 
-  xMin = 0.9*xMin;
-  xMax = 1.1*xMax;
-  yMin = 0.9*yMin;
-  yMax = 1.1*yMax;
+  xMin_iv = 0.9*xMin_iv;
+  xMax_iv = 1.1*xMax_iv;
+  yMin_iv = 0.9*yMin_iv;
+  yMax_iv = 1.1*yMax_iv;
 
   if( name_tstr.Contains( "INRiM" ) ) {
     if( ivs.d() < 0.9 ) {
-      xMin = 0.;
-      xMax = 70.;
+      xMin_iv = 0.;
+      xMax_iv = 70.;
     } else {
-      xMin = 170.;
-      xMax = 220.;
+      xMin_iv = 170.;
+      xMax_iv = 220.;
     }
-    yMin = -1.9999;
-    yMax = 5.;
+    yMin_iv = -1.9999;
+    yMax_iv = 5.;
   } else {
-    xMin = 0.;
-    yMin = 0.;
+    xMin_iv = 0.;
+    yMin_iv = 0.;
   }
 
 
-  TH2D* h2_axes = new TH2D( "axes", "", 10, xMin, xMax, 10, yMin, yMax );
+  TH2D* h2_axes = new TH2D( "axes", "", 10, xMin_iv, xMax_iv, 10, yMin_iv, yMax_iv );
   h2_axes->SetXTitle( "-#DeltaV (V)" );
   h2_axes->SetYTitle( "I (pA)" );
   h2_axes->Draw();
 
-  TLine* line_zero = new TLine( xMin, 0., xMax, 0. );
+  TLine* line_zero = new TLine( xMin_iv, 0., xMax_iv, 0. );
   line_zero->Draw("P same");
 
-  TLine* line_one  = new TLine( xMin, 1., xMax, 1. );
+  TLine* line_one  = new TLine( xMin_iv, 1., xMax_iv, 1. );
   line_one->SetLineStyle(2);
   if( name_tstr.Contains( "INRiM" ) ) line_one->Draw("P same");
 
@@ -292,7 +297,7 @@ IVScanFN analyzeFN( const std::string& name ) {
   c1->Clear();
   c1->SetLogy();
 
-  TH2D* h2_axes_log = new TH2D( "axes_log", "", 10, 0., xMax, 10, 0.1*yMin, 20.*yMax);
+  TH2D* h2_axes_log = new TH2D( "axes_log", "", 10, 0., xMax_iv, 10, 0.1*yMin_iv, 20.*yMax_iv);
   h2_axes_log->SetXTitle( "-#DeltaV (V)" );
   h2_axes_log->SetYTitle( "I (nA)" );
   h2_axes_log->Draw();
@@ -303,15 +308,25 @@ IVScanFN analyzeFN( const std::string& name ) {
   c1->SaveAs( Form("%s/iv_log.pdf", outdir.c_str()) );
 
 
+
+
+  // ***** SECOND STEP: draw FN plots
+
   TGraphErrors* gr_fn = ivs.graphFN();
+  TF1* lineFN = gr_fn->GetFunction(Form("lineFN_%s", gr_fn->GetName()));
+
 
   TCanvas* c1_fn = new TCanvas( "c1_fn", "", 600, 600 );
   c1_fn->Clear();
 
   TGaxis::SetMaxDigits(2);
 
-  float xMinFN = 1./xMax;
-  float xMaxFN = 1./xMin;
+
+  float xMinFN, xMaxFN, yMinFN, yMaxFN;
+  AndCommon::findGraphRanges( gr_fn, xMinFN, xMaxFN, yMinFN, yMaxFN );
+
+  xMinFN = 0.95*xMinFN;
+  xMaxFN = 1.05*xMaxFN;
 
   //TH2D* h2_axes_fn = new TH2D( "axes_fn", "", 10, 0.0005, 0.0012, 10, IVScanFN::yMinFN(), IVScanFN::yMaxFN() );
   TH2D* h2_axes_fn = new TH2D( "axes_fn", "", 10, xMinFN, xMaxFN, 10, -20, 5);
@@ -327,38 +342,38 @@ IVScanFN analyzeFN( const std::string& name ) {
   gr_fn->Draw("P same");
 
   std::cout << std::endl;
-  std::cout << "Chi^2 / NDF: " << ivs.lineFN()->GetChisquare() << " / " << ivs.lineFN()->GetNDF() <<std::endl;
+  std::cout << "Chi^2 / NDF: " << lineFN->GetChisquare() << " / " << lineFN->GetNDF() <<std::endl;
   std::cout << std::endl;
 
 
-  // check outliers:
-  for( unsigned iPoint=0; iPoint<gr_fn->GetN(); ++iPoint ) {
+//// check outliers:
+//for( unsigned iPoint=0; iPoint<gr_fn->GetN(); ++iPoint ) {
 
-    double x, y;
-    gr_fn->GetPoint( iPoint, x, y );
+//  double x, y;
+//  gr_fn->GetPoint( iPoint, x, y );
 
-    double yerr = gr_fn->GetErrorY( iPoint );
+//  double yerr = gr_fn->GetErrorY( iPoint );
 
-    float delta = fabs( ivs.lineFN()->Eval(x)-y )/yerr;
+//  float delta = fabs( lineFN->Eval(x)-y )/yerr;
 
-    if( delta > 3. ) {
+//  if( delta > 3. ) {
 
-      std::cout << std::endl;
-      std::cout << "   WARNING!! POINT #" << iPoint << " is an OUTLIER!" << std::endl;
-      std::cout << "     hv = " << 1/x << " Volts" << std::endl;
-      std::cout << "     y = " << y << " +/- " << yerr << std::endl;
-      std::cout << "     f(x) = " << ivs.lineFN()->Eval(x) << std::endl;
-      std::cout << "     Delta = " << delta << " sigma" << std::endl;
-      std::cout << std::endl;
+//    std::cout << std::endl;
+//    std::cout << "   WARNING!! POINT #" << iPoint << " is an OUTLIER!" << std::endl;
+//    std::cout << "     hv = " << 1/x << " Volts" << std::endl;
+//    std::cout << "     y = " << y << " +/- " << yerr << std::endl;
+//    std::cout << "     f(x) = " << lineFN->Eval(x) << std::endl;
+//    std::cout << "     Delta = " << delta << " sigma" << std::endl;
+//    std::cout << std::endl;
 
-    } // if outlier
+//  } // if outlier
 
-  } // for points
+//} // for points
 
  
-
-  float gamma = ivs.gamma();
-  float gamma_err = ivs.gamma_err();
+  float gamma_err_corr, gamma_err_ucorr;
+  float gamma = ivs.get_gamma_and_err( gamma_err_corr, gamma_err_ucorr );
+  float gamma_err = sqrt( gamma_err_corr*gamma_err_corr + gamma_err_ucorr*gamma_err_ucorr );
 
   TPaveText* gamma_text = new TPaveText( 0.6, 0.8, 0.85, 0.9, "brNDC" );
   gamma_text->SetFillColor(0);
