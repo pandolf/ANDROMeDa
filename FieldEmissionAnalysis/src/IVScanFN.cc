@@ -128,7 +128,7 @@ TGraphErrors* IVScanFN::graphFN( TGraphErrors* graph, float iMin, float iMax, in
   f1_line->SetLineWidth(2);
   f1_line->SetRange( 0.1*xMin, 1.1*xMax );
   f1_line->SetParameter( 1, m0 );
-  graphFN->Fit( f1_line, "R+" );
+  graphFN->Fit( f1_line, "QR+" );
 
 
   return graphFN;
