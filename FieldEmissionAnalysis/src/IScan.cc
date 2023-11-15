@@ -15,7 +15,7 @@
 
 
 
-IScan::IScan( const std::string& name, float scale, float vMin, float vMax ) {
+IScan::IScan( const std::string& name, float scale) { 
 
   name_ = AndCommon::removePathAndSuffix(name);
 
@@ -28,20 +28,19 @@ IScan::IScan( const std::string& name, float scale, float vMin, float vMax ) {
   dz_ = 0.1;  // mm
   verr_ = 1.; // V
   n_ = 1; 
+  color_ = 46; // default color for graphs
 
   graph_ = new TGraphErrors(0);
   graph_->SetName( Form("gr_%s", name_.c_str()) );
   graph_->SetMarkerSize(1.8);
   graph_->SetMarkerStyle(20);
+  graph_->SetMarkerColor( color_ );
+  graph_->SetLineColor  ( color_ );
 
-  vMin_ = vMin;
-  vMax_ = vMax;
 
   readFile( getDataFileName(name_) );
 
   if( scale!=1 ) scaleDataPoints( scale );
-
-  setColor(46);
 
 }
 
@@ -142,6 +141,13 @@ int IScan::n() const {
 }
 
 
+int IScan::color() const {
+
+  return color_;
+
+}
+
+
 
 
 void IScan::set_sampleName( const std::string& sampleName ) {
@@ -216,40 +222,15 @@ void IScan::set_n( int n ) {
 }
 
 
-void IScan::setColor( int color ) {
+void IScan::set_color( int color ) {
+
+  color_ = color;
 
   graph_->SetMarkerColor( color );
   graph_->SetLineColor( color );
 
 }
 
-
-float IScan::vMin() const {
-
-  return vMin_;
-
-}
-
-
-float IScan::vMax() const {
-
-  return vMax_;
-
-}
-
-
-void IScan::set_vMin( float vMin ) {
-
-  vMin_ = vMin;
-
-}
-
-
-void IScan::set_vMax( float vMax ) {
-
-  vMax_ = vMax;
-
-}
 
 
   
@@ -301,15 +282,15 @@ void IScan::readCommentLine( const std::vector< std::string >& words ) {
     std::cout << "-> Power supply: " << hv_ << std::endl;
     if( hv_ == "caenN472" ) {
       std::cout << "[IScan::readCommentLine] Recognized power supply CAEN N472 " << std::endl;
-      std::cout << " -> Setting voltage uncertainty to 1 V" << std::endl;
+      std::cout << "-> Setting voltage uncertainty to 1 V" << std::endl;
       verr_ = 1.;
     } else if( hv_ == "keithley6487" )  {
       verr_ = 0.1;
       std::cout << "[IScan::readCommentLine] Recognized power supply Keithley 6487 " << std::endl;
-      std::cout << " -> Setting voltage uncertainty to 0.1 V" << std::endl;
+      std::cout << "-> Setting voltage uncertainty to 0.1 V" << std::endl;
     } else {
       std::cout << "[IScan::readCommentLine] Warning!! Unknown power supply model: " << hv_ << std::endl;
-      std::cout << " -> Setting voltage uncertainty to 1 Volt!" << std::endl;
+      std::cout << "-> Setting voltage uncertainty to 1 Volt!" << std::endl;
       verr_ = 1.;
     }
   }
@@ -335,11 +316,9 @@ void IScan::readDataLine( const std::vector< std::string >& words, bool& addToGr
   float y    = std::atof( words[1].c_str() );
   float yerr = std::atof( words[2].c_str() );
 
-  if( (x > vMin_) && (x < vMax_) ) {
-    int iPoint = this->graph()->GetN();
-    this->graph()->SetPoint     ( iPoint, x   , y    );
-    this->graph()->SetPointError( iPoint, verr_, yerr ); 
-  }
+  int iPoint = this->graph()->GetN();
+  this->graph()->SetPoint     ( iPoint, x   , y    );
+  this->graph()->SetPointError( iPoint, verr_, yerr ); 
 
 }
 
@@ -366,18 +345,6 @@ void IScan::scaleDataPoints( float scale ) {
 }
 
 
-//void IScan::addPointToGraph( float hv, std::vector<float> i_meas ) {
-//
-//  float mean, rms;
-//  getMeanRMS( i_meas, mean, rms );
-//
-//  int iPoint = this->graph()->GetN();
-//  this->graph()->SetPoint     ( iPoint, hv, mean );
-//  this->graph()->SetPointError( iPoint, 1., rms  );
-//
-//}
-
-
 
 void IScan::readFile( const std::string& name ) {
 
@@ -385,9 +352,6 @@ void IScan::readFile( const std::string& name ) {
   std::string fileName = (name=="") ? getDataFileName(name_) : getDataFileName(name);
 
   std::cout << "-> Opening data file: " << fileName << std::endl;
-  if( vMin_ > -50000. && vMax_ < 50000 ) std::cout << "-> Will add only data points with " << vMin_ << " < x < " << vMax_ << std::endl;
-  else if( vMin_ > -50000. ) std::cout << "-> Will add only data points with x > " << vMin_ << std::endl;
-  else if( vMax_ <  50000. ) std::cout << "-> Will add only data points with x < " << vMax_ << std::endl;
 
   std::ifstream ifs( fileName.c_str() );
 
@@ -444,7 +408,6 @@ void IScan::readFile( const std::string& name ) {
       std::vector<std::string> words_nocomm = AndCommon::splitString( line_nocomm, " " );
 
       readDataLine( words_nocomm, addToGraph );
-      //readDataLine( words, vMin, vMax );
 
 
     }  // while get lines
@@ -454,38 +417,3 @@ void IScan::readFile( const std::string& name ) {
   std::cout << "-> Added " << graph_->GetN() << " data points." << std::endl;
 
 }
-
-
-
-//void IScan::getMeanRMS( std::vector<float> v, float& mean, float& rms ) {
-//
-//  mean = 0.;
-//  rms = 0.;
-//
-//  if( v.size()<2 ) {
-//
-//    std::cout << "[IScan::getMeanRMS] Data vector size < 2" << std::endl;
-//    exit(2);
-//
-//  } else if( v.size()==2 ) { // first is mean second is RMS
-//
-//    mean = v[0];
-//    rms  = v[1];
-//
-//  } else { // just a number of measurements
-//
-//    for( unsigned i=0; i<v.size(); ++i )
-//      mean += v[i];
-//    
-//    mean /= (float)(v.size());
-//
-//
-//    for( unsigned i=0; i<v.size(); ++i ) 
-//      rms += (v[i] - mean)*(v[i] - mean);
-//    rms /= (float)(v.size()-1);
-//    rms = sqrt(rms);
-//
-//  }  // if
-//
-//}
-

@@ -12,7 +12,7 @@ class IScan {
 
  public:
 
-  IScan( const std::string& name, float scale=1., float xMin=-99999., float xMax=99999. );
+  IScan( const std::string& name, float scale=1.);
 
   virtual ~IScan();
 
@@ -21,10 +21,6 @@ class IScan {
   virtual void readDataLine( const std::vector< std::string >& words, bool& addToGraph );
 
   void scaleDataPoints( float scale = 1. );
-
-  //void addPointToGraph( float hv, std::vector<float> i_meas );
-
-  //void getMeanRMS( std::vector<float> v, float& mean, float& rms );
 
   std::string name() const;
   std::string sampleName() const;
@@ -40,6 +36,7 @@ class IScan {
   float dz() const;
   float verr() const;
   int n() const;
+  int color() const;
 
   void set_name( const std::string& name );
   void set_sampleName( const std::string& sampleName );
@@ -51,6 +48,7 @@ class IScan {
   void set_dz( float dz );
   void set_verr( float verr );
   void set_n ( int n );
+  virtual void set_color ( int color );
 
   float vMin() const;
   float vMax() const;
@@ -60,8 +58,6 @@ class IScan {
 
 
   virtual void set_graph( TGraphErrors* graph );
-
-  virtual void setColor( int color );
 
 
 
@@ -82,9 +78,7 @@ class IScan {
   float dz_;   // uncertainty on delta(d) in mm
   float verr_; // voltage uncertainty
   int n_;      // number of points used in current measurement
-
-  float vMin_; // will consider only data points with voltage > vMin_ Volts
-  float vMax_; // will consider only data points with voltage < vMax_ Volts
+  int color_;  // color of graphs
 
   std::string getDataFileName( const std::string& dataName );
 
