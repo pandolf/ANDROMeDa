@@ -242,7 +242,7 @@ IVScanFN analyzeFN( const std::string& name ) {
   yMin_iv = 0.9*yMin_iv;
   yMax_iv = 1.1*yMax_iv;
 
-  if( name_tstr.Contains( "INRiM" ) ) {
+  if( ivs.lab() == "INRiM" ) {
     if( ivs.d() < 0.9 ) {
       xMin_iv = 0.;
       xMax_iv = 70.;
@@ -268,18 +268,20 @@ IVScanFN analyzeFN( const std::string& name ) {
 
   TLine* line_one  = new TLine( xMin_iv, 1., xMax_iv, 1. );
   line_one->SetLineStyle(2);
-  if( name_tstr.Contains( "INRiM" ) ) line_one->Draw("P same");
+  if( ivs.lab() == "INRiM" ) line_one->Draw("P same");
 
   TPaveText* pd_text = new TPaveText( 0.2, 0.7, 0.5, 0.85, "brNDC" );
   pd_text->SetFillColor(0);
   pd_text->SetTextSize(0.038);
   pd_text->SetTextAlign(13);
   pd_text->SetTextColor(kGray+3);
-  //pd_text->AddText( Form("p = %s mbar", AndCommon::scientific(ivs.p(), 0).c_str()) );
-  if( name_tstr.Contains( "INRiM" ) ) 
-    pd_text->AddText( Form("INRiM") );
+  pd_text->AddText( AndCommon::cuteSampleName( ivs.sampleName() ).c_str() );
+  //if( name_tstr.Contains( "INRiM" ) ) 
+  //  pd_text->AddText( Form("INRiM") );
   if( ivs.t() < 200 )
-    pd_text->AddText( Form("T = %.1f K"  , ivs.t()) );
+    pd_text->AddText( Form("%s, T = %.1f K"  , ivs.lab().c_str(), ivs.t()) );
+  else
+    pd_text->AddText( Form("%s, p =  %s mbar", ivs.lab().c_str(), AndCommon::scientific(ivs.p(), 0).c_str()) );
   pd_text->AddText( Form("d = %.1f mm"  , ivs.d()) );
   pd_text->Draw("Same");
 
@@ -328,7 +330,6 @@ IVScanFN analyzeFN( const std::string& name ) {
   xMinFN = 0.95*xMinFN;
   xMaxFN = 1.05*xMaxFN;
 
-  //TH2D* h2_axes_fn = new TH2D( "axes_fn", "", 10, 0.0005, 0.0012, 10, IVScanFN::yMinFN(), IVScanFN::yMaxFN() );
   TH2D* h2_axes_fn = new TH2D( "axes_fn", "", 10, xMinFN, xMaxFN, 10, -20, 5);
   h2_axes_fn->SetXTitle( IVScanFN::xTitleFN().c_str() );
   h2_axes_fn->SetYTitle( IVScanFN::yTitleFN().c_str() );
