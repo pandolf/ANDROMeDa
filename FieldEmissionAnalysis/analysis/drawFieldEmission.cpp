@@ -276,8 +276,6 @@ IVScanFN analyzeFN( const std::string& name ) {
   pd_text->SetTextAlign(13);
   pd_text->SetTextColor(kGray+3);
   pd_text->AddText( AndCommon::cuteSampleName( ivs.sampleName() ).c_str() );
-  //if( name_tstr.Contains( "INRiM" ) ) 
-  //  pd_text->AddText( Form("INRiM") );
   if( ivs.t() < 200 )
     pd_text->AddText( Form("%s, T = %.1f K"  , ivs.lab().c_str(), ivs.t()) );
   else
@@ -384,13 +382,11 @@ IVScanFN analyzeFN( const std::string& name ) {
   gamma_text->AddText( Form("#gamma = %.0f #pm %.0f", gamma, gamma_err) );
   gamma_text->Draw("same");
 
-  TPaveText* pd_text_log = new TPaveText( 0.2, 0.2, 0.5, 0.3, "brNDC" );
-  pd_text_log->SetFillColor(0);
-  pd_text_log->SetTextSize(0.038);
-  pd_text_log->SetTextColor(kGray+3);
-  //pd_text_log->AddText( Form("p = %s mbar", AndCommon::scientific(ivs.p(), 0).c_str()) );
-  pd_text_log->AddText( Form("d = %.1f mm"  , ivs.d()) );
-  pd_text_log->Draw("same");
+  pd_text->SetX1( 0.18  );
+  pd_text->SetY1( 0.2  );
+  pd_text->SetX2( 0.48  );
+  pd_text->SetY2( 0.35 );
+  pd_text->Draw("same");
 
 
   c1_fn->SaveAs( Form("%s/fn.pdf", outdir.c_str()) );
