@@ -476,3 +476,17 @@ TGraphErrors* AndCommon::getGraphRatio( TGraphErrors* gr1, TGraphErrors* gr2 ) {
   return gr_ratio;
 
 }
+
+
+std::string AndCommon::cuteSampleName( const std::string& sampleName ) {
+
+  std::string cuteSampleName = "CNT Sample";
+
+  if( sampleName == "CNTArO2Etching_N1new" ) 
+    cuteSampleName = "CNT mild Ar/O_{2} etching";
+  
+
+  return cuteSampleName;
+
+}
+

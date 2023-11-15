@@ -45,6 +45,8 @@ class AndCommon {
 
   static std::string removePathAndSuffix( const std::string& fileName );
 
+  static std::string cuteSampleName( const std::string& sampleName );
+
 };
 
 #endif
