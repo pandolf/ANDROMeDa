@@ -1,3 +1,5 @@
+// generic class for current scans (eg vs voltage or vs time)
+
 #ifndef IScan_h
 #define IScan_h
 
