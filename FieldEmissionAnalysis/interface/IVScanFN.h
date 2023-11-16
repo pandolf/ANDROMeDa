@@ -1,7 +1,7 @@
+// IVScan dedicated to Fowler–Nordheim analysis
+
 #ifndef IVScanFN_h
 #define IVScanFN_h
-
-// IVScan dedicated to Fowler–Nordheim analysis
 
 
 #include "../interface/IVScan.h"
