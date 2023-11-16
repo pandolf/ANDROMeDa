@@ -47,6 +47,8 @@ class AndCommon {
 
   static std::string cuteSampleName( const std::string& sampleName );
 
+  static void get_mean_and_rms( const std::vector<float> data, float& mean, float& rms );
+
 };
 
 #endif

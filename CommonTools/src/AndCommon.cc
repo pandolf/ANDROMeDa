@@ -490,3 +490,24 @@ std::string AndCommon::cuteSampleName( const std::string& sampleName ) {
 
 }
 
+
+void AndCommon::get_mean_and_rms( const std::vector<float> data, float& mean, float& rms ) {
+
+  float n = (float)(data.size());
+  float sum = 0.;
+
+  for( unsigned i=0; i<data.size(); ++i ) 
+    sum += data[i];
+
+  mean = sum / n;
+
+
+  float sum2 = 0.;
+
+  for( unsigned i=0; i<data.size(); ++i ) 
+    sum2 += (data[i]-mean)*(data[i]-mean);
+
+  rms = sqrt( sum2 / n );
+
+
+}
