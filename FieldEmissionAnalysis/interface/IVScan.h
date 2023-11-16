@@ -1,3 +1,5 @@
+// class for I vs V scans
+
 #ifndef IVScan_h
 #define IVScan_h
 
