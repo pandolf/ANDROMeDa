@@ -1,11 +1,10 @@
-#LAB: INRiM
+#lab INRiM
 #s CNTArO2Etching_N1new
 #t 2.7
 #d 0.5
 #V -58
 #
 #Time	Current
-#s	pA	0.000000	-0.875327
 1.036099	-0.802163
 2.036300	-0.990241
 3.036338	-1.115087
