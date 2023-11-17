@@ -514,7 +514,6 @@ std::string AndCommon::cuteSampleName( const std::string& sampleName ) {
 
   std::string cuteSampleName = "CNT Sample";
 
-std::cout << "@@@@@@@@@@@ sample name: '" << sampleName << "'" << std::endl;
   if( sampleName == "CNTArO2Etching_N1new" ) 
     cuteSampleName = "CNT mild Ar/O_{2} etching";
   
