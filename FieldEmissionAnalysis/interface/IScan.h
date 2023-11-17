@@ -29,13 +29,14 @@ class IScan {
   std::string sampleName() const;
   std::string lab() const;
 
-  TGraphErrors* graph() const;  // I vs something
+  TGraphErrors* graph( int groupData = 1 ) const;  // I vs something
 
   float pressure() const;
   float p() const;
   float d() const;
   float t() const;
   std::string hv() const;
+  float deltaV() const;
   float dz() const;
   float verr() const;
   int n() const;
@@ -48,6 +49,7 @@ class IScan {
   void set_d ( float d );
   void set_t ( float t );
   void set_hv( const std::string& hv );
+  void set_deltaV( float deltaV );
   void set_dz( float dz );
   void set_verr( float verr );
   void set_n ( int n );
@@ -76,14 +78,15 @@ class IScan {
 
   TGraphErrors* graph_; // graph of I(nA) vs V(V)
 
-  float p_;    // pressure in mbar
-  float d_;    // distance between anode and cathode in mm
-  float t_;    // temperature in K
+  float p_;        // pressure in mbar
+  float d_;        // distance between anode and cathode in mm
+  float t_;        // temperature in K
   std::string hv_; // power supply model
-  float dz_;   // uncertainty on delta(d) in mm
-  float verr_; // voltage uncertainty
-  int n_;      // number of points used in current measurement
-  int color_;  // color of graphs
+  float dz_;       // uncertainty on delta(d) in mm
+  float deltaV_;   // deltaV in V
+  float verr_;     // voltage uncertainty
+  int n_;          // number of points used in current measurement
+  int color_;      // color of graphs
 
   std::string getDataFileName( const std::string& dataName );
 

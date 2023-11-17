@@ -25,6 +25,7 @@ IScan::IScan( const std::string& name, float scale) {
   d_ = -1.;   // mm
   t_ = 300.;  // K
   hv_ = "caen472";
+  deltaV_ = 0.; // V
   dz_ = 0.1;  // mm
   verr_ = 1.; // V
   n_ = 1; 
@@ -77,9 +78,58 @@ std::string IScan::lab() const {
 
 
 
-TGraphErrors* IScan::graph() const {
+TGraphErrors* IScan::graph( int groupData ) const {
 
-  return graph_;
+  TGraphErrors* returnGraph;
+
+  if( groupData == 1 ) {
+
+    returnGraph = graph_;
+
+  } else {
+
+    TGraphErrors* gr_binned = new TGraphErrors(0);
+    gr_binned->SetName( Form("binned%d_%s", groupData, graph_->GetName()) );
+    gr_binned->SetMarkerStyle(20);
+    gr_binned->SetMarkerSize(1.6);
+    gr_binned->SetMarkerColor(color_);
+    gr_binned->SetLineColor(color_);
+
+
+    std::vector<float> datax, datay;
+
+    for( unsigned iPoint = 0; iPoint < graph_->GetN(); ++iPoint ) {
+
+      double x, y;
+      graph_->GetPoint( iPoint, x, y );
+
+      datax.push_back(x);
+      datay.push_back(y);
+
+      if( (iPoint+1) % groupData == 0 ) {
+
+        float meanx, rmsx;
+        AndCommon::get_mean_and_rms( datax, meanx, rmsx );
+
+        float meany, rmsy;
+        AndCommon::get_mean_and_rms( datay, meany, rmsy );
+
+        int i_binned = gr_binned->GetN();
+        gr_binned->SetPoint     ( i_binned, meanx, meany );
+        gr_binned->SetPointError( i_binned,    0., rmsy/sqrt((float)groupData) );
+
+        datax.clear();
+        datay.clear();
+   
+      } // if
+
+    } // for iPoint
+
+    returnGraph = gr_binned;
+
+  } // else
+
+  return returnGraph;
 
 }
 
@@ -116,6 +166,13 @@ float IScan::t() const {
 std::string IScan::hv() const {
 
   return hv_;
+
+}
+
+
+float IScan::deltaV() const {
+
+  return deltaV_;
 
 }
 
@@ -197,6 +254,13 @@ void IScan::set_d( float d ) {
 void IScan::set_hv( const std::string& hv ) {
 
   hv_ = hv;
+
+}
+
+
+void IScan::set_deltaV( float deltaV ) {
+
+  deltaV_ = deltaV;
 
 }
 
@@ -293,6 +357,10 @@ void IScan::readCommentLine( const std::vector< std::string >& words ) {
       std::cout << "-> Setting voltage uncertainty to 1 Volt!" << std::endl;
       verr_ = 1.;
     }
+  }
+  if( words[0]=="#V" ) {
+    deltaV_ = std::atof(words[words.size()-1].c_str());
+    std::cout << "-> deltaV = " << deltaV_ << " V" << std::endl;
   }
   if( words[0]=="#dz" ) {
     dz_ = std::atof(words[words.size()-1].c_str());
@@ -396,7 +464,7 @@ void IScan::readFile( const std::string& name ) {
 
       if( line[0] == '#' ) {
 
-        readCommentLine(words);
+        this->readCommentLine(words);
 
         continue;
 

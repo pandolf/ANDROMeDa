@@ -28,8 +28,8 @@ compareFN: compareFN.cpp AndCommon.o IScan.o IVScan.o IVScanFN.o
 compareScans: compareScans.cpp AndCommon.o IScan.o IVScan.o IVScanFN.o
 	$(CC) -Wall $(INCLUDES) -o compareScans compareScans.cpp AndCommon.o IScan.o IVScan.o IVScanFN.o $(ROOTFLAG) $(EXTRALIBS)
 
-drawTimeStability: drawTimeStability.cpp AndCommon.o ITScan.o IScan.o
-	$(CC) -Wall $(INCLUDES) -o drawTimeStability drawTimeStability.cpp AndCommon.o ITScan.o IScan.o $(ROOTFLAG) $(EXTRALIBS)
+drawTimeStability: drawTimeStability.cpp AndCommon.o IScan.o
+	$(CC) -Wall $(INCLUDES) -o drawTimeStability drawTimeStability.cpp AndCommon.o IScan.o $(ROOTFLAG) $(EXTRALIBS)
 
 computeGammaFromScans: computeGammaFromScans.cpp AndCommon.o UncCorr.o IVScan.o IVScanFN.o
 	$(CC) -Wall $(INCLUDES) -o computeGammaFromScans computeGammaFromScans.cpp AndCommon.o UncCorr.o IScan.o IVScan.o IVScanFN.o $(ROOTFLAG) $(EXTRALIBS)
@@ -57,9 +57,6 @@ IVScan.o: ../src/IVScan.cc IScan.o AndCommon.o
 
 IVScanFN.o: ../src/IVScanFN.cc IScan.o IVScan.o AndCommon.o
 	$(CC) -Wall $(INCLUDES) -c ../src/IVScanFN.cc IScan.o IVScan.o AndCommon.o $(ROOTFLAG) $(EXTRALIBS)
-
-ITScan.o: ../src/ITScan.cc IScan.o AndCommon.o
-	$(CC) -Wall $(INCLUDES) -c ../src/ITScan.cc IScan.o AndCommon.o $(ROOTFLAG) $(EXTRALIBS)
 
 
 
