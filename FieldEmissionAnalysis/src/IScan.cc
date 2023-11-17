@@ -314,7 +314,7 @@ void IScan::readDataLine( const std::vector< std::string >& words, bool& addToGr
 
   float x    = std::atof( words[0].c_str() );
   float y    = std::atof( words[1].c_str() );
-  float yerr = std::atof( words[2].c_str() );
+  float yerr = (words.size()>2) ? std::atof( words[2].c_str() ) : 0.;
 
   int iPoint = this->graph()->GetN();
   this->graph()->SetPoint     ( iPoint, x   , y    );
@@ -415,5 +415,25 @@ void IScan::readFile( const std::string& name ) {
   } // if file good
 
   std::cout << "-> Added " << graph_->GetN() << " data points." << std::endl;
+
+}
+
+
+
+TPaveText* IScan::setupLabel( float x1, float y1, float x2, float y2 ) const {
+
+  TPaveText* pd_text = new TPaveText( x1, y1, x2, y2, "brNDC" );
+  pd_text->SetFillColor(0);
+  pd_text->SetTextSize(0.038);
+  pd_text->SetTextAlign(13);
+  pd_text->SetTextColor(kGray+3);
+  pd_text->AddText( AndCommon::cuteSampleName( sampleName_ ).c_str() );
+  if( t_ < 200 )
+    pd_text->AddText( Form("%s, T = %.1f K"  , lab_.c_str(), t_) );
+  else
+    pd_text->AddText( Form("%s, p =  %s mbar", lab_.c_str(), AndCommon::scientific(p_, 0).c_str()) );
+  pd_text->AddText( Form("d = %.1f mm"  , d_) );
+
+  return pd_text;
 
 }
