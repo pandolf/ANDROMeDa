@@ -7,6 +7,7 @@
 #include <string>
 
 #include "TGraphErrors.h"
+#include "TPaveText.h"
 
 
 
@@ -60,6 +61,8 @@ class IScan {
 
 
   virtual void set_graph( TGraphErrors* graph );
+
+  TPaveText* setupLabel( float x1=0.2, float y1=0.7, float x2=0.5, float y2=0.85 ) const;
 
 
 
