@@ -270,17 +270,7 @@ IVScanFN analyzeFN( const std::string& name ) {
   line_one->SetLineStyle(2);
   if( ivs.lab() == "INRiM" ) line_one->Draw("P same");
 
-  TPaveText* pd_text = new TPaveText( 0.2, 0.7, 0.5, 0.85, "brNDC" );
-  pd_text->SetFillColor(0);
-  pd_text->SetTextSize(0.038);
-  pd_text->SetTextAlign(13);
-  pd_text->SetTextColor(kGray+3);
-  pd_text->AddText( AndCommon::cuteSampleName( ivs.sampleName() ).c_str() );
-  if( ivs.t() < 200 )
-    pd_text->AddText( Form("%s, T = %.1f K"  , ivs.lab().c_str(), ivs.t()) );
-  else
-    pd_text->AddText( Form("%s, p =  %s mbar", ivs.lab().c_str(), AndCommon::scientific(ivs.p(), 0).c_str()) );
-  pd_text->AddText( Form("d = %.1f mm"  , ivs.d()) );
+  TPaveText* pd_text = ivs.setupLabel();
   pd_text->Draw("Same");
 
   graph->SetMarkerStyle(20);
