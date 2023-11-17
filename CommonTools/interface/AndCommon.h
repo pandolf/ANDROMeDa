@@ -40,6 +40,7 @@ class AndCommon {
 
 
   static std::string scientific( float x, int decimals = 1 );
+  static std::string scientificMeanRMS( float mean, float rms );
 
   static std::vector<std::string> splitString( const std::string& s, const std::string& divider=" " );
 

@@ -301,6 +301,38 @@ std::string AndCommon::scientific( float x, int decimals ) {
 }
 
 
+std::string AndCommon::scientificMeanRMS( float mean, float rms ) {
+
+  int power = 0.;
+
+  while( rms >= 10. ) {
+    rms /= 10.;
+    mean /= 10.;
+    power += 1;
+  }
+
+  while( rms < 0.9999 ) {
+    rms *= 10.;
+    mean *= 10.;
+    power -= 1;
+  }
+
+  std::string sign = (power>=0) ? "+" : "-";
+
+  int decimals = 1;
+
+  std::string scient;
+  if( decimals==1 )      scient = std::string(Form("(%.1f #pm %.1f)E%s%d", mean, rms, sign.c_str(), abs(power)));
+  else if( decimals==2 ) scient = std::string(Form("(%.2f #pm %.2f)E%s%d", mean, rms, sign.c_str(), abs(power)));
+  else if( decimals==3 ) scient = std::string(Form("(%.3f #pm %.3f)E%s%d", mean, rms, sign.c_str(), abs(power)));
+  else if( decimals==4 ) scient = std::string(Form("(%.4f #pm %.4f)E%s%d", mean, rms, sign.c_str(), abs(power)));
+  else if( decimals==0 ) scient = std::string(Form("(%.0f #pm %.0f)E%s%d", mean, rms, sign.c_str(), abs(power)));
+
+  return scient;
+
+}
+
+
 std::vector<std::string> AndCommon::splitString( const std::string& s, const std::string& divider ) {
 
   std::string s_copy(s);
@@ -482,6 +514,7 @@ std::string AndCommon::cuteSampleName( const std::string& sampleName ) {
 
   std::string cuteSampleName = "CNT Sample";
 
+std::cout << "@@@@@@@@@@@ sample name: '" << sampleName << "'" << std::endl;
   if( sampleName == "CNTArO2Etching_N1new" ) 
     cuteSampleName = "CNT mild Ar/O_{2} etching";
   
