@@ -243,18 +243,28 @@ IVScanFN analyzeFN( const std::string& name ) {
   yMax_iv = 1.1*yMax_iv;
 
   if( ivs.lab() == "INRiM" ) {
-    if( ivs.d() < 0.9 ) {
+
+    if( ivs.sampleName()=="CNTArO2Etching_N1new" ) {
+      if( ivs.d() < 0.9 ) {
+        xMin_iv = 0.;
+        xMax_iv = 70.;
+      } else {
+        xMin_iv = 170.;
+        xMax_iv = 220.;
+      }
+    } else if( ivs.sampleName()=="CNTArO2Etching_N1new_B" ) {
       xMin_iv = 0.;
-      xMax_iv = 70.;
-    } else {
-      xMin_iv = 170.;
-      xMax_iv = 220.;
+      xMax_iv = 150.;
     }
+
     yMin_iv = -1.9999;
     yMax_iv = 5.;
+
   } else {
+
     xMin_iv = 0.;
     yMin_iv = 0.;
+
   }
 
 
@@ -287,9 +297,9 @@ IVScanFN analyzeFN( const std::string& name ) {
   c1->Clear();
   c1->SetLogy();
 
-  TH2D* h2_axes_log = new TH2D( "axes_log", "", 10, 0., xMax_iv, 10, 0.1*yMin_iv, 20.*yMax_iv);
+  TH2D* h2_axes_log = new TH2D( "axes_log", "", 10, 0., xMax_iv, 10, 0.1, 20.*yMax_iv);
   h2_axes_log->SetXTitle( "-#DeltaV (V)" );
-  h2_axes_log->SetYTitle( "I (nA)" );
+  h2_axes_log->SetYTitle( "I (pA)" );
   h2_axes_log->Draw();
 
   pd_text->Draw("Same");
@@ -318,10 +328,29 @@ IVScanFN analyzeFN( const std::string& name ) {
   xMinFN = 0.95*xMinFN;
   xMaxFN = 1.05*xMaxFN;
 
-  TH2D* h2_axes_fn = new TH2D( "axes_fn", "", 10, xMinFN, xMaxFN, 10, -20, 5);
+  TH2D* h2_axes_fn = new TH2D( "axes_fn", "", 10, xMinFN, xMaxFN, 10, -10., -4. );
   h2_axes_fn->SetXTitle( IVScanFN::xTitleFN().c_str() );
   h2_axes_fn->SetYTitle( IVScanFN::yTitleFN().c_str() );
   h2_axes_fn->Draw();
+
+  float gamma_err_corr, gamma_err_ucorr;
+  float gamma = ivs.get_gamma_and_err( gamma_err_corr, gamma_err_ucorr );
+  float gamma_err = sqrt( gamma_err_corr*gamma_err_corr + gamma_err_ucorr*gamma_err_ucorr );
+
+  TPaveText* gamma_text = new TPaveText( 0.6, 0.8, 0.85, 0.9, "brNDC" );
+  gamma_text->SetFillColor(0);
+  gamma_text->SetTextSize(0.038);
+  gamma_text->SetTextColor( 46 );
+  //gamma_text->SetTextColor( kGray+3 );
+  gamma_text->AddText( Form("#gamma = %.0f #pm %.0f", gamma, gamma_err) );
+  gamma_text->Draw("same");
+
+  pd_text->SetX1( 0.18  );
+  pd_text->SetY1( 0.2  );
+  pd_text->SetX2( 0.48  );
+  pd_text->SetY2( 0.35 );
+  pd_text->Draw("same");
+
 
   gr_fn->SetMarkerStyle(20);
   gr_fn->SetMarkerSize(1.5);
@@ -360,24 +389,6 @@ IVScanFN analyzeFN( const std::string& name ) {
 //} // for points
 
  
-  float gamma_err_corr, gamma_err_ucorr;
-  float gamma = ivs.get_gamma_and_err( gamma_err_corr, gamma_err_ucorr );
-  float gamma_err = sqrt( gamma_err_corr*gamma_err_corr + gamma_err_ucorr*gamma_err_ucorr );
-
-  TPaveText* gamma_text = new TPaveText( 0.6, 0.8, 0.85, 0.9, "brNDC" );
-  gamma_text->SetFillColor(0);
-  gamma_text->SetTextSize(0.038);
-  gamma_text->SetTextColor( 46 );
-  //gamma_text->SetTextColor( kGray+3 );
-  gamma_text->AddText( Form("#gamma = %.0f #pm %.0f", gamma, gamma_err) );
-  gamma_text->Draw("same");
-
-  pd_text->SetX1( 0.18  );
-  pd_text->SetY1( 0.2  );
-  pd_text->SetX2( 0.48  );
-  pd_text->SetY2( 0.35 );
-  pd_text->Draw("same");
-
 
   c1_fn->SaveAs( Form("%s/fn.pdf", outdir.c_str()) );
 
