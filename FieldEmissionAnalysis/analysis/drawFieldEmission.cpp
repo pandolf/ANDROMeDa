@@ -66,140 +66,6 @@ int main( int argc, char* argv[] ) {
 IVScanFN analyzeFN( const std::string& name ) {
 
 
-  //float hvMin = -1.;
-  //float hvMax = 3000.;
-
-  //if( name=="CNTArO2Etching_N1_d5_20221130" ) {
-
-  //  hvMin = 480.;
-  //  hvMax = 560.;
-  //  scale = -1.;
-
-  //} else if( name=="CNTArO2Etching_N1_d4_20221130" ) {
-
-  //  hvMin = 385.;
-  //  hvMax = 440.;
-  //  scale = -1.;
-
-  //} else if( name=="CNTArO2Etching_N1_d3_20221130" ) {
-
-  //  hvMin = 280.;
-  //  hvMax = 350.;
-  //  scale = -1.;
-
-  //} else if( name=="CNTArO2Etching_N1_d2_20221130" ) {
-
-  //  hvMin = 175.;
-  //  hvMax = 350.;
-  //  scale = -1.;
-
-  //} else if( name=="CNTArO2Etching_AG_d5_new" ) {
-
-  //  hvMin = 1930.;
-  //  hvMax = 2100.;
-  //  scale = -1.;
-
-  //} else if( name=="CNTArO2Etching_AG_d4_new" ) {
-
-  //  hvMin = 1500.;
-  //  hvMax = 1800.;
-  //  scale = -1.;
-
-  //} else if( name=="CNTArO2Etching_AG_d3_new" ) {
-
-  //  hvMin = 1110.;
-  //  hvMax = 1230.;
-  //  scale = -1.;
-
-  //} else if( name=="CNTArO2Etching_AG_d4_20221214" ) {
-
-  //  hvMin = 789.;
-  //  hvMax = 3000.;
-  //  scale = -1.;
-
-  //} else if( name=="CNTArO2Etching_AG2_d3_20221215" ) {
-
-  //  hvMin = 210.;
-  //  hvMax = 3000.;
-  //  scale = -1.;
-
-  //} else if( name=="CNTetchedOLD_N6bis_whopper_LNGS_d1_t1_20230228_drain" ) {
-
-  //  //hvMin = 730.; // first component
-  //  //hvMax = 900.;
-  //  hvMin = 1030.; // second component
-  //  hvMax = 1500.;
-  //  scale = +1.;
-
-  //} else if( name=="CNTetchedOLD_N6bis_LNGS_HdM_d1p5_t30_20230315_drain" ) {
-
-  //  //hvMin = 730.; // first component
-  //  //hvMax = 900.;
-  //  hvMin = 590.; // second component
-  //  hvMax = 770.;
-  //  scale = +1.;
-
-  //} else if( name=="CNTetchedOLD_AG2_LNGS_HdM_d1p5_t20_20230404" ) {
-
-  //  //hvMin = 730.; // first component
-  //  //hvMax = 900.;
-  //  //hvMin = 680.; // second component
-  //  //hvMax = 880.;
-
-  //} else if( name=="CNTetchedOLD_Strongnew_d3_20230927_2" ) {
-
-  //  hvMin = 190.;
-  //  hvMax = 255.;
-
-  //} else if( name=="CNTetchedOLD_Strongnew_d4_20230927" ) {
-
-  //  hvMin = 340.;
-  //  //hvMax = 255.;
-
-  //} else if( name=="CNTetchedOLD_Strongnew_d5_20230927" ) {
-
-  //  hvMin = 390.;
-  //  hvMax = 510.;
-
-  //} else if( name=="CNTetchedOLD_Strongnew_d3_20230927_drain" ) {
-
-  //  //hvMin = 390.;
-  //  //hvMax = 510.;
-  //  scale = +1.;
-
-  //} else if( name=="CNTetchedOLD_Strongnew_d4_20230927_drain" ) {
-
-  //  //hvMin = 390.;
-  //  //hvMax = 510.;
-  //  scale = +1.;
-
-  //} else if( name=="CNTetchedOLD_Strongnew_d5_20230927_drain" ) {
-
-  //  //hvMin = 390.;
-  //  //hvMax = 510.;
-  //  scale = +1.;
-
-  //} else if( name=="CNTetchedOLD_Strongnew_d3_20231002_drain_2" ) {
-
-  //  hvMin = 359.;
-  //  //hvMax = 510.;
-  //  scale = +1.;
-
-  //} else if( name=="CNTetchedOLD_Strongnew_d4_20231002_drain_2" ) {
-
-  //  hvMin = 560.;
-  //  //hvMax = 510.;
-  //  scale = +1.;
-
-  //} else if( name=="CNTetchedOLD_Strongnew_d5_20231006_drain" ) {
-
-  //  //hvMin = 560.;
-  //  hvMax = 460.;
-  //  scale = +1.;
-
-  //}
-
-
   float scale = -1.;
   float iMin = 0.5; // default: compute FN only between 0.5 pA
   float iMax = 10.; //          and 10 pA
@@ -209,6 +75,10 @@ IVScanFN analyzeFN( const std::string& name ) {
 
   IVScanFN ivs( name, scale, iMin, iMax );
 
+  if(ivs.d() > 1.1 ) {
+    ivs.set_iMin(0.8);
+    ivs.set_iMax(3.);
+  }
 
 
   // ***** FIRST STEP: draw I vs V
@@ -247,7 +117,7 @@ IVScanFN analyzeFN( const std::string& name ) {
     if( ivs.sampleName()=="CNTArO2Etching_N1new" ) {
       if( ivs.d() < 0.9 ) {
         xMin_iv = 0.;
-        xMax_iv = 70.;
+        xMax_iv = 80.*(ivs.d()/0.5);
       } else {
         xMin_iv = 170.;
         xMax_iv = 220.;
@@ -257,8 +127,8 @@ IVScanFN analyzeFN( const std::string& name ) {
       xMax_iv = 150.;
     }
 
-    yMin_iv = -1.9999;
-    yMax_iv = 5.;
+    yMin_iv = -0.9999;
+    yMax_iv = 10.;
 
   } else {
 
@@ -328,7 +198,13 @@ IVScanFN analyzeFN( const std::string& name ) {
   xMinFN = 0.95*xMinFN;
   xMaxFN = 1.05*xMaxFN;
 
-  TH2D* h2_axes_fn = new TH2D( "axes_fn", "", 10, xMinFN, xMaxFN, 10, -10., -4. );
+  yMinFN = (yMinFN<0.) ? 1.1*yMinFN : 0.9*yMinFN;
+  yMaxFN = (yMaxFN<0.) ? 0.9*yMaxFN : 1.1*yMaxFN;
+
+  //yMinFN = -10. - 2.*(ivs.d()-0.5)/0.5;
+  //yMaxFN = -3.  - 2.*(ivs.d()-0.5)/0.5;
+
+  TH2D* h2_axes_fn = new TH2D( "axes_fn", "", 10, xMinFN, xMaxFN, 10, yMinFN, yMaxFN );
   h2_axes_fn->SetXTitle( IVScanFN::xTitleFN().c_str() );
   h2_axes_fn->SetYTitle( IVScanFN::yTitleFN().c_str() );
   h2_axes_fn->Draw();
