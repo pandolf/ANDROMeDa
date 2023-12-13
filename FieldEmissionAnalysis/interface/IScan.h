@@ -15,13 +15,13 @@ class IScan {
 
  public:
 
-  IScan( const std::string& name, float scale=1.);
+  IScan( const std::string& name, float scale=1. );
 
   virtual ~IScan();
 
-  virtual void readFile( const std::string& name="" );
+  virtual void readFile( const std::string& name="", int columnx=0, int columny=1, int columnyerr=2 );
   virtual void readCommentLine( const std::vector< std::string >& words );
-  virtual void readDataLine( const std::vector< std::string >& words, bool& addToGraph );
+  virtual void readDataLine( const std::vector< std::string >& words, int columnx=0, int columny=1, int columnyerr=2 );
 
   void scaleDataPoints( float scale = 1. );
 
