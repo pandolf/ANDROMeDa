@@ -21,6 +21,8 @@ class IVScanFN : public IVScan {
   static TGraphErrors* graphFN( const IScan* scan, float iMin = 0., float iMax = 1E9 );
   static TGraphErrors* graphFN( TGraphErrors* graph, float iMin = 0., float iMax = 1E9, int n = 1, float verr = 0.1 );
 
+  TGraphErrors* reducedgraph() const; // return graph with only points with iMin < I < iMax
+  
   //TGraphErrors* graphFN() const;
   //TF1* lineFN() const;
 
