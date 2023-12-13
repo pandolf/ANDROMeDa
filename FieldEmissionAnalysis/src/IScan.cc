@@ -15,7 +15,7 @@
 
 
 
-IScan::IScan( const std::string& name, float scale) { 
+IScan::IScan( const std::string& name, float scale ) {
 
   name_ = AndCommon::removePathAndSuffix(name);
 
@@ -39,7 +39,10 @@ IScan::IScan( const std::string& name, float scale) {
   graph_->SetLineColor  ( color_ );
 
 
-  readFile( getDataFileName(name_) );
+  int columnx = 0;
+  int columny = 1;
+  int columnyerr = 2;
+  readFile( getDataFileName(name_), columnx, columny, columnyerr );
 
   if( scale!=1 ) scaleDataPoints( scale );
 
@@ -326,7 +329,7 @@ void IScan::readCommentLine( const std::vector< std::string >& words ) {
     std::cout << "-> Sample name: " << sampleName_ << std::endl;
   }
   if( words[0]=="#lab" ) {
-    lab_ = words[words.size()-1];
+    lab_ = words[1];
     std::cout << "-> Lab: " << lab_ << std::endl;
   }
   if( words[0]=="#p" ) {
@@ -372,17 +375,17 @@ void IScan::readCommentLine( const std::vector< std::string >& words ) {
   }
   if( words[0]=="#N" ) {
     n_ = std::atoi(words[words.size()-1].c_str());
-    std::cout << "-> Number of points in current measurements = " << n_ << std::endl;
+    std::cout << "-> Number of points in I measurements = " << n_ << std::endl;
   }
 
 }
 
 
-void IScan::readDataLine( const std::vector< std::string >& words, bool& addToGraph ) {
+void IScan::readDataLine( const std::vector< std::string >& words, int columnx, int columny, int columnyerr ) {
 
-  float x    = std::atof( words[0].c_str() );
-  float y    = std::atof( words[1].c_str() );
-  float yerr = (words.size()>2) ? std::atof( words[2].c_str() ) : 0.;
+  float x    = std::atof( words[columnx].c_str() );
+  float y    = std::atof( words[columny].c_str() );
+  float yerr = (words.size()>2) ? std::atof( words[columnyerr].c_str() ) : 0.;
 
   int iPoint = this->graph()->GetN();
   this->graph()->SetPoint     ( iPoint, x   , y    );
@@ -414,7 +417,7 @@ void IScan::scaleDataPoints( float scale ) {
 
 
 
-void IScan::readFile( const std::string& name ) {
+void IScan::readFile( const std::string& name, int columnx, int columny, int columnyerr ) {
 
 
   std::string fileName = (name=="") ? getDataFileName(name_) : getDataFileName(name);
@@ -431,8 +434,6 @@ void IScan::readFile( const std::string& name ) {
   std::string line;
 
   if( ifs.good() ) {
-
-    bool addToGraph = true; // default: all points
 
     while( getline(ifs,line) ) {
 
@@ -475,7 +476,7 @@ void IScan::readFile( const std::string& name ) {
       std::string line_nocomm = (std::string)(AndCommon::splitString( line, "#" ))[0];
       std::vector<std::string> words_nocomm = AndCommon::splitString( line_nocomm, " " );
 
-      readDataLine( words_nocomm, addToGraph );
+      readDataLine( words_nocomm, columnx, columny, columnyerr );
 
 
     }  // while get lines
