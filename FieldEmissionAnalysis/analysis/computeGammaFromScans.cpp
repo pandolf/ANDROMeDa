@@ -46,9 +46,8 @@ int main( int argc, char* argv[] ) {
 
   std::vector< IVScanFN* > scans;
 
-  float imax = 30.;
+  float iMax = 5.;
   float vmax = 2200.;
-  bool scaleToMicroA = true;
   int nPointsSelect = 5;
   std::string legendName = "xxx";
 
@@ -59,8 +58,7 @@ int main( int argc, char* argv[] ) {
     scans.push_back( new IVScanFN("CNTArO2Etching_AG_d5_new.dat", -1., 1930., 2100.) );
 
     legendName = "No etching (as grown)";
-    imax = 7.;
-    scaleToMicroA = false;
+    iMax = 7.;
     nPointsSelect = -1; // all
 
   } else if( sampleName == "CNTArO2Etching_N1" ) {
@@ -75,9 +73,8 @@ int main( int argc, char* argv[] ) {
     //scans.push_back( new IVScanFN("CNTArO2Etching_N1_d5_20221130", -1.) );//, 450., 600.) );
 
     legendName = "Mild Ar/O_{2} etching";
-    imax = 7.;
+    iMax = 7.;
     vmax = 700.;
-    scaleToMicroA = false;
     nPointsSelect = -1; // all
 
   } else if( sampleName == "CNTetchedOLD_AGnew" ) {
@@ -120,9 +117,8 @@ int main( int argc, char* argv[] ) {
     //scans.push_back( new IVScanFN("CNTetchedOLD_Strongnew_d3_20230927.dat") );
 
     legendName = "Strong O_{2} etching";
-    imax = 350.;
+    iMax = 350.;
     vmax = 650.;
-    scaleToMicroA = false;
     nPointsSelect = -1; // all
 
     //scans.push_back( new IVScanFN("CNTetchedOLD_Strongnew_d3p6_20230519_drain.dat") );
@@ -137,9 +133,8 @@ int main( int argc, char* argv[] ) {
     scans.push_back( new IVScanFN("CNTetchedOLD_Strongnew_d5_20230927.dat"    , -1.) );
 
     legendName = "Strong O_{2} etching";
-    imax = 350.;
+    iMax = 350.;
     vmax = 650.;
-    scaleToMicroA = false;
     nPointsSelect = -1; // all
 
   } else if( sampleName == "CNTArO2Etching_N3new" ) {
@@ -154,6 +149,15 @@ int main( int argc, char* argv[] ) {
     scans.push_back( new IVScanFN("CNTArO2Etching_N1_d3_20221130", -1.) );
     scans.push_back( new IVScanFN("CNTArO2Etching_N1_d4_20221130", -1.) );
     scans.push_back( new IVScanFN("CNTArO2Etching_N1_d5_20221130", -1.) );
+
+  } else if( sampleName == "CNTArO2Etching_N1new_B_INRiM_3K" ) {
+
+    scans.push_back( new IVScanFN("CNTArO2Etching_N1new_B_INRiM_3Kplate_d0p5_t2p7_20231120_drain_90to125V_sweepR"      ,  1., 0.8, 3.) );
+    scans.push_back( new IVScanFN("CNTArO2Etching_N1new_B_INRiM_MICa_3Kplate_d1p0_IvsV_drain_140to215V_20231130_sweepR",  1., 0.8, 3.) );
+    scans.push_back( new IVScanFN("CNTArO2Etching_N1new_B_INRiM_MICa_3Kplate_d1p5_IvsV_drain_190to295V_20231207_sweepR",  1., 0.8, 3.) );
+    //scans.push_back( new IVScanFN("CNTArO2Etching_N1new_B_INRiM_MICa_3Kplate_d1p5_IvsV_anode_200to295V_20231206_sweepR", -1., 0.8, 3.) );
+
+    vmax = 250.;
 
   } else {
 
@@ -189,16 +193,16 @@ int main( int argc, char* argv[] ) {
 
   for( unsigned i=0; i<scans.size(); ++i ) {
 
-    scans[i]->setColor( colors[i] );
+    scans[i]->set_color( colors[i] );
 
     float this_d = scans[i]->d();
     if( this_d < d1 ) d1 = this_d; // find d1, ie the minimal d
 
-    TGraphErrors* graph   = scans[i]->graph();
+    TGraphErrors* graph   = scans[i]->reducedgraph();
     TGraphErrors* graphFN = scans[i]->graphFN();
 
     TGraphErrors* thisgraph = new TGraphErrors( *graph );
-    graphs_selected.push_back( thisgraph );
+    graphs_selected.push_back( scans[i]->reducedgraph() );
 
     TGraphErrors* thisgraphFN = new TGraphErrors( *graphFN );
     graphsFN_selected.push_back( thisgraphFN );
@@ -210,8 +214,6 @@ int main( int argc, char* argv[] ) {
 //for( unsigned i=0; i<scans.size(); ++i ) {
 
 //  std::cout << "    Scan: " << scans[i]->name() << std::endl;
-
-//  if( scaleToMicroA ) scans[i]->scaleDataPoints( 1E-6 ); // in muA
 
 
 //  TGraphErrors* graph = scans[i]->graph();
@@ -245,11 +247,13 @@ int main( int argc, char* argv[] ) {
 
 
 
-  int nsteps = 120;
-  float start_delta = -1.3; // in mm, relative to central d
-  float stepsize = 0.01; // in mm
+  int nsteps = 200;
+  //int nsteps = 120;
+  float start_delta = +0.5; // in mm, relative to central d
+  //float start_delta = -1.3; // in mm, relative to central d
+  float stepsize = 0.001; // in mm
 
-  float minChi2 = 99999.;
+  float minChi2 = 99999999.;
   float NDF = 0.;
   int step_minChi2 = -1;
   float gamma_comb_minChi2 = 0.;
@@ -263,15 +267,17 @@ int main( int argc, char* argv[] ) {
   TGraphErrors* gr_chi2red_vs_istep = new TGraphErrors(0);
   gr_chi2red_vs_istep->SetName("gr_chi2red_vs_istep");
 
+  //TGraphErrors* gr_gamma_vs_istep = new TGraphErrors(0);
+  //gr_gamma_vs_istep->SetName("gr_gamma_vs_istep");
+
 
   TCanvas* c3 = new TCanvas( "c3", "", 600, 600 );
 
-  TH2D* h2_axes_totfit = new TH2D( "axes_totfit", "", 10, 0., vmax/4., 10, 0., imax );
+  TH2D* h2_axes_totfit = new TH2D( "axes_totfit", "", 10, 0., 300., 10, 0., iMax );
   //h2_axes_totfit->SetXTitle( IVScanFN::xTitleFN().c_str() );
   //h2_axes_totfit->SetYTitle( IVScanFN::yTitleFN().c_str() );
   h2_axes_totfit->SetXTitle( "#DeltaV/d (V/mm)" );
-  if( scaleToMicroA ) h2_axes_totfit->SetYTitle( "I (#muA)" );
-  else                h2_axes_totfit->SetYTitle( "I (pA)" );
+  h2_axes_totfit->SetYTitle( "I (pA)" );
   h2_axes_totfit->GetXaxis()->SetNdivisions(505);
   h2_axes_totfit->GetYaxis()->SetNdivisions(505);
 
@@ -295,6 +301,7 @@ int main( int argc, char* argv[] ) {
     h2_axes_totfit->Draw();
 
     float this_delta_d = start_delta + (float)istep*stepsize;
+    std::cout << " deltad = " << this_delta_d << std::endl;
 
     UncCorr uc;
 
@@ -314,8 +321,10 @@ int main( int argc, char* argv[] ) {
     for( unsigned i=0; i<scans.size(); ++i ) {
 
       float this_d = scans[i]->d() + this_delta_d;
+      //std::cout << " d(" << i << ") = " << this_d << " mm" << std::endl;
 
       label_d->AddText( Form("d_{%d} = %.2f mm", i, this_d) );
+
 
       for( unsigned iPoint=0; iPoint<graphs_selected[i]->GetN(); ++iPoint ) {
 
@@ -331,7 +340,7 @@ int main( int argc, char* argv[] ) {
 
       }
 
-      TF1* f1_line = graphsFN_selected[i]->GetFunction( Form( "lineFN_%s", (scans[i]->name()).c_str()) );
+      TF1* f1_line = graphsFN_selected[i]->GetFunction( Form( "lineFN_%s", graphsFN_selected[i]->GetName() ) );
       
       float gamma_err_tot_uncorr, gamma_err_tot_corr;
       TString name_tstr(scans[i]->name() );
@@ -340,7 +349,7 @@ int main( int argc, char* argv[] ) {
 
       uc.addDataPoint(gamma, gamma_err_tot_uncorr, gamma_err_tot_corr);
 
-      gr_gamma_vs_istep[i]->SetPoint( gr_gamma_vs_istep[istep]->GetN(), d1 + this_delta_d, gamma );
+      //gr_gamma_vs_istep[i]->SetPoint( gr_gamma_vs_istep[istep]->GetN(), d1 + this_delta_d, gamma );
 
 
     } // for scans
@@ -354,9 +363,19 @@ int main( int argc, char* argv[] ) {
     AndCommon::findGraphRanges( gr_selected_totfit, xMin_totfit, xMax_totfit, yMin_totfit, yMax_totfit );
 
     f1_exp_totfit->SetRange( 0.9999*xMin_totfit, 1.00001*xMax_totfit );
-    f1_exp_totfit->SetParLimits( 1, 0., 10.);
-    f1_exp_totfit->SetParameter( 0, -30. );
-    f1_exp_totfit->SetParameter( 1, 0.2 );
+    //f1_exp_totfit->SetParLimits( 1, 0., 10.);
+    //f1_exp_totfit->SetParameter( 0, -30. );
+    //f1_exp_totfit->SetParameter( 1, 0.2 );
+    f1_exp_totfit->SetParameter( 0, -2.85687e+01 );
+    f1_exp_totfit->SetParameter( 1, 2.80401e-01 );
+    
+if( istep==84 ) {
+TFile* file = TFile::Open("test.root", "recreate");
+file->cd();
+gr_selected_totfit->Write();
+file->Close();
+//exit(1);
+}
 
     gr_selected_totfit->Fit(f1_exp_totfit, "R+");
     gr_selected_totfit->Draw( "P same" );
@@ -366,11 +385,13 @@ int main( int argc, char* argv[] ) {
     float thisChi2 = f1_exp_totfit->GetChisquare();
     NDF  = (float)(f1_exp_totfit->GetNDF());
 
+    std::cout << " -> Chi2: " << thisChi2 << std::endl;
+
     c3->cd();
     gPad->RedrawAxis();
     c3->SaveAs( Form("%s/steps/i_vs_e_step%d.pdf", outdir.c_str(), istep) );
 
-    if( thisChi2<0.00001 ) continue;
+    if( thisChi2/NDF<0.1 ) continue;
 
     gr_chi2_vs_istep   ->SetPoint( gr_chi2_vs_istep   ->GetN(), d1 + this_delta_d, thisChi2     );
     gr_chi2red_vs_istep->SetPoint( gr_chi2red_vs_istep->GetN(), d1 + this_delta_d, thisChi2/NDF );
@@ -404,6 +425,13 @@ int main( int argc, char* argv[] ) {
   } // steps
 
 
+  std::cout << "minChi2 : " <<  minChi2 << std::endl;
+  std::cout << "step_minChi2  : " <<  step_minChi2  << std::endl;
+  std::cout << "gamma_comb_minChi2  : " <<  gamma_comb_minChi2  << std::endl;
+  std::cout << "gamma_err_comb_minChi2  : " <<  gamma_err_comb_minChi2  << std::endl;
+  std::cout << "gamma_nocorr_minChi2  : " <<  gamma_nocorr_minChi2  << std::endl;
+  std::cout << "gamma_err_nocorr_minChi2 : " <<  gamma_err_nocorr_minChi2  << std::endl;
+
   TCanvas* c4 = new TCanvas( "c4", "", 600, 600 );
   c4->cd();
 
@@ -415,11 +443,11 @@ int main( int argc, char* argv[] ) {
   yMin4 *= 0.9;
   yMax4 *= 1.1;
 
-  TH2D* h2_axes4 = new TH2D( "axes4", "", 10, xMin4, xMax4, 10, 0., 150. );
-  h2_axes4->SetXTitle( "d_{1} (mm)" );
-  h2_axes4->SetYTitle( Form("#chi^{2} (NDF = %.0f)", NDF) );
-  //h2_axes4->SetYTitle( "#chi^{2} / NDF" );
-  h2_axes4->Draw();
+  TH2D* h2_axesChiSquare = new TH2D( "axesChiSquare", "", 10, xMin4, xMax4, 10, 0., NDF*100. );
+  h2_axesChiSquare->SetXTitle( "d_{1} (mm)" );
+  h2_axesChiSquare->SetYTitle( Form("#chi^{2} (NDF = %.0f)", NDF) );
+  //h2_axesChiSquare->SetYTitle( "#chi^{2} / NDF" );
+  h2_axesChiSquare->Draw();
 
   gr_chi2_vs_istep->SetMarkerStyle(20);
   gr_chi2_vs_istep->SetMarkerColor(kGray+3);
@@ -474,6 +502,29 @@ int main( int argc, char* argv[] ) {
   gPad->RedrawAxis();
 
   c4->SaveAs( Form("%s/chi2Scan.pdf", outdir.c_str()) );
+  c4->Clear();
+
+  TH2D* h2_axesChiSquareRed = new TH2D( "axesChiSquareRed", "", 10, xMin4, xMax4, 10, 0., 100. );
+  h2_axesChiSquareRed->SetXTitle( "d_{1} (mm)" );
+  h2_axesChiSquareRed->SetYTitle( Form("#chi^{2} / (NDF = %.0f)", NDF) );
+  //h2_axesChiSquareRed->SetYTitle( "#chi^{2} / NDF" );
+  h2_axesChiSquareRed->Draw();
+
+  gr_chi2red_vs_istep->SetMarkerStyle(20);
+  gr_chi2red_vs_istep->SetMarkerColor(kGray+3);
+  gr_chi2red_vs_istep->SetLineColor(kGray+3);
+  gr_chi2red_vs_istep->SetMarkerSize(1.1);
+
+  gr_chi2red_vs_istep->Draw("Psame");
+
+TFile* file2 = TFile::Open("test2.root", "recreate" );
+file2->cd();
+gr_chi2red_vs_istep->Write();
+file2->Close();
+
+  gPad->RedrawAxis();
+
+  c4->SaveAs( Form("%s/chi2redScan.pdf", outdir.c_str()) );
 
 
   std::cout << std::endl << std::endl;
@@ -488,10 +539,9 @@ int main( int argc, char* argv[] ) {
   TCanvas* c1 = new TCanvas( "c1", "", 600, 600 );
   c1->cd();
 
-  TH2D* h2_axes = new TH2D( "axes", "", 10, 0., vmax, 10, 0., imax );
+  TH2D* h2_axes = new TH2D( "axes", "", 10, 0., vmax, 10, 0., iMax );
   h2_axes->SetXTitle( "#DeltaV (V)" );
-  if( scaleToMicroA ) h2_axes->SetYTitle( "I (#muA)" );
-  else                h2_axes->SetYTitle( "I (pA)"   );
+  h2_axes->SetYTitle( "I (pA)"   );
   h2_axes->GetXaxis()->SetNdivisions(505);
   h2_axes->Draw();
 
@@ -529,7 +579,7 @@ int main( int argc, char* argv[] ) {
     if( yMaxFN_this > yMaxFN ) yMaxFN = yMaxFN_this;
 
 
-    TF1* f1_line = graphsFN_selected[i]->GetFunction( Form( "lineFN_%s", (scans[i]->name()).c_str() ) );
+    TF1* f1_line = graphsFN_selected[i]->GetFunction( Form( "lineFN_%s", graphsFN_selected[i]->GetName() ) );
     
     float gamma_err_tot_uncorr, gamma_err_tot_corr;
     float gamma = IVScanFN::get_gamma_and_err( gamma_err_tot_uncorr, gamma_err_tot_corr, f1_line->GetParameter(1), f1_line->GetParError(1), this_d, d_err_new );
