@@ -137,6 +137,43 @@ TGraphErrors* IVScanFN::graphFN( TGraphErrors* graph, float iMin, float iMax, in
 
 
 
+TGraphErrors* IVScanFN::reducedgraph() const {
+
+  TGraphErrors* graph = this->graph();
+
+  TGraphErrors* gr_reduced = new TGraphErrors(0);
+  gr_reduced->SetName( Form("red_%s", graph->GetName()) );
+
+  gr_reduced->SetMarkerStyle( graph->GetMarkerStyle() );
+  gr_reduced->SetMarkerSize ( graph->GetMarkerSize () );
+  gr_reduced->SetMarkerColor( graph->GetMarkerColor() );
+  gr_reduced->SetLineColor  ( graph->GetMarkerColor() );
+
+  for( unsigned iPoint=0; iPoint<graph->GetN(); ++iPoint ) {
+
+    double x,y,xerr,yerr;
+    graph->GetPoint( iPoint, x, y );
+
+    if( y>=iMin_ && y<iMax_ ) {
+
+      xerr = graph->GetErrorX( iPoint );
+      yerr = graph->GetErrorY( iPoint );
+
+      int iPoint_red = gr_reduced->GetN();
+
+      gr_reduced->SetPoint     ( iPoint_red, x, y );
+      gr_reduced->SetPointError( iPoint_red, xerr, yerr );
+     
+    } // if iMin/Max
+
+  } // for points
+
+  return gr_reduced;
+
+}
+
+      
+
 
 float IVScanFN::get_gamma_and_err( float& gamma_err_tot_uncorr, float& gamma_err_tot_corr, float derrcorr ) { // derrcorr is by default = -1
 
