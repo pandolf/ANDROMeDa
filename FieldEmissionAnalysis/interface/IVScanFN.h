@@ -27,13 +27,13 @@ class IVScanFN : public IVScan {
   //TF1* lineFN() const;
 
   float get_gamma_and_err( float& gamma_err_uncorr, float& gamma_err_corr, float d_errcorr=-1. );
-  static float get_gamma_and_err( float& gamma_err_uncorr, float& gamma_err_corr, float s, float s_err, float d, float d_errcorr=-1. );
+  float get_gamma_and_err( float& gamma_err_uncorr, float& gamma_err_corr, float s, float s_err, float d, float d_errcorr=-1. );
 
-  static float phi();
-  static float phi_err();
-  static float b();
-  static float d_err_uncorr();
-  static float d_err_corr();
+  float phi();
+  float phi_err();
+  float b();
+  float d_err_uncorr();
+  float d_err_corr();
 
   float iMin() const;
   float iMax() const;
