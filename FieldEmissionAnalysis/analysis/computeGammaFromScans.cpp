@@ -308,7 +308,7 @@ int main( int argc, char* argv[] ) {
       float gamma_err_tot_uncorr, gamma_err_tot_corr;
       TString name_tstr(scans[i]->name() );
       float derrcorr = ( name_tstr.Contains("20230927") ) ? 0.5 : -1.; // set 0.5 mm uncertainty on relative d because setup had bad parallax
-      float gamma = IVScanFN::get_gamma_and_err( gamma_err_tot_uncorr, gamma_err_tot_corr, f1_line->GetParameter(1), f1_line->GetParError(1), this_d, derrcorr );
+      float gamma = scans[i]->get_gamma_and_err( gamma_err_tot_uncorr, gamma_err_tot_corr, f1_line->GetParameter(1), f1_line->GetParError(1), this_d, derrcorr );
 
       uc.addDataPoint(gamma, gamma_err_tot_uncorr, gamma_err_tot_corr);
 
@@ -447,7 +447,7 @@ int main( int argc, char* argv[] ) {
   TPaveText* label_d_err = new TPaveText( 0.6, 0.2, 0.8, 0.3, "brNDC" );
   label_d_err->SetTextSize( 0.035 );
   label_d_err->SetFillColor(0);
-  label_d_err->AddText( Form("d_{1} = (%.2f #pm %.2f) mm", d1_minChi2, d_err_new) );
+  label_d_err->AddText( Form("d_{1} = (%.3f #pm %.3f) mm", d1_minChi2, d_err_new) );
   //label_d_err->AddText( Form("#sigma(d_{0}) = %.2f mm", d_err_new) );
   label_d_err->Draw("same");
 
@@ -531,16 +531,16 @@ int main( int argc, char* argv[] ) {
 
 
     float gamma_err_tot_uncorr, gamma_err_tot_corr;
-    float gamma = IVScanFN::get_gamma_and_err( gamma_err_tot_uncorr, gamma_err_tot_corr, f1_line->GetParameter(1), f1_line->GetParError(1), this_d, -1 );
+    float gamma = scans[i]->get_gamma_and_err( gamma_err_tot_uncorr, gamma_err_tot_corr, f1_line->GetParameter(1), f1_line->GetParError(1), this_d, -1 );
 
     float gamma_err_tot_uncorr_new, gamma_err_tot_corr_new;
-    float gamma_new = IVScanFN::get_gamma_and_err( gamma_err_tot_uncorr_new, gamma_err_tot_corr_new, f1_line->GetParameter(1), f1_line->GetParError(1), this_d, d_err_new );
+    float gamma_new = scans[i]->get_gamma_and_err( gamma_err_tot_uncorr_new, gamma_err_tot_corr_new, f1_line->GetParameter(1), f1_line->GetParError(1), this_d, d_err_new );
 
     std::cout << std::endl;
-    std::cout << "         Scan " << i << " (d = " << this_d << ")" << std::endl;
+    std::cout << "         Scan " << i << " (d = " << this_d << " mm)" << std::endl;
     std::cout << "         ";
-
     uc    .addDataPoint(gamma    , gamma_err_tot_uncorr    , gamma_err_tot_corr    );
+    std::cout << "         ";
     uc_new.addDataPoint(gamma_new, gamma_err_tot_uncorr_new, gamma_err_tot_corr_new);
 
     std::string thisText(Form(" & $%.0f \\pm %.0f \\pm %.0f$", gamma_new, gamma_err_tot_uncorr_new, gamma_err_tot_corr_new));
@@ -601,13 +601,13 @@ int main( int argc, char* argv[] ) {
   uc_new.combine( gamma_comb_new, gamma_err_comb_new );
   
   std::cout << std::endl << std::endl;
-  std::cout << "---------------------------------------------------" << std::endl;
+  std::cout << "------------------------------------------------------------------" << std::endl;
   std::cout << "  Found min chi2: " << minChi2 << " at step: " << step_minChi2 << std::endl;
   std::cout << "  Corresponding gamma: " << gamma_comb_minChi2 << " +/- " << gamma_err_comb_minChi2 << std::endl;
   std::cout << "  (No correlations) gamma: " << gamma_nocorr_minChi2 << " +/- " << gamma_err_nocorr_minChi2 << std::endl;
   std::cout << "  Old gamma: " << gamma_comb << " +/- " << gamma_err_comb << std::endl;
   std::cout << "  (Constraining d to chi2 scan) gamma: " << gamma_comb_new << " +/- " << gamma_err_comb_new << std::endl;
-  std::cout << "---------------------------------------------------" << std::endl;
+  std::cout << "------------------------------------------------------------------" << std::endl;
   std::cout << std::endl;
 
 
