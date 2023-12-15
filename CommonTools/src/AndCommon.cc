@@ -518,6 +518,8 @@ std::string AndCommon::cuteSampleName( const std::string& sampleName ) {
     cuteSampleName = "CNT mild etch";
   else if( sampleName == "CNTArO2Etching_N1new_B" ) 
     cuteSampleName = "CNT mild etch B";
+  else if( sampleName == "CNTArO2Etching_AsGrown" ) 
+    cuteSampleName = "CNT as grown";
     //cuteSampleName = "CNT mild Ar/O_{2} etching";
   
 
