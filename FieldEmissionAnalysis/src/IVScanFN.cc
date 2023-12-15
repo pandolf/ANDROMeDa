@@ -13,6 +13,9 @@
 
 
 
+
+
+
 IVScanFN::IVScanFN( const std::string& name, float scale, float iMin, float iMax ) : IVScan( name, scale ) {
 
   iMin_ = iMin;
@@ -235,18 +238,41 @@ float IVScanFN::b() {
 
 
 
-float IVScanFN::d_err_uncorr() {
+float IVScanFN::d_err_uncorr() {  // relative uncertainty on distance between scans, in mm
 
-  return 0.01; // relative uncertainty between scans, in mm
+  float d_err_uncorr = 0.01;
+
+  if( this->lab()=="INRiM" ) {
+
+    d_err_uncorr = 0.1; // uncertainty on glue = 0.01 mm summed in quadrature to uncertainty on sapphire thickness ~ 0.1 mm
+
+  } else {
+
+    d_err_uncorr = 0.01; // in TITAN uncertainty is precision of linear shifter
+
+  }
+
+  return d_err_uncorr; 
 
 }
 
 
 
-float IVScanFN::d_err_corr() {
+float IVScanFN::d_err_corr() {  // correlated uncertainty on d, ie uncertainty on d_0
 
-  return 0.1; // 0.1 for the syst on the position (linear shifter, see logbook_ANDROMeDa entry 24/01/22) plus 0.1 for the uncertainty on the length of the tubes
-  //return 0.3; // 0.1 for the syst on the position (linear shifter, see logbook_ANDROMeDa entry 24/01/22) plus 0.1 for the uncertainty on the length of the tubes
+  float d_err_corr = 0.1;
+
+  if( this->lab()=="INRiM" ) {
+
+    d_err_corr = 0.05; // 50 microns is the uncertainty on the CNT length, but maybe it doesn't play a role?
+
+  } else {
+
+    d_err_corr = 0.3; // 0.1 for the syst on the position (linear shifter, see logbook_ANDROMeDa entry 24/01/22) plus 0.1 for the uncertainty on the length of the tubes
+
+  }
+
+  return d_err_corr;
 
 }
 
