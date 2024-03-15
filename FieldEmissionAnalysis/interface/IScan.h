@@ -16,6 +16,7 @@ class IScan {
  public:
 
   IScan( const std::string& name, float scale=1. );
+  IScan( const IScan& scan );
 
   virtual ~IScan();
 
@@ -23,7 +24,7 @@ class IScan {
   virtual void readCommentLine( const std::vector< std::string >& words );
   virtual void readDataLine( const std::vector< std::string >& words, int columnx=0, int columny=1, int columnyerr=2 );
 
-  void scaleDataPoints( float scale = 1. );
+  void scaleDataPoints( float scale = 1. ); // multiply I by scale
 
   std::string name() const;
   std::string sampleName() const;
