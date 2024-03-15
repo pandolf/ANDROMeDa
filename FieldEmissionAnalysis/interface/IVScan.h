@@ -18,7 +18,11 @@ class IVScan : public IScan {
 
   IVScan( const std::string& name, float scale=1. );
 
+  IVScan( const IVScan& scan );
+
   virtual ~IVScan();
+
+  void add_deltaV( float deltaV ); // change data points V -> V + deltaV
 
   TGraphErrors* graph_vsE() const; // I vs deltaV/d = E (V/mm)
 
