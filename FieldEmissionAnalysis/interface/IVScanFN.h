@@ -15,6 +15,8 @@ class IVScanFN : public IVScan {
 
   IVScanFN( const std::string& name, float scale=1., float iMin=0., float iMax=1E9 );   //, float vMin = -99999., float vMax = 99999. );
 
+  IVScanFN( const IVScanFN& scan );
+
   ~IVScanFN();
 
   TGraphErrors* graphFN() const;
