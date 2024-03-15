@@ -49,6 +49,29 @@ IScan::IScan( const std::string& name, float scale ) {
 }
 
 
+
+IScan::IScan( const IScan& scan ) {
+
+  name_ = scan.name();
+
+  std::cout << "[IScan] Setting up new IScan with name: " << name_ << std::endl;
+
+  p_ = scan.p();
+  d_ = scan.d();
+  t_ = scan.t();
+  hv_ = scan.hv();
+  deltaV_ = scan.deltaV();
+  dz_ = scan.dz();
+  verr_ = scan.verr();
+  n_ = scan.n();
+  color_ = scan.color();
+
+  graph_ = new TGraphErrors( *(scan.graph()) );
+
+}
+
+
+
 IScan::~IScan() {
 
 //delete graph_;
