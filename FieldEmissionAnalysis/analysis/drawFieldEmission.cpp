@@ -68,16 +68,27 @@ IVScanFN analyzeFN( const std::string& name ) {
 
   float scale = -1.;
   float iMin = 0.5; // default: compute FN only between 0.5 pA
-  float iMax = 10.; //          and 10 pA
+  float iMax = 1.5; //          and 1.5 pA
 
   TString name_tstr(name);
   if( name_tstr.Contains("drain") ) scale = +1.;
 
+   if ( name_tstr.BeginsWith( "CNTArO2Etching_AsGrown_INRiM_MICa_3Kplate_d1p5_IvsV_anode" ) ) {
+    iMin = 0.5;
+    iMax = 1.0;
+  }
+
+
   IVScanFN ivs( name, scale, iMin, iMax );
 
-  if(ivs.d() > 1.1 ) {
-    ivs.set_iMin(0.8);
-    ivs.set_iMax(3.);
+  if( ivs.t() < 1. ) {
+    ivs.set_iMin( 5. );
+    ivs.set_iMax( 100. );
+  }
+
+  if( ivs.t() > 100. ) {
+    ivs.set_iMin( 0.5 );
+    ivs.set_iMax( 5. );
   }
 
 
@@ -122,9 +133,9 @@ IVScanFN analyzeFN( const std::string& name ) {
         xMin_iv = 170.;
         xMax_iv = 220.;
       }
-    } else if( ivs.sampleName()=="CNTArO2Etching_N1new_B" ) {
-      xMin_iv = 0.;
-      xMax_iv = 150.;
+   // } else if( ivs.sampleName()=="CNTArO2Etching_N1new_B" ) {
+   //   xMin_iv = 0.;
+   //   xMax_iv = 150.;
     }
 
     yMin_iv = -0.9999;
