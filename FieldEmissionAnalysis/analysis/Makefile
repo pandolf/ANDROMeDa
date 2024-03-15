@@ -37,6 +37,12 @@ drawTempStability: drawTempStability.cpp AndCommon.o IScan.o
 computeGammaFromScans: computeGammaFromScans.cpp AndCommon.o UncCorr.o IVScan.o IVScanFN.o
 	$(CC) -Wall $(INCLUDES) -o computeGammaFromScans computeGammaFromScans.cpp AndCommon.o UncCorr.o IScan.o IVScan.o IVScanFN.o $(ROOTFLAG) $(EXTRALIBS)
 
+computeGammaFromScans_deltaV: computeGammaFromScans_deltaV.cpp AndCommon.o UncCorr.o IVScan.o IVScanFN.o
+	$(CC) -Wall $(INCLUDES) -o computeGammaFromScans_deltaV computeGammaFromScans_deltaV.cpp AndCommon.o UncCorr.o IScan.o IVScan.o IVScanFN.o $(ROOTFLAG) $(EXTRALIBS)
+
+computeGammaFromScans_R: computeGammaFromScans_R.cpp AndCommon.o UncCorr.o IVScan.o IVScanFN.o
+	$(CC) -Wall $(INCLUDES) -o computeGammaFromScans_R computeGammaFromScans_R.cpp AndCommon.o UncCorr.o IScan.o IVScan.o IVScanFN.o $(ROOTFLAG) $(EXTRALIBS)
+
 testUncCorr: testUncCorr.cpp AndCommon.o UncCorr.o
 	$(CC) -Wall $(INCLUDES) -o testUncCorr testUncCorr.cpp AndCommon.o UncCorr.o $(ROOTFLAG) $(EXTRALIBS)
 
