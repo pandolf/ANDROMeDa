@@ -239,6 +239,7 @@ IVScanFN analyzeFN( const std::string& name ) {
   pd_text->Draw("same");
 
 
+  // test per git
   gr_fn->SetMarkerStyle(20);
   gr_fn->SetMarkerSize(1.5);
   gr_fn->SetMarkerColor(kGray+3);
