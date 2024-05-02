@@ -43,7 +43,7 @@ int main(int argc, char* argv[]){
   //impostazioni grafiche
   float magnifying = 1; //per avere numeri in carica più comodi (sono in E-6 sennò)
   float offset     = 0; //per allungare il range di disegno permesso wrt var_min/var_max
-  if      (strcmp(choice,"amp"   )==0){ magnifying = 1e+1; offset = 0.1;}
+  if      (strcmp(choice,"amp"   )==0){ magnifying = 1e+0; offset = 0.1;}
   else if (strcmp(choice,"charge")==0){ magnifying = 1e+6; offset = 5  ;}
 
   //variabili per l'istogramma
