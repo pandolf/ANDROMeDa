@@ -7,7 +7,7 @@
 #include "TTree.h"
 #include "TString.h"
 #include "TMath.h"
-#include "pshape_functions.h"
+#include "../interface/pshape_functions.h"
 
 int main(int argc, char* argv[]){
 

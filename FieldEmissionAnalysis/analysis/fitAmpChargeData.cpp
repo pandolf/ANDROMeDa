@@ -11,8 +11,8 @@
 #include "TH2D.h"
 #include "TMath.h"
 #include "TAxis.h"
-#include "pshape_functions.h"
-#include "graphics.h"
+#include "../interface/pshape_functions.h"
+#include "../interface/graphics.h"
 
 //variabili da modificare di volta in volta: range_min, range_max, fit_min, fit_max, nbins
 

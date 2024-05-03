@@ -12,9 +12,9 @@
 #include "TMath.h"
 #include "TAxis.h"
 
-#include "pshape_functions.h"
-#include "graphics.h"
-#include "CD_plot_details.h"
+#include "../interface/pshape_functions.h"
+#include "../interface/graphics.h"
+#include "../interface/CD_plot_details.h"
 
 void Input_Param_Ctrls(int argc, char* argv[]);
 int Voltage_Initialization(int CD_number, int voltage[]);
