@@ -24,6 +24,14 @@ IVScanFN::IVScanFN( const std::string& name, float scale, float iMin, float iMax
 }
 
 
+IVScanFN::IVScanFN( const IVScanFN& scan ) : IVScan(scan) {
+
+  iMin_ = scan.iMin();
+  iMax_ = scan.iMax();
+
+}
+
+
 IVScanFN::~IVScanFN() {
 
 }
@@ -218,14 +226,14 @@ float IVScanFN::get_gamma_and_err( float& gamma_err_tot_uncorr, float& gamma_err
 
 float IVScanFN::phi() {
 
-  return 4.7; // in eV
+  return 4.4; // in eV
 
 }
 
 
 float IVScanFN::phi_err() {
 
-  return 0.1; // in eV
+  return 0.05; // in eV
 
 }
 
@@ -244,7 +252,7 @@ float IVScanFN::d_err_uncorr() {  // relative uncertainty on distance between sc
 
   if( this->lab()=="INRiM" ) {
 
-    d_err_uncorr = 0.1; // uncertainty on glue = 0.01 mm summed in quadrature to uncertainty on sapphire thickness ~ 0.1 mm
+    d_err_uncorr = 0.05; // uncertainty on glue = 0.01 mm summed in quadrature to uncertainty on sapphire thickness ~ 0.1 mm
 
   } else {
 
