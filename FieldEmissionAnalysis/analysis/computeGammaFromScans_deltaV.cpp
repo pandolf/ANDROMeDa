@@ -169,6 +169,7 @@ int main( int argc, char* argv[] ) {
   if( legendName == "xxx" ) legendName = sampleName;
 
 
+
   std::string outdir("plots/GammaScans_deltaV/"+sampleName);
   system( Form("mkdir -p %s/steps", outdir.c_str()) );
 
@@ -181,27 +182,10 @@ int main( int argc, char* argv[] ) {
   style->cd();
 
   std::vector<int> colors = AndCommon::colors();
+  for( unsigned i=0; i<scans.size(); ++ i ) scans[i]->set_color(colors[i]);
 
-
-  std::vector< TGraphErrors* > graphs_selected;
-  std::vector< TGraphErrors* > graphsFN_selected;
-
-  float d1 = 99999.;
 
   std::cout << " -> Selecting points from graphs..." << std::endl << std::endl;
-
-
-  for( unsigned i=0; i<scans.size(); ++i ) {
-
-    scans[i]->set_color( colors[i] );
-
-    float this_d = scans[i]->d();
-    if( this_d < d1 ) d1 = this_d; // find d1, ie the minimal d
-
-    graphs_selected.push_back( scans[i]->reducedgraph() );
-    graphsFN_selected.push_back( scans[i]->graphFN() );
-
-  }
 
 
 
@@ -413,8 +397,7 @@ int main( int argc, char* argv[] ) {
 
   float deltaV_minChi2 = start_deltaV + (float)step_minChi2*stepsize;
 
-  float d1_minChi2 = deltaV_minChi2;
-  TLine* line_min = new TLine( d1_minChi2, 0., d1_minChi2, minChi2 );
+  TLine* line_min = new TLine( deltaV_minChi2, 0., deltaV_minChi2, minChi2 );
   line_min->SetLineColor(46);
   line_min->SetLineWidth(2);
   line_min->Draw("same");
@@ -446,7 +429,7 @@ int main( int argc, char* argv[] ) {
   TPaveText* label_d_err = new TPaveText( 0.6, 0.2, 0.8, 0.3, "brNDC" );
   label_d_err->SetTextSize( 0.035 );
   label_d_err->SetFillColor(0);
-  label_d_err->AddText( Form("d_{1} = (%.3f #pm %.3f) mm", d1_minChi2, d_err_new) );
+  label_d_err->AddText( Form("d_{1} = (%.3f #pm %.3f) mm", deltaV_minChi2, d_err_new) );
   //label_d_err->AddText( Form("#sigma(d_{0}) = %.2f mm", d_err_new) );
   //label_d_err->Draw("same");
 
@@ -457,7 +440,7 @@ int main( int argc, char* argv[] ) {
   c4->Clear();
 
   TH2D* h2_axesChiSquareRed = new TH2D( "axesChiSquareRed", "", 10, xMin4, xMax4, 10, 0., 100. );
-  h2_axesChiSquareRed->SetXTitle( "-DeltaV (V)" );
+  h2_axesChiSquareRed->SetXTitle( "-#DeltaV (V)" );
   h2_axesChiSquareRed->SetYTitle( Form("#chi^{2} / (NDF = %.0f)", NDF) );
   h2_axesChiSquareRed->Draw();
 
@@ -498,6 +481,8 @@ int main( int argc, char* argv[] ) {
   float yMaxFN = -999.;
 
 
+  std::vector<TGraphErrors*> graphFN_optimal;
+
   std::string textableline = legendName;
 
   UncCorr uc, uc_new;
@@ -506,48 +491,57 @@ int main( int argc, char* argv[] ) {
   std::cout << std::endl << "##############################################################################" << std::endl << std::endl;
   std::cout << "         At optimal point:" << std::endl;
 
-//// plot I vs V and FN plots with optimal d values
-//// plus update gamma measurement with new d uncertainty
-//for( unsigned i=0; i<scans.size(); ++i ) {
+  // plot I vs V and FN plots with optimal d values
+  // plus update gamma measurement with new d uncertainty
+  for( unsigned i=0; i<scans.size(); ++i ) {
 
-//  float this_d = scans[i]->d() + deltaV_minChi2;
+    float this_d = scans[i]->d();
 
-//  c1->cd();
-//  graphs_selected[i]->Draw("P same" );
+    IVScanFN scan_optimal(*(scans[i]));
+    scan_optimal.add_deltaV( -deltaV_minChi2 );
 
-//  legend->AddEntry( graphs_selected[i], Form("d = %.2f mm", this_d), "P" );
+    TGraphErrors* graph_optimal = scan_optimal.reducedgraph();
+    TGraphErrors* graphFN_optimal_this = scan_optimal.graphFN();
+ 
+    c1->cd();
+    graph_optimal->Draw("P same" );
 
-//  float xMinFN_this, xMaxFN_this, yMinFN_this, yMaxFN_this;
-//  AndCommon::findGraphRanges( graphsFN_selected[i], xMinFN_this, xMaxFN_this, yMinFN_this, yMaxFN_this );
+    legend->AddEntry( graph_optimal, Form("d = %.2f mm", this_d), "P" );
 
-//  TF1* f1_line = graphsFN_selected[i]->GetFunction( Form( "lineFN_%s", graphsFN_selected[i]->GetName() ) );
-//  f1_line->SetRange( 0.98*xMinFN_this, 1.02*xMaxFN_this );
+    float xMinFN_this, xMaxFN_this, yMinFN_this, yMaxFN_this;
+    AndCommon::findGraphRanges( graphFN_optimal_this, xMinFN_this, xMaxFN_this, yMinFN_this, yMaxFN_this );
 
-//  if( xMinFN_this < xMinFN ) xMinFN = xMinFN_this;
-//  if( yMinFN_this < yMinFN ) yMinFN = yMinFN_this;
-//  if( xMaxFN_this > xMaxFN ) xMaxFN = xMaxFN_this;
-//  if( yMaxFN_this > yMaxFN ) yMaxFN = yMaxFN_this;
+    TF1* f1_line = graphFN_optimal_this->GetFunction( Form( "lineFN_%s", graphFN_optimal_this->GetName() ) );
+    f1_line->SetRange( 0.98*xMinFN_this, 1.02*xMaxFN_this );
+
+    if( xMinFN_this < xMinFN ) xMinFN = xMinFN_this;
+    if( yMinFN_this < yMinFN ) yMinFN = yMinFN_this;
+    if( xMaxFN_this > xMaxFN ) xMaxFN = xMaxFN_this;
+    if( yMaxFN_this > yMaxFN ) yMaxFN = yMaxFN_this;
+
+    graphFN_optimal.push_back(graphFN_optimal_this);
+
+    float gamma_err_tot_uncorr, gamma_err_tot_corr;
+    float gamma = scans[i]->get_gamma_and_err( gamma_err_tot_uncorr, gamma_err_tot_corr, f1_line->GetParameter(1), f1_line->GetParError(1), this_d, -1 );
+
+    float gamma_err_tot_uncorr_new, gamma_err_tot_corr_new;
+    float gamma_new = scans[i]->get_gamma_and_err( gamma_err_tot_uncorr_new, gamma_err_tot_corr_new, f1_line->GetParameter(1), f1_line->GetParError(1), this_d, d_err_new );
+
+    std::cout << std::endl;
+    std::cout << "         Scan " << i << " (d = " << this_d << " mm)" << std::endl;
+    std::cout << "         ";
+    uc    .addDataPoint(gamma    , gamma_err_tot_uncorr    , gamma_err_tot_corr    );
+    std::cout << "         ";
+    uc_new.addDataPoint(gamma_new, gamma_err_tot_uncorr_new, gamma_err_tot_corr_new);
+
+    std::string thisText(Form(" & $%.0f \\pm %.0f \\pm %.0f$", gamma_new, gamma_err_tot_uncorr_new, gamma_err_tot_corr_new));
+    textableline = textableline + thisText;
+
+  } // for scans
+
+  std::cout << std::endl << "##############################################################################" << std::endl << std::endl;
 
 
-//  float gamma_err_tot_uncorr, gamma_err_tot_corr;
-//  float gamma = scans[i]->get_gamma_and_err( gamma_err_tot_uncorr, gamma_err_tot_corr, f1_line->GetParameter(1), f1_line->GetParError(1), this_d, -1 );
-
-//  float gamma_err_tot_uncorr_new, gamma_err_tot_corr_new;
-//  float gamma_new = scans[i]->get_gamma_and_err( gamma_err_tot_uncorr_new, gamma_err_tot_corr_new, f1_line->GetParameter(1), f1_line->GetParError(1), this_d, d_err_new );
-
-//  std::cout << std::endl;
-//  std::cout << "         Scan " << i << " (d = " << this_d << " mm)" << std::endl;
-//  std::cout << "         ";
-//  uc    .addDataPoint(gamma    , gamma_err_tot_uncorr    , gamma_err_tot_corr    );
-//  std::cout << "         ";
-//  uc_new.addDataPoint(gamma_new, gamma_err_tot_uncorr_new, gamma_err_tot_corr_new);
-
-//  std::string thisText(Form(" & $%.0f \\pm %.0f \\pm %.0f$", gamma_new, gamma_err_tot_uncorr_new, gamma_err_tot_corr_new));
-//  textableline = textableline + thisText;
-
-//} // for scans
-
-//std::cout << std::endl << "##############################################################################" << std::endl << std::endl;
 
   TCanvas* c2 = new TCanvas( "c2", "", 600, 600 );
   c2->cd();
@@ -560,15 +554,11 @@ int main( int argc, char* argv[] ) {
   h2_axesFN->GetYaxis()->SetNdivisions(505);
   h2_axesFN->Draw();
 
+  for(unsigned i=0; i<scans.size(); ++i ) graphFN_optimal[i]->Draw("P same" );
+
   legend->Draw("same");
-
-  for( unsigned i=0; i<graphsFN_selected.size(); ++i ) {
-    graphsFN_selected[i]->Draw("P same");
-  }
-
-
-  c2->cd();
   gPad->RedrawAxis();
+
   c2->SaveAs( Form("%s/fn.pdf", outdir.c_str()) );
 
   c1->cd();
@@ -580,8 +570,8 @@ int main( int argc, char* argv[] ) {
   TCanvas* c1_gamma = new TCanvas( "c1_gamma", "", 600, 600 );
   c1_gamma->cd();
 
-  TH2D* h2_axes_gamma = new TH2D( "axes_gamma", "", 10, xMin4, xMax4, 10, 0., 40000. );
-  h2_axes_gamma->SetXTitle( "d_{1} (mm)" );
+  TH2D* h2_axes_gamma = new TH2D( "axes_gamma", "", 10, xMin4, xMax4, 10, 0., 80000. );
+  h2_axes_gamma->SetXTitle( "#DeltaV (V)" );
   h2_axes_gamma->SetYTitle( "#gamma" );
   h2_axes_gamma->Draw();
 
