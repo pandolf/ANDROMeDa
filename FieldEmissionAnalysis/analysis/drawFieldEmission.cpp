@@ -81,7 +81,15 @@ IVScanFN analyzeFN( const std::string& name ) {
 
   IVScanFN ivs( name, scale, iMin, iMax );
 
+//if( ivs.t() < 1. ) {
+//  ivs.set_iMin( 5. );
+//  ivs.set_iMax( 100. );
+//}
 
+//if( ivs.t() > 100. ) {
+//  ivs.set_iMin( 0.5 );
+//  ivs.set_iMax( 5. );
+//}
 
 
   // ***** FIRST STEP: draw I vs V
@@ -231,6 +239,7 @@ IVScanFN analyzeFN( const std::string& name ) {
   pd_text->Draw("same");
 
 
+  // test per git
   gr_fn->SetMarkerStyle(20);
   gr_fn->SetMarkerSize(1.5);
   gr_fn->SetMarkerColor(kGray+3);

@@ -28,6 +28,7 @@ compareFN: compareFN.cpp AndCommon.o IScan.o IVScan.o IVScanFN.o
 compareScans: compareScans.cpp AndCommon.o IScan.o IVScan.o IVScanFN.o
 	$(CC) -Wall $(INCLUDES) -o compareScans compareScans.cpp AndCommon.o IScan.o IVScan.o IVScanFN.o $(ROOTFLAG) $(EXTRALIBS)
 
+
 drawTimeStability: drawTimeStability.cpp AndCommon.o IScan.o
 	$(CC) -Wall $(INCLUDES) -o drawTimeStability drawTimeStability.cpp AndCommon.o IScan.o $(ROOTFLAG) $(EXTRALIBS)
 
@@ -48,8 +49,22 @@ testUncCorr: testUncCorr.cpp AndCommon.o UncCorr.o
 
 
 
+makeTree: makeTree.cpp pshape_functions.h
+	$(CC) -Wall $(INCLUDES) -o makeTree makeTree.cpp $(ROOTFLAG) $(EXTRALIBS) 
+
+fitAmpChargeData: fitAmpChargeData.cpp pshape_functions.h graphics.h
+	$(CC) -Wall $(INCLUDES) -o fitAmpChargeData fitAmpChargeData.cpp $(ROOTFLAG) $(EXTRALIBS) 
+
+drawAmpChargeFinalFits_all: drawAmpChargeFinalFits_all.cpp pshape_functions.h CD_plot_details.h
+	$(CC) -Wall $(INCLUDES) -o drawAmpChargeFinalFits_all drawAmpChargeFinalFits_all.cpp $(ROOTFLAG) $(EXTRALIBS)
+
+drawAmpChargeFinalFits_single: drawAmpChargeFinalFits_single.cpp pshape_functions.h CD_plot_details.h
+	$(CC) -Wall $(INCLUDES) -o drawAmpChargeFinalFits_single drawAmpChargeFinalFits_single.cpp $(ROOTFLAG) $(EXTRALIBS) 
 
 
+graphics.h: ../interface/graphics.h
+CD_plot_details.h: ../interface/graphics.h
+pshape_functions.h: ../interface/graphics.h
 
 AndCommon.o: ../../CommonTools/src/AndCommon.cc 
 	$(CC) -Wall $(INCLUDES) -c ../../CommonTools/src/AndCommon.cc $(ROOTFLAG) $(EXTRALIBS)

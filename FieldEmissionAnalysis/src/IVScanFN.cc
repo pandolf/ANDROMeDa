@@ -95,6 +95,8 @@ TGraphErrors* IVScanFN::graphFN( const IScan* scan, float iMin, float iMax ) {
 
 TGraphErrors* IVScanFN::graphFN( TGraphErrors* graph, float iMin, float iMax, int n, float verr ) {
 
+  std::cout << "[IVScanFN::graphFN] Getting FN graph with iMin = " << iMin << " pA and iMax = " << iMax << " pA" << std::endl; 
+
   int color = graph->GetMarkerColor();
 
   TGraphErrors* graphFN = new TGraphErrors(0);
