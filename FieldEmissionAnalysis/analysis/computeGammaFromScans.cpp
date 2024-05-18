@@ -153,9 +153,34 @@ int main( int argc, char* argv[] ) {
     scans.push_back( new IVScanFN("CNTArO2Etching_N1new_B_INRiM_3Kplate_d0p5_t2p7_20231120_drain_90to125V_sweepR"      ,  1., 0.8, 3.) );
     scans.push_back( new IVScanFN("CNTArO2Etching_N1new_B_INRiM_MICa_3Kplate_d1p0_IvsV_drain_140to215V_20231130_sweepR",  1., 0.8, 3.) );
     scans.push_back( new IVScanFN("CNTArO2Etching_N1new_B_INRiM_MICa_3Kplate_d1p5_IvsV_drain_190to295V_20231207_sweepR",  1., 0.8, 3.) );
+
+    //scans.push_back( new IVScanFN("CNTArO2Etching_N1new_B_INRiM_3Kplate_d0p5_t2p7_20231120_drain_90to125V_sweepR"      ,  1., 0.5, 1.5) );
+    //scans.push_back( new IVScanFN("CNTArO2Etching_N1new_B_INRiM_MICa_3Kplate_d1p0_IvsV_drain_140to215V_20231130_sweepR",  1., 0.5, 1.5) );
+    //scans.push_back( new IVScanFN("CNTArO2Etching_N1new_B_INRiM_MICa_3Kplate_d1p5_IvsV_drain_190to295V_20231207_sweepR",  1., 0.5, 1.5) );
+
     //scans.push_back( new IVScanFN("CNTArO2Etching_N1new_B_INRiM_MICa_3Kplate_d1p5_IvsV_anode_200to295V_20231206_sweepR", -1., 0.8, 3.) );
 
     vmax = 250.;
+
+  } else if( sampleName == "CNTArO2Etching_AsGrown_INRiM_3K" ) {
+
+    scans.push_back( new IVScanFN("CNTArO2Etching_AsGrown_INRiM_MICa_3Kplate_d0p5_IvsV_anode_90to150V_20231213_2_sweepA", -1., 0.5, 1.5) );
+    scans.push_back( new IVScanFN("CNTArO2Etching_AsGrown_INRiM_MICa_3Kplate_d1p0_IvsV_anode_150to240V_20231220_sweepR" , -1., 0.5, 1.5) );
+    scans.push_back( new IVScanFN("CNTArO2Etching_AsGrown_INRiM_MICa_3Kplate_d1p5_IvsV_anode_290to410V_20240123_sweepR" , -1., 0.5, 1.0) );
+
+    vmax = 250.;
+
+//} else if( sampleName == "CNTArO2Etching_Strongnew_INRiM_3K" ) {
+
+//  scans.push_back( new IVScanFN("CNTArO2Etching_Strongnew_INRiM_MICb_3Kplate_d0p5_IvsV_drain_0to90V_20231206_sweepR"   , +1., 0.8, 3.) );
+//  scans.push_back( new IVScanFN("CNTArO2Etching_Strongnew_INRiM_MICb_3Kplate_d1p0_IvsV_anode_70to170V_20231221_sweepR" , -1., 0.8, 3.) );
+
+//  vmax = 250.;
+
+  } else if( sampleName == "CNTArO2Etching_Strongnew_INRiM_3K" ) {
+
+    scans.push_back( new IVScanFN("CNTArO2Etching_Strongnew_INRiM_MICb_3Kplate_d0p5_IvsV_anode_20to95V_20231207_sweepR"  , -1., 0.5, 1.5) );
+    scans.push_back( new IVScanFN("CNTArO2Etching_Strongnew_INRiM_MICb_3Kplate_d1p0_IvsV_anode_70to170V_20231221_sweepR" , -1., 0.8, 3.0) );
 
   } else {
 
@@ -203,11 +228,23 @@ int main( int argc, char* argv[] ) {
 
 
 
-  int nsteps = 200;
-  //int nsteps = 120;
-  float start_delta = +0.5; // in mm, relative to central d
-  //float start_delta = -1.3; // in mm, relative to central d
-  float stepsize = 0.001; // in mm
+  int nsteps = 120;
+  float start_delta = 0.; // in mm, relative to central d
+  float stepsize = 0.005; // in mm
+
+  if( sampleName == "CNTArO2Etching_N1new_B_INRiM_3K" ) {
+    nsteps = 200;
+    start_delta = +0.5;
+    stepsize = 0.001;
+  } else if( sampleName == "CNTArO2Etching_AsGrown_INRiM_3K" ) {
+    nsteps = 200;
+    start_delta = +0.2;
+    stepsize = 0.001;
+  } else if( sampleName == "CNTArO2Etching_Strongnew_INRiM_3K" ) {
+    nsteps = 100;
+    start_delta = -0.01;
+    stepsize = 0.001;
+  }
 
   float minChi2 = 99999999.;
   float NDF = 0.;
@@ -401,7 +438,11 @@ int main( int argc, char* argv[] ) {
   yMin4 *= 0.9;
   yMax4 *= 1.1;
 
-  TH2D* h2_axesChiSquare = new TH2D( "axesChiSquare", "", 10, xMin4, xMax4, 10, 0., NDF*100. );
+  
+  float scaleChi2 = 10.;
+  if( sampleName=="CNTArO2Etching_N1new_B_INRiM_3K" ) scaleChi2 = 100.;
+
+  TH2D* h2_axesChiSquare = new TH2D( "axesChiSquare", "", 10, xMin4, xMax4, 10, 0., NDF*scaleChi2 );
   h2_axesChiSquare->SetXTitle( "d_{1} (mm)" );
   h2_axesChiSquare->SetYTitle( Form("#chi^{2} (NDF = %.0f)", NDF) );
   h2_axesChiSquare->Draw();
@@ -457,7 +498,7 @@ int main( int argc, char* argv[] ) {
   c4->SaveAs( Form("%s/chi2Scan.pdf", outdir.c_str()) );
   c4->Clear();
 
-  TH2D* h2_axesChiSquareRed = new TH2D( "axesChiSquareRed", "", 10, xMin4, xMax4, 10, 0., 100. );
+  TH2D* h2_axesChiSquareRed = new TH2D( "axesChiSquareRed", "", 10, xMin4, xMax4, 10, 0., scaleChi2 );
   h2_axesChiSquareRed->SetXTitle( "d_{1} (mm)" );
   h2_axesChiSquareRed->SetYTitle( Form("#chi^{2} / (NDF = %.0f)", NDF) );
   h2_axesChiSquareRed->Draw();
@@ -466,6 +507,11 @@ int main( int argc, char* argv[] ) {
   gr_chi2red_vs_istep->SetMarkerColor(kGray+3);
   gr_chi2red_vs_istep->SetLineColor(kGray+3);
   gr_chi2red_vs_istep->SetMarkerSize(1.1);
+
+  TLine* lineOne_chi2Red = new TLine( xMin4, 1., xMax4, 1. );
+  lineOne_chi2Red->SetLineColor(kGray+3);
+  lineOne_chi2Red->SetLineWidth(1);
+  lineOne_chi2Red->Draw("same"); 
 
   gr_chi2red_vs_istep->Draw("Psame");
 
