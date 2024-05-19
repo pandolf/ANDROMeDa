@@ -28,6 +28,13 @@ compareFN: compareFN.cpp AndCommon.o IScan.o IVScan.o IVScanFN.o
 compareScans: compareScans.cpp AndCommon.o IScan.o IVScan.o IVScanFN.o
 	$(CC) -Wall $(INCLUDES) -o compareScans compareScans.cpp AndCommon.o IScan.o IVScan.o IVScanFN.o $(ROOTFLAG) $(EXTRALIBS)
 
+makeRawTree: makeRawTree.cpp AndCommon.o
+	$(CC) -Wall $(INCLUDES) -o makeRawTree makeRawTree.cpp AndCommon.o $(ROOTFLAG) $(EXTRALIBS)
+
+checkPulseShape: checkPulseShape.cpp 
+	$(CC) -Wall $(INCLUDES) -o checkPulseShape checkPulseShape.cpp $(ROOTFLAG) $(EXTRALIBS)
+
+
 
 drawTimeStability: drawTimeStability.cpp AndCommon.o IScan.o
 	$(CC) -Wall $(INCLUDES) -o drawTimeStability drawTimeStability.cpp AndCommon.o IScan.o $(ROOTFLAG) $(EXTRALIBS)
