@@ -54,6 +54,8 @@ IScan::IScan( const IScan& scan ) {
 
   name_ = scan.name();
 
+  sampleName_ = scan.sampleName();
+
   std::cout << "[IScan] Setting up new IScan with name: " << name_ << std::endl;
 
   p_ = scan.p();
