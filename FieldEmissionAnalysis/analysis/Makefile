@@ -22,6 +22,9 @@ drawFieldEmission_forTES: drawFieldEmission_forTES.cpp AndCommon.o IScan.o IVSca
 drawCompareAnodeAndDrain: drawCompareAnodeAndDrain.cpp AndCommon.o IScan.o IVScan.o
 	$(CC) -Wall $(INCLUDES) -o drawCompareAnodeAndDrain drawCompareAnodeAndDrain.cpp AndCommon.o IScan.o IVScan.o $(ROOTFLAG) $(EXTRALIBS)
 
+drawFN_forPaper: drawFN_forPaper.cpp AndCommon.o IScan.o IVScan.o IVScanFN.o
+	$(CC) -Wall $(INCLUDES) -o drawFN_forPaper drawFN_forPaper.cpp AndCommon.o IScan.o IVScan.o IVScanFN.o $(ROOTFLAG) $(EXTRALIBS)
+
 compareFN: compareFN.cpp AndCommon.o IScan.o IVScan.o IVScanFN.o
 	$(CC) -Wall $(INCLUDES) -o compareFN compareFN.cpp AndCommon.o IScan.o IVScan.o IVScanFN.o $(ROOTFLAG) $(EXTRALIBS)
 
@@ -31,8 +34,17 @@ compareScans: compareScans.cpp AndCommon.o IScan.o IVScan.o IVScanFN.o
 makeRawTree: makeRawTree.cpp AndCommon.o
 	$(CC) -Wall $(INCLUDES) -o makeRawTree makeRawTree.cpp AndCommon.o $(ROOTFLAG) $(EXTRALIBS)
 
+makeTreeLite: makeTreeLite.cpp AndCommon.o
+	$(CC) -Wall $(INCLUDES) -o makeTreeLite makeTreeLite.cpp AndCommon.o $(ROOTFLAG) $(EXTRALIBS)
+
 checkPulseShape: checkPulseShape.cpp 
 	$(CC) -Wall $(INCLUDES) -o checkPulseShape checkPulseShape.cpp $(ROOTFLAG) $(EXTRALIBS)
+
+checkPulseShape_old: checkPulseShape_old.cpp 
+	$(CC) -Wall $(INCLUDES) -o checkPulseShape_old checkPulseShape_old.cpp $(ROOTFLAG) $(EXTRALIBS)
+
+computeRate: computeRate.cpp 
+	$(CC) -Wall $(INCLUDES) -o computeRate computeRate.cpp $(ROOTFLAG) $(EXTRALIBS)
 
 
 
