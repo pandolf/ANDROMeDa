@@ -169,7 +169,7 @@ TGraph* AndCommon::getGraphFromFile( const std::string& fileName ) {
 
     while( getline(ifs,line) ) {
 
-      std::vector<std::string> words = splitString(",");
+      std::vector<std::string> words = splitString(line, ",");
 
       if( read ) {
 
@@ -515,13 +515,13 @@ std::string AndCommon::cuteSampleName( const std::string& sampleName ) {
   std::string cuteSampleName = "CNT Sample";
 
   if( sampleName == "CNTArO2Etching_N1new" ) 
-    cuteSampleName = "CNT mild etch";
+    cuteSampleName = "Ar/O_{2} mild etch";
   else if( sampleName == "CNTArO2Etching_N1new_B" || sampleName == "CNTArO2Etching_N1new_b" ) 
-    cuteSampleName = "CNT mild etch B";
+    cuteSampleName = "Mild etch B";
   else if( sampleName == "CNTArO2Etching_AsGrown" ) 
-    cuteSampleName = "CNT as grown";
+    cuteSampleName = "As grown";
   else if( sampleName == "CNTArO2Etching_Strongnew" ) 
-    cuteSampleName = "CNT strong etch";
+    cuteSampleName = "O_{2} strong etch";
     //cuteSampleName = "CNT mild Ar/O_{2} etching";
   
 
