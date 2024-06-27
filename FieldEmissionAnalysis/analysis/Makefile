@@ -25,6 +25,12 @@ drawCompareAnodeAndDrain: drawCompareAnodeAndDrain.cpp AndCommon.o IScan.o IVSca
 drawFN_forPaper: drawFN_forPaper.cpp AndCommon.o IScan.o IVScan.o IVScanFN.o
 	$(CC) -Wall $(INCLUDES) -o drawFN_forPaper drawFN_forPaper.cpp AndCommon.o IScan.o IVScan.o IVScanFN.o $(ROOTFLAG) $(EXTRALIBS)
 
+drawGamma_vs_r: drawGamma_vs_r.cpp AndCommon.o 
+	$(CC) -Wall $(INCLUDES) -o drawGamma_vs_r drawGamma_vs_r.cpp AndCommon.o $(ROOTFLAG) $(EXTRALIBS)
+
+drawRadiusHisto: drawRadiusHisto.cpp AndCommon.o 
+	$(CC) -Wall $(INCLUDES) -o drawRadiusHisto drawRadiusHisto.cpp AndCommon.o $(ROOTFLAG) $(EXTRALIBS)
+
 compareFN: compareFN.cpp AndCommon.o IScan.o IVScan.o IVScanFN.o
 	$(CC) -Wall $(INCLUDES) -o compareFN compareFN.cpp AndCommon.o IScan.o IVScan.o IVScanFN.o $(ROOTFLAG) $(EXTRALIBS)
 
