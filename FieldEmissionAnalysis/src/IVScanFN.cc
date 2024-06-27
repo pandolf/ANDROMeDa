@@ -188,13 +188,13 @@ TGraphErrors* IVScanFN::reducedgraph() const {
       
 
 
-float IVScanFN::get_gamma_and_err( float& gamma_err_tot_uncorr, float& gamma_err_tot_corr, float derrcorr ) { // derrcorr is by default = -1
+float IVScanFN::get_gamma_and_err_corr( float& gamma_err_tot_uncorr, float& gamma_err_tot_corr, float derrcorr ) { // derrcorr is by default = -1
 
   TGraphErrors* graphFN = this->graphFN();
 
   TF1* f1_line = graphFN->GetFunction(Form("lineFN_%s", graphFN->GetName()));
 
-  float gamma = this->get_gamma_and_err( gamma_err_tot_uncorr, gamma_err_tot_corr, f1_line->GetParameter(1), f1_line->GetParError(1), this->d(), this->d_err_corr() );
+  float gamma = this->get_gamma_and_err_corr( gamma_err_tot_uncorr, gamma_err_tot_corr, f1_line->GetParameter(1), f1_line->GetParError(1), this->d(), this->d_err_corr() );
 
   return gamma;
 
@@ -203,7 +203,7 @@ float IVScanFN::get_gamma_and_err( float& gamma_err_tot_uncorr, float& gamma_err
 
   
 
-float IVScanFN::get_gamma_and_err( float& gamma_err_tot_uncorr, float& gamma_err_tot_corr, float s, float s_err, float d, float derrcorr ) { // derrcorr is by default = -1
+float IVScanFN::get_gamma_and_err_corr( float& gamma_err_tot_uncorr, float& gamma_err_tot_corr, float s, float s_err, float d, float derrcorr ) { // derrcorr is by default = -1
 
   float gamma = -b()*phi()*sqrt(phi())*d/s;
 
@@ -219,6 +219,49 @@ float IVScanFN::get_gamma_and_err( float& gamma_err_tot_uncorr, float& gamma_err
 
   float gamma_err2_tot_corr = gamma_err2_d_corr + gamma_err2_phi;
   gamma_err_tot_corr = sqrt( gamma_err2_tot_corr );
+
+  return gamma;
+
+}
+
+
+
+float IVScanFN::get_gamma_and_err( float& gamma_err_tot ) {
+
+  TGraphErrors* graphFN = this->graphFN();
+
+  TF1* f1_line = graphFN->GetFunction(Form("lineFN_%s", graphFN->GetName()));
+
+  float gamma = this->get_gamma_and_err( gamma_err_tot, f1_line->GetParameter(1), f1_line->GetParError(1), this->d(), this->d_err_corr() );
+
+  return gamma;
+
+}
+
+
+
+float IVScanFN::get_gamma_and_err( float& gamma_err_tot, float s, float s_err, float d, float d_err ) { 
+
+  float gamma = -b()*phi()*sqrt(phi())*d/s;
+
+  float gamma_err2_phi = (9./4.)*gamma*gamma/(phi()*phi())*phi_err()*phi_err();
+  float gamma_err2_d   = gamma*gamma/(d*d)*d_err*d_err; 
+  float gamma_err2_s   = gamma*gamma/(s*s)*s_err*s_err;
+  
+  std::cout << "d: " << d << " +/- " << d_err << std::endl;
+  std::cout << "phi: " << phi() << " +/- " << phi_err() << std::endl;
+  std::cout << "s: " << s << " +/- " << s_err << std::endl;
+
+  std::cout << "gamma_err_phi: " <<  sqrt(gamma_err2_phi) << std::endl;
+  std::cout << "gamma_err_d  : " <<  sqrt(gamma_err2_d  ) << std::endl;
+  std::cout << "gamma_err_s  : " <<  sqrt(gamma_err2_s  ) << std::endl;
+
+  std::cout << "gamma_err_phi/gamma: " <<  sqrt(gamma_err2_phi)/gamma << std::endl;
+  std::cout << "gamma_err_d  /gamma: " <<  sqrt(gamma_err2_d  )/gamma << std::endl;
+  std::cout << "gamma_err_s  /gamma: " <<  sqrt(gamma_err2_s  )/gamma << std::endl;
+
+  float gamma_err2_tot = gamma_err2_phi + gamma_err2_d + gamma_err2_s;
+  gamma_err_tot = sqrt( gamma_err2_tot );
 
   return gamma;
 
