@@ -35,6 +35,8 @@ class IScan {
   float pressure() const;
   float p() const;
   float d() const;
+  float h() const;
+  float h_err() const;
   float t() const;
   std::string hv() const;
   float deltaV() const;
@@ -81,6 +83,8 @@ class IScan {
 
   float p_;        // pressure in mbar
   float d_;        // distance between anode and cathode in mm
+  float h_;        // nanotube lenght in mm
+  float h_err_;    // uncertainty on nanotube lenght in mm
   float t_;        // temperature in K
   std::string hv_; // power supply model
   float dz_;       // uncertainty on delta(d) in mm
@@ -89,6 +93,7 @@ class IScan {
   int n_;          // number of points used in current measurement
   int color_;      // color of graphs
 
+  void set_h_and_herr ();
   std::string getDataFileName( const std::string& dataName );
 
 };
