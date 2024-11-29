@@ -30,14 +30,15 @@ class IVScanFN : public IVScan {
 
   float get_gamma_and_err( float& gamma_err_tot );
   float get_gamma_and_err( float& gamma_err_tot, float s, float s_err, float d, float d_err );
-  float get_gamma_and_err_corr( float& gamma_err_uncorr, float& gamma_err_corr, float d_errcorr=-1. );
-  float get_gamma_and_err_corr( float& gamma_err_uncorr, float& gamma_err_corr, float s, float s_err, float d, float d_errcorr=-1. );
+  //float get_gamma_and_err_corr( float& gamma_err_uncorr, float& gamma_err_corr, float d_errcorr=-1. );
+  //float get_gamma_and_err_corr( float& gamma_err_uncorr, float& gamma_err_corr, float s, float s_err, float d, float d_errcorr=-1. );
 
   float phi();
   float phi_err();
   float b();
-  float d_err_uncorr();
-  float d_err_corr();
+  float d_err();
+  //float d_err_uncorr();
+  //float d_err_corr();
 
   float iMin() const;
   float iMax() const;
