@@ -232,8 +232,7 @@ float IVScanFN::get_gamma_and_err( float& gamma_err_tot ) {
 
   TF1* f1_line = graphFN->GetFunction(Form("lineFN_%s", graphFN->GetName()));
 
-  float d = this->d();
-  float d_err = this->d_err();
+  float d, d_err;
 
   if( d == 0.5 && this->lab()=="INRiM") {
 
@@ -251,7 +250,13 @@ float IVScanFN::get_gamma_and_err( float& gamma_err_tot ) {
     d = sapphire_grease + scasso - glue - silicon - nanotubes;
     d_err = sqrt( sapphire_grease_err*sapphire_grease_err + scasso_err*scasso_err + glue_err*glue_err + silicon_err*silicon_err + nanotubes_err*nanotubes_err );
 
-  }
+  } else {
+
+    d = this->d() - this->h();
+    d_err = sqrt( this->d_err()*this->d_err() + this->h_err()*this->h_err() );
+
+  } 
+
 
   float gamma = this->get_gamma_and_err( gamma_err_tot, f1_line->GetParameter(1), f1_line->GetParError(1), d, d_err );
 
