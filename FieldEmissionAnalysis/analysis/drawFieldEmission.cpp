@@ -12,6 +12,7 @@
 #include "TF1.h"
 #include "TFile.h"
 #include "TGaxis.h"
+#include "TLegend.h"
 
 
 
@@ -35,6 +36,7 @@ int main( int argc, char* argv[] ) {
   style->SetTitleYOffset(1.15);
   style->cd();
 
+  std::vector<int> colors = AndCommon::colors();
 
   std::vector< IVScanFN > scans;
 
@@ -50,11 +52,49 @@ int main( int argc, char* argv[] ) {
     scans.push_back( analyzeFN( "CNTArO2Etching_N1new_d5_20230517_drain" ) );
     scans.push_back( analyzeFN( "CNTArO2Etching_N1new_d4_20230517_drain" ) );
 
+  } else if( name == "paper" ) {
+
+    scans.push_back( analyzeFN( "CNTArO2Etching_AsGrown_INRiM_MICa_3Kplate_d0p5_IvsV_anode_90to150V_20231213_2_sweepA" ) );
+    scans.push_back( analyzeFN( "CNTArO2Etching_N1new_INRiM_MICb_3Kplate_d0p5_IvsV_drain_0to88V_20231130_sweepR" ) );
+    scans.push_back( analyzeFN( "CNTArO2Etching_Strongnew_INRiM_MICb_3Kplate_d0p5_IvsV_anode_20to95V_20231207_sweepR" ) );
+
   } else {
 
     scans.push_back( analyzeFN(name) );
 
   }
+
+
+  if( scans.size()>1 ) { // plot them together (hardwired numbers just for paper for the moment)
+
+    TCanvas* c1 = new TCanvas( "c1", "", 600, 600 );
+    c1->cd();
+
+    TH2D* h2_axes = new TH2D( "axes_all", "", 10, 0., 200., 10, -1., 3. );
+    h2_axes->SetXTitle( "V_{cnt} (V)" );
+    h2_axes->SetYTitle( "I_{cnt} (pA)" );
+    h2_axes->Draw("");
+
+    TLegend* legend = new TLegend( 0.2, 0.55, 0.6, 0.9 );
+    legend->SetFillColor(0);
+    legend->SetTextSize(0.04);
+    legend->Draw("same");
+
+    for( unsigned i=0; i<scans.size(); ++i ) {
+      scans[i].set_color(colors[i]);
+      scans[i].graph()->SetLineColor(kBlack);
+      scans[i].graph()->Draw("P same");
+      //scans[i].reducedgraph()->Draw("P same");
+      legend->AddEntry( scans[i].graph(), AndCommon::cuteSampleName(scans[i].sampleName()).c_str(), "PL" );
+    }
+
+
+    gPad->RedrawAxis();
+
+    c1->SaveAs( Form("iv_%s.pdf", name.c_str()) );
+
+  }
+
     
 
   return 0;
@@ -175,6 +215,8 @@ IVScanFN analyzeFN( const std::string& name ) {
 
   c1->SaveAs( Form("%s/iv.pdf", outdir.c_str()) );
 
+  delete h2_axes;
+
   c1->Clear();
   c1->SetLogy();
 
@@ -188,6 +230,7 @@ IVScanFN analyzeFN( const std::string& name ) {
 
   c1->SaveAs( Form("%s/iv_log.pdf", outdir.c_str()) );
 
+  delete h2_axes_log;
 
 
 
@@ -200,7 +243,7 @@ IVScanFN analyzeFN( const std::string& name ) {
   TCanvas* c1_fn = new TCanvas( "c1_fn", "", 600, 600 );
   c1_fn->Clear();
 
-  TGaxis::SetMaxDigits(2);
+  //TGaxis::SetMaxDigits(2);
 
 
   float xMinFN, xMaxFN, yMinFN, yMaxFN;
@@ -218,11 +261,15 @@ IVScanFN analyzeFN( const std::string& name ) {
   TH2D* h2_axes_fn = new TH2D( "axes_fn", "", 10, xMinFN, xMaxFN, 10, yMinFN, yMaxFN );
   h2_axes_fn->SetXTitle( IVScanFN::xTitleFN().c_str() );
   h2_axes_fn->SetYTitle( IVScanFN::yTitleFN().c_str() );
+  h2_axes_fn->GetXaxis()->SetMaxDigits(2);
+  h2_axes_fn->GetYaxis()->SetMaxDigits(2);
   h2_axes_fn->Draw();
 
-  float gamma_err_corr, gamma_err_ucorr;
-  float gamma = ivs.get_gamma_and_err( gamma_err_corr, gamma_err_ucorr );
-  float gamma_err = sqrt( gamma_err_corr*gamma_err_corr + gamma_err_ucorr*gamma_err_ucorr );
+  float gamma_err;
+std::cout << "before" << std::endl;
+  float gamma = ivs.get_gamma_and_err( gamma_err );
+std::cout << "after" << std::endl;
+  //float gamma_err = sqrt( gamma_err_corr*gamma_err_corr + gamma_err_ucorr*gamma_err_ucorr );
 
   TPaveText* gamma_text = new TPaveText( 0.6, 0.8, 0.85, 0.9, "brNDC" );
   gamma_text->SetFillColor(0);
@@ -280,6 +327,8 @@ IVScanFN analyzeFN( const std::string& name ) {
 
   c1_fn->SaveAs( Form("%s/fn.pdf", outdir.c_str()) );
 
+  delete h2_axes_fn;
+
   std::cout << std::endl;
   std::cout << "---------------------------------" << std::endl;
   std::cout << " gamma: " << gamma << " +/- " << gamma_err  << std::endl;
@@ -301,6 +350,8 @@ IVScanFN analyzeFN( const std::string& name ) {
   std::cout << "-> Stored graphs in: " << graphsFileName << std::endl;
 
 
+  delete c1;
+  delete c1_fn;
 
   return ivs;
 
