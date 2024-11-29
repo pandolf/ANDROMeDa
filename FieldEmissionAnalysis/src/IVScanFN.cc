@@ -188,41 +188,41 @@ TGraphErrors* IVScanFN::reducedgraph() const {
       
 
 
-float IVScanFN::get_gamma_and_err_corr( float& gamma_err_tot_uncorr, float& gamma_err_tot_corr, float derrcorr ) { // derrcorr is by default = -1
-
-  TGraphErrors* graphFN = this->graphFN();
-
-  TF1* f1_line = graphFN->GetFunction(Form("lineFN_%s", graphFN->GetName()));
-
-  float gamma = this->get_gamma_and_err_corr( gamma_err_tot_uncorr, gamma_err_tot_corr, f1_line->GetParameter(1), f1_line->GetParError(1), this->d(), this->d_err_corr() );
-
-  return gamma;
-
-}
-
-
-  
-
-float IVScanFN::get_gamma_and_err_corr( float& gamma_err_tot_uncorr, float& gamma_err_tot_corr, float s, float s_err, float d, float derrcorr ) { // derrcorr is by default = -1
-
-  float gamma = -b()*phi()*sqrt(phi())*d/s;
-
-  if( derrcorr<0. ) derrcorr = d_err_corr();
-
-  float gamma_err2_phi      = (9./4.)*gamma*gamma/(phi()*phi())*phi_err()*phi_err();
-  float gamma_err2_d_corr   = gamma*gamma/(d*d)*derrcorr*derrcorr; 
-  float gamma_err2_d_uncorr = gamma*gamma/(d*d)*d_err_uncorr()*d_err_uncorr(); 
-  float gamma_err2_s        = gamma*gamma/(s*s)*s_err*s_err;
-
-  float gamma_err2_tot_uncorr = gamma_err2_d_uncorr + gamma_err2_s;
-  gamma_err_tot_uncorr = sqrt( gamma_err2_tot_uncorr );
-
-  float gamma_err2_tot_corr = gamma_err2_d_corr + gamma_err2_phi;
-  gamma_err_tot_corr = sqrt( gamma_err2_tot_corr );
-
-  return gamma;
-
-}
+//float IVScanFN::get_gamma_and_err_corr( float& gamma_err_tot_uncorr, float& gamma_err_tot_corr, float derrcorr ) { // derrcorr is by default = -1
+//
+//  TGraphErrors* graphFN = this->graphFN();
+//
+//  TF1* f1_line = graphFN->GetFunction(Form("lineFN_%s", graphFN->GetName()));
+//
+//  float gamma = this->get_gamma_and_err_corr( gamma_err_tot_uncorr, gamma_err_tot_corr, f1_line->GetParameter(1), f1_line->GetParError(1), this->d(), this->d_err_corr() );
+//
+//  return gamma;
+//
+//}
+//
+//
+//  
+//
+//float IVScanFN::get_gamma_and_err_corr( float& gamma_err_tot_uncorr, float& gamma_err_tot_corr, float s, float s_err, float d, float derrcorr ) { // derrcorr is by default = -1
+//
+//  float gamma = -b()*phi()*sqrt(phi())*d/s;
+//
+//  if( derrcorr<0. ) derrcorr = d_err_corr();
+//
+//  float gamma_err2_phi      = (9./4.)*gamma*gamma/(phi()*phi())*phi_err()*phi_err();
+//  float gamma_err2_d_corr   = gamma*gamma/(d*d)*derrcorr*derrcorr; 
+//  float gamma_err2_d_uncorr = gamma*gamma/(d*d)*d_err_uncorr()*d_err_uncorr(); 
+//  float gamma_err2_s        = gamma*gamma/(s*s)*s_err*s_err;
+//
+//  float gamma_err2_tot_uncorr = gamma_err2_d_uncorr + gamma_err2_s;
+//  gamma_err_tot_uncorr = sqrt( gamma_err2_tot_uncorr );
+//
+//  float gamma_err2_tot_corr = gamma_err2_d_corr + gamma_err2_phi;
+//  gamma_err_tot_corr = sqrt( gamma_err2_tot_corr );
+//
+//  return gamma;
+//
+//}
 
 
 
@@ -232,7 +232,28 @@ float IVScanFN::get_gamma_and_err( float& gamma_err_tot ) {
 
   TF1* f1_line = graphFN->GetFunction(Form("lineFN_%s", graphFN->GetName()));
 
-  float gamma = this->get_gamma_and_err( gamma_err_tot, f1_line->GetParameter(1), f1_line->GetParError(1), this->d(), this->d_err_corr() );
+  float d = this->d();
+  float d_err = this->d_err();
+
+  if( d == 0.5 && this->lab()=="INRiM") {
+
+    float sapphire_grease = 0.5345;
+    float sapphire_grease_err = 0.008;
+    float scasso = 0.73;
+    float scasso_err = 0.01;
+    float glue = 0.0355;
+    float glue_err = 0.015;
+    float silicon = 0.500;
+    float silicon_err = 0.025;
+    float nanotubes = this->h();
+    float nanotubes_err = this->h_err();
+
+    d = sapphire_grease + scasso - glue - silicon - nanotubes;
+    d_err = sqrt( sapphire_grease_err*sapphire_grease_err + scasso_err*scasso_err + glue_err*glue_err + silicon_err*silicon_err + nanotubes_err*nanotubes_err );
+
+  }
+
+  float gamma = this->get_gamma_and_err( gamma_err_tot, f1_line->GetParameter(1), f1_line->GetParError(1), d, d_err );
 
   return gamma;
 
@@ -271,7 +292,16 @@ float IVScanFN::get_gamma_and_err( float& gamma_err_tot, float s, float s_err, f
 
 float IVScanFN::phi() {
 
-  return 4.4; // in eV
+  float phi = 4.5;
+
+  if( this->sampleName() == "CNTArO2Etching_AsGrown" )
+    phi = 4.26;
+  else if( this->sampleName() == "CNTArO2Etching_N1new" )
+    phi = 4.48;
+  else if( this->sampleName() == "CNTArO2Etching_Strongnew" )
+    phi = 4.53;
+
+  return phi;
 
 }
 
@@ -291,43 +321,67 @@ float IVScanFN::b() {
 
 
 
-float IVScanFN::d_err_uncorr() {  // relative uncertainty on distance between scans, in mm
+float IVScanFN::d_err() {  // uncertainty on d
 
-  float d_err_uncorr = 0.01;
+  float d_err = 0.1;
 
   if( this->lab()=="INRiM" ) {
 
-    d_err_uncorr = 0.05; // uncertainty on glue = 0.01 mm summed in quadrature to uncertainty on sapphire thickness ~ 0.1 mm
+    d_err = 0.05; // 50 microns is the uncertainty on the CNT length, but maybe it doesn't play a role?
 
   } else {
 
-    d_err_uncorr = 0.01; // in TITAN uncertainty is precision of linear shifter
+    d_err = 0.3; // 0.1 for the syst on the position (linear shifter, see logbook_ANDROMeDa entry 24/01/22) plus 0.1 for the uncertainty on the length of the tubes
 
   }
 
-  return d_err_uncorr; 
+  return d_err;
 
 }
 
 
-
-float IVScanFN::d_err_corr() {  // correlated uncertainty on d, ie uncertainty on d_0
-
-  float d_err_corr = 0.1;
-
-  if( this->lab()=="INRiM" ) {
-
-    d_err_corr = 0.05; // 50 microns is the uncertainty on the CNT length, but maybe it doesn't play a role?
-
-  } else {
-
-    d_err_corr = 0.3; // 0.1 for the syst on the position (linear shifter, see logbook_ANDROMeDa entry 24/01/22) plus 0.1 for the uncertainty on the length of the tubes
-
-  }
-
-  return d_err_corr;
-
-}
+//float IVScanFN::d_err_uncorr() {  // relative uncertainty on distance between scans, in mm
+//
+//  float d_err_uncorr = 0.01;
+//
+//  if( this->lab()=="INRiM" ) {
+//
+//    if( this->sampleName() == "CNTArO2Etching_AsGrown" )
+//      d_err_uncorr = 0.032; // as taken from excel file "misure di distanze"
+//    else if( this->sampleName() == "CNTArO2Etching_N1new" )
+//      d_err_uncorr = 0.032; // as taken from excel file "misure di distanze"
+//    else if( this->sampleName() == "CNTArO2Etching_Strongnew" )
+//      d_err_uncorr = 0.046; // as taken from excel file "misure di distanze"
+//
+//  } else {
+//
+//    d_err_uncorr = 0.01; // in TITAN uncertainty is precision of linear shifter
+//
+//  }
+//
+//  return d_err_uncorr; 
+//
+//}
+//
+//
+//
+//float IVScanFN::d_err_corr() {  // correlated uncertainty on d, ie uncertainty on d_0
+//
+//  float d_err_corr = 0.1;
+//
+//  if( this->lab()=="INRiM" ) {
+//
+//    d_err_corr = 0.05; // 50 microns is the uncertainty on the CNT length, but maybe it doesn't play a role?
+//
+//  } else {
+//
+//    d_err_corr = 0.3; // 0.1 for the syst on the position (linear shifter, see logbook_ANDROMeDa entry 24/01/22) plus 0.1 for the uncertainty on the length of the tubes
+//
+//  }
+//
+//  return d_err_corr;
+//
+//}
 
 
   
