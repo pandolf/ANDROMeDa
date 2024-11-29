@@ -44,6 +44,8 @@ IScan::IScan( const std::string& name, float scale ) {
   int columnyerr = 2;
   readFile( getDataFileName(name_), columnx, columny, columnyerr );
 
+  set_h_and_herr();
+
   if( scale!=1 ) scaleDataPoints( scale );
 
 }
@@ -67,6 +69,8 @@ IScan::IScan( const IScan& scan ) {
   verr_ = scan.verr();
   n_ = scan.n();
   color_ = scan.color();
+
+  set_h_and_herr();
 
   graph_ = new TGraphErrors( *(scan.graph()) );
 
@@ -180,6 +184,20 @@ float IScan::p() const {
 float IScan::d() const {
 
   return d_;
+
+}
+
+
+float IScan::h() const {
+
+  return h_;
+
+}
+
+
+float IScan::h_err() const {
+
+  return h_err_;
 
 }
 
@@ -324,8 +342,40 @@ void IScan::set_color( int color ) {
 }
 
 
+void IScan::set_h_and_herr() { // this function is private
 
+  if( sampleName_ == "CNTArO2Etching_AsGrown" ) {
+
+    h_ = 0.3248718;
+    h_err_ = 0.03057308;
+
+  } else if( sampleName_ == "CNTArO2Etching_N1new" ) {
+
+    h_ = 0.3713333;
+    h_err_ = 0.02756568;
+
+  } else if( sampleName_ == "CNTArO2Etching_Strongnew" ) {
+
+    h_ = 0.1203583;
+    h_err_ = 0.03173205;
+
+  } else if( sampleName_ == "PECVD_FE_INRIM_001" ) {
+
+    h_ = 0.023;
+    h_err_ = 0.05;
+
+  } else { // default (do we need a default?)
+
+    h_ = 0.200;
+    h_err_ = 0.050;
+    std::cout << "WARNING! Sample name does not have a pre-defined nanotube length! Setting default 0.200 +/- 0.050 mm!" << std::endl;
+
+  }
+
+  std::cout << "-> Nanotube length: " << h_ << " +/- " << h_err_ << " mm" << std::endl;
   
+}
+
 
 std::string IScan::getDataFileName( const std::string& dataName ) {
 
