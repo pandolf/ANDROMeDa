@@ -29,9 +29,11 @@ class IVScanFN : public IVScan {
   //TF1* lineFN() const;
 
   float get_gamma_and_err( float& gamma_err_tot );
-  float get_gamma_and_err( float& gamma_err_tot, float s, float s_err, float d, float d_err );
+  float get_gamma_and_err( float& gamma_err_tot, float s, float s_err, float d = -1., float d_err = -1. );
   //float get_gamma_and_err_corr( float& gamma_err_uncorr, float& gamma_err_corr, float d_errcorr=-1. );
   //float get_gamma_and_err_corr( float& gamma_err_uncorr, float& gamma_err_corr, float s, float s_err, float d, float d_errcorr=-1. );
+
+  void get_d_fromMeas( float& d, float& d_err );
 
   float phi();
   float phi_err();

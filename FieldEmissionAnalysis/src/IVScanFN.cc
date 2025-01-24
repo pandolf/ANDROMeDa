@@ -232,23 +232,11 @@ float IVScanFN::get_gamma_and_err( float& gamma_err_tot ) {
 
   TF1* f1_line = graphFN->GetFunction(Form("lineFN_%s", graphFN->GetName()));
 
-  float d, d_err;
+  float d(-1.), d_err(0.);
 
-  if( d == 0.5 && this->lab()=="INRiM") {
+  if( this->d() == 0.5 && this->lab()=="INRiM") {
 
-    float sapphire_grease = 0.5345;
-    float sapphire_grease_err = 0.008;
-    float scasso = 0.73;
-    float scasso_err = 0.01;
-    float glue = 0.0355;
-    float glue_err = 0.015;
-    float silicon = 0.500;
-    float silicon_err = 0.025;
-    float nanotubes = this->h();
-    float nanotubes_err = this->h_err();
-
-    d = sapphire_grease + scasso - glue - silicon - nanotubes;
-    d_err = sqrt( sapphire_grease_err*sapphire_grease_err + scasso_err*scasso_err + glue_err*glue_err + silicon_err*silicon_err + nanotubes_err*nanotubes_err );
+    get_d_fromMeas( d, d_err );
 
   } else {
 
@@ -267,6 +255,8 @@ float IVScanFN::get_gamma_and_err( float& gamma_err_tot ) {
 
 
 float IVScanFN::get_gamma_and_err( float& gamma_err_tot, float s, float s_err, float d, float d_err ) { 
+
+  if( d<0. ) get_d_fromMeas( d, d_err );
 
   float gamma = -b()*phi()*sqrt(phi())*d/s;
 
@@ -290,6 +280,26 @@ float IVScanFN::get_gamma_and_err( float& gamma_err_tot, float s, float s_err, f
   gamma_err_tot = sqrt( gamma_err2_tot );
 
   return gamma;
+
+}
+
+
+void IVScanFN::get_d_fromMeas( float& d, float& d_err ) {  // from benedetta's measurements
+
+  float sapphire_grease = 0.5345;
+  float sapphire_grease_err = 0.008;
+  float scasso = 0.73;
+  float scasso_err = 0.01;
+  float glue = 0.0355;
+  float glue_err = 0.015;
+  float silicon = 0.500;
+  float silicon_err = 0.025;
+  float nanotubes = this->h();
+  float nanotubes_err = this->h_err();
+
+  std::cout << sapphire_grease << " + " << scasso << " - " << glue << " - " << silicon << " - " << nanotubes << std::endl;
+  d = sapphire_grease + scasso - glue - silicon - nanotubes;
+  d_err = sqrt( sapphire_grease_err*sapphire_grease_err + scasso_err*scasso_err + glue_err*glue_err + silicon_err*silicon_err + nanotubes_err*nanotubes_err );
 
 }
 
