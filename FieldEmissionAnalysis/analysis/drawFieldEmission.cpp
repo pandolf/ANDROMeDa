@@ -108,28 +108,33 @@ IVScanFN analyzeFN( const std::string& name ) {
 
   float scale = -1.;
   float iMin = 0.5; // default: compute FN only between 0.5 pA
-  float iMax = 1.5; //          and 1.5 pA
+  float iMax = 7.; //          and 1.5 pA
+  //float iMin = 0.5; // default: compute FN only between 0.5 pA
+  //float iMax = 1.5; //          and 1.5 pA
 
   TString name_tstr(name);
   if( name_tstr.Contains("drain") ) scale = +1.;
 
-   if ( name_tstr.BeginsWith( "CNTArO2Etching_AsGrown_INRiM_MICa_3Kplate_d1p5_IvsV_anode" ) ) {
+  if ( name_tstr.BeginsWith( "CNTArO2Etching_AsGrown_INRiM_MICa_3Kplate_d1p5_IvsV_anode" ) ) {
     iMin = 0.5;
     iMax = 1.0;
+  } else if ( name_tstr.BeginsWith( "PECVD_FE_INRIM_001_MICa_3Kplate_d0p5_IvsV_anode_from235Vto275V_18022024_post_conditioning" ) ) {
+    iMin = 2.;
+    iMax = 7.;
+  } else if ( name_tstr.BeginsWith( "CNTArO2Etching_Strongnew_INRiM_MICb_3Kplate_d0p5_IvsV_anode_20to95V_20231207_sweepA" ) ) {
+    iMin = 2.5;
+    iMax = 7.;
+  } else if ( name_tstr.BeginsWith( "CNTArO2Etching_Strongnew_INRiM_MICb_3Kplate_d0p5_IvsV_anode_20to95V_20231207_sweepR" ) ) {
+    iMin = 0.5;
+    iMax = 1.5;
   }
 
 
   IVScanFN ivs( name, scale, iMin, iMax );
 
-//if( ivs.t() < 1. ) {
-//  ivs.set_iMin( 5. );
-//  ivs.set_iMax( 100. );
-//}
+//if( name_tstr.BeginsWith( "PECVD_FE_INRIM_001_MICa_3Kplate_d0p5_IvsV_anode_from235Vto275V_18022024_post_conditioning" ) )
+//  ivs.set_n(0);
 
-//if( ivs.t() > 100. ) {
-//  ivs.set_iMin( 0.5 );
-//  ivs.set_iMax( 5. );
-//}
 
 
   // ***** FIRST STEP: draw I vs V
@@ -168,7 +173,8 @@ IVScanFN analyzeFN( const std::string& name ) {
     if( ivs.sampleName()=="CNTArO2Etching_N1new" ) {
       if( ivs.d() < 0.9 ) {
         xMin_iv = 0.;
-        xMax_iv = 80.*(ivs.d()/0.5);
+        xMax_iv = 120.;
+        //xMax_iv = 80.*(ivs.d()/0.5);
       } else {
         xMin_iv = 170.;
         xMax_iv = 220.;
