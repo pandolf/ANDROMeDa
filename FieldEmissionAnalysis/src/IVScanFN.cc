@@ -117,8 +117,13 @@ TGraphErrors* IVScanFN::graphFN( TGraphErrors* graph, float iMin, float iMax, in
     graph->GetPoint(iPoint, v, i);
     i = fabs(i);
     v = fabs(v);
-    float i_err = graph->GetErrorY( iPoint );
-    i_err = i_err / sqrt(n); // uncertainty on mean
+    double i_err = graph->GetErrorY( iPoint );
+    if( n>0 )
+      i_err = i_err / sqrt(n); // uncertainty on mean
+    else {
+      i_err = 0.; // consider points with no uncertainty
+      std::cout << "[IVScanFN::graphFN] Setting uncertainties on current measurements to ZERO!!!" << std::endl;
+    }
 
     if( (i>=iMin) && (i<iMax) ) {
       int iPointFN = graphFN->GetN();
@@ -129,7 +134,8 @@ TGraphErrors* IVScanFN::graphFN( TGraphErrors* graph, float iMin, float iMax, in
       if( xFN > xMax ) xMax = xFN ;
       if( yFN > yMax ) yMax = yFN ;
       graphFN->SetPoint     ( iPointFN, xFN, yFN );
-      graphFN->SetPointError( iPointFN, verr/(v*v), i_err/i );
+      //graphFN->SetPointError( iPointFN, verr/(v*v), i_err/i );
+      graphFN->SetPointError( iPointFN, verr/(v*v), sqrt( (i_err*i_err)/(i*i) + 4.*verr*verr/(v*v) ) );
     }
 
   } // for
@@ -315,6 +321,8 @@ float IVScanFN::phi() {
     phi = 4.48;
   else if( this->sampleName() == "CNTArO2Etching_Strongnew" )
     phi = 4.53;
+  else if( this->sampleName() == "PECVD_FE_INRIM_001" )
+    phi = 4.19;
 
   return phi;
 
