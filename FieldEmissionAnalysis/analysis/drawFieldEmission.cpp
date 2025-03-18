@@ -57,6 +57,7 @@ int main( int argc, char* argv[] ) {
     scans.push_back( analyzeFN( "CNTArO2Etching_AsGrown_INRiM_MICa_3Kplate_d0p5_IvsV_anode_90to150V_20231213_2_sweepA" ) );
     scans.push_back( analyzeFN( "CNTArO2Etching_N1new_INRiM_MICb_3Kplate_d0p5_IvsV_drain_0to88V_20231130_sweepR" ) );
     scans.push_back( analyzeFN( "CNTArO2Etching_Strongnew_INRiM_MICb_3Kplate_d0p5_IvsV_anode_20to95V_20231207_sweepR" ) );
+    scans.push_back( analyzeFN( "PECVD_FE_INRIM_001_MICa_3Kplate_d0p5_IvsV_anode_from205Vto265V_10032025_post_conditioning_sweepR" ) );
 
   } else {
 
@@ -108,8 +109,7 @@ IVScanFN analyzeFN( const std::string& name ) {
 
   float scale = -1.;
   float iMin = 0.5; // default: compute FN only between 0.5 pA
-  float iMax = 7.; //          and 1.5 pA
-  //float iMin = 0.5; // default: compute FN only between 0.5 pA
+  float iMax = 7.;
   //float iMax = 1.5; //          and 1.5 pA
 
   TString name_tstr(name);
@@ -127,6 +127,9 @@ IVScanFN analyzeFN( const std::string& name ) {
   } else if ( name_tstr.BeginsWith( "CNTArO2Etching_Strongnew_INRiM_MICb_3Kplate_d0p5_IvsV_anode_20to95V_20231207_sweepR" ) ) {
     iMin = 0.5;
     iMax = 1.5;
+  } else if ( name_tstr.BeginsWith( "PECVD_FE_INRIM_001_MICa_3Kplate_d0p5_IvsV_anode_from205Vto265V_10032025_post_conditioning" ) ) {
+    iMin = 2.;
+    iMax = 7.;
   }
 
 
@@ -226,7 +229,7 @@ IVScanFN analyzeFN( const std::string& name ) {
   c1->Clear();
   c1->SetLogy();
 
-  TH2D* h2_axes_log = new TH2D( "axes_log", "", 10, 0., xMax_iv, 10, 0.1, 20.*yMax_iv);
+  TH2D* h2_axes_log = new TH2D( "axes_log", "", 10, 60, 150, 10, 0.1, 600. );
   h2_axes_log->SetXTitle( "-#DeltaV (V)" );
   h2_axes_log->SetYTitle( "I (pA)" );
   h2_axes_log->Draw();
@@ -355,6 +358,13 @@ std::cout << "after" << std::endl;
 
   std::cout << "-> Stored graphs in: " << graphsFileName << std::endl;
 
+  std::ofstream ofs(Form("%s/gamma.dat", outdir.c_str()));
+
+  ofs << gamma << " " << gamma_err << std::endl;
+
+  ofs.close();
+
+  std::cout << "-> Stored gamma in: " << Form("%s/gamma.dat", outdir.c_str()) << std::endl;
 
   delete c1;
   delete c1_fn;
