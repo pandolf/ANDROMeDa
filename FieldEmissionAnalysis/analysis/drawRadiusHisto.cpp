@@ -84,17 +84,11 @@ int main( ) {
   fillHistoFromFile( "rc_S.csv" , h1_strong , r_strong , rerr_strong  );
   fillHistoFromFile( "rc_PE.csv", h1_pecvd  , r_pecvd  , rerr_pecvd   );
 
-//std::ifstream ifs("data/DataTipMorphologyVACNTs.csv");
+  rerr_asgrown = sqrt( rerr_asgrown*rerr_asgrown + 2.*2. ); 
+  rerr_mild    = sqrt( rerr_mild   *rerr_mild    + 2.*2. ); 
+  rerr_strong  = sqrt( rerr_strong *rerr_strong  + 2.*2. ); 
+  rerr_pecvd   = sqrt( rerr_pecvd  *rerr_pecvd   + 2.*2. ); 
 
-//for (std::string line; std::getline(ifs, line); ) {
-
-//  std::vector<std::string> words = AndCommon::splitString(line, ",");
-
-//  h1_asgrown->Fill( std::atof(words[0].c_str())*1E9 );
-//  h1_mild   ->Fill( std::atof(words[1].c_str())*1E9 );
-//  h1_strong ->Fill( std::atof(words[2].c_str())*1E9 );
-
-//}
  
   h1_asgrown->SetFillColor( 46 );
   h1_asgrown->SetLineColor( 46 );
@@ -377,10 +371,10 @@ int main( ) {
 
   c1->Clear();
 
-  TH1D* h1_prom_asgrown = new TH1D("prom_asgrown", "", 100, 0., 1000.);
-  TH1D* h1_prom_mild = new TH1D("prom_mild", "", 100, 0., 1000.);
-  TH1D* h1_prom_strong = new TH1D("prom_strong", "", 100, 0., 1000.);
-  TH1D* h1_prom_pecvd = new TH1D("prom_pecvd", "", 100, 0., 1000.);
+  TH1D* h1_prom_asgrown = new TH1D("hprom_asgrown", "", 100, 0., 1000.);
+  TH1D* h1_prom_mild    = new TH1D("hprom_mild"   , "", 100, 0., 1000.);
+  TH1D* h1_prom_strong  = new TH1D("hprom_strong" , "", 100, 0., 1000.);
+  TH1D* h1_prom_pecvd   = new TH1D("hprom_pecvd"  , "", 100, 0., 1000.);
 
   float prom_asgrown, prom_err_asgrown;
   fillHistoFromFile( "prom_As.csv", h1_prom_asgrown, prom_asgrown, prom_err_asgrown );
