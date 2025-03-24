@@ -50,11 +50,11 @@ int main( ) {
   float xMin = 0.;
   float xMax = 50.;
 
-  TH2D* h2_axes = new TH2D( "axes", "", 10, xMin, xMax, 10, 0., 5500. );
+  TH2D* h2_axes = new TH2D( "axes", "", 10, xMin, xMax, 10, 0., 4400. );
   h2_axes->GetYaxis()->SetTitleOffset( 1.3 );
   h2_axes->GetYaxis()->SetMaxDigits(3);
   //h2_axes->GetXaxis()->SetNdivisions(505);
-  h2_axes->SetXTitle( "r_{rms} (nm)" );
+  h2_axes->SetXTitle( "r_{c} (nm)" );
   h2_axes->SetYTitle( "Counts" );
   h2_axes->Draw("");
 
@@ -84,10 +84,10 @@ int main( ) {
   fillHistoFromFile( "rc_S.csv" , h1_strong , r_strong , rerr_strong  );
   fillHistoFromFile( "rc_PE.csv", h1_pecvd  , r_pecvd  , rerr_pecvd   );
 
-  rerr_asgrown = sqrt( rerr_asgrown*rerr_asgrown + 2.*2. ); 
-  rerr_mild    = sqrt( rerr_mild   *rerr_mild    + 2.*2. ); 
-  rerr_strong  = sqrt( rerr_strong *rerr_strong  + 2.*2. ); 
-  rerr_pecvd   = sqrt( rerr_pecvd  *rerr_pecvd   + 2.*2. ); 
+  //rerr_asgrown = sqrt( rerr_asgrown*rerr_asgrown + 2.*2. ); 
+  //rerr_mild    = sqrt( rerr_mild   *rerr_mild    + 2.*2. ); 
+  //rerr_strong  = sqrt( rerr_strong *rerr_strong  + 2.*2. ); 
+  //rerr_pecvd   = sqrt( rerr_pecvd  *rerr_pecvd   + 2.*2. ); 
 
  
   h1_asgrown->SetFillColor( 46 );
@@ -120,21 +120,21 @@ int main( ) {
 
 
   //TLegend* legend = new TLegend( 0.47, 0.57, 0.9, 0.79 );
-  TLegend* legend = new TLegend( 0.47, 0.68, 0.9, 0.9 );
+  TLegend* legend = new TLegend( 0.54, 0.71, 0.9, 0.9 );
   legend->SetFillColor(0);
   legend->SetTextSize(0.035);
   legend->SetTextFont(42);
   legend->AddEntry(h1_asgrown, "As grown", "F");
-  legend->AddEntry(h1_mild, "Mild Ar/O_{2} etch", "F");
-  legend->AddEntry(h1_strong, "Strong O_{2} etch", "F");
-  legend->AddEntry(h1_pecvd, "PE-CVD", "F");
+  legend->AddEntry(h1_mild, "Mild etch", "F");
+  legend->AddEntry(h1_strong, "Strong etch", "F");
+  //legend->AddEntry(h1_pecvd, "PE-CVD", "F");
   legend->Draw("same");
 
 
   h1_mild->Draw("same");
   h1_strong->Draw("same");
   h1_asgrown->Draw("same");
-  h1_pecvd->Draw("same");
+  //h1_pecvd->Draw("same");
 
 
   c1->cd();
@@ -179,7 +179,7 @@ int main( ) {
   h1_mild->Draw("same");
   h1_strong->Draw("same");
   h1_asgrown->Draw("same");
-  h1_pecvd->Draw("same");
+  //h1_pecvd->Draw("same");
 
   legend->Draw("same");
 
@@ -192,15 +192,15 @@ int main( ) {
   c1->Clear();
 
   float xMin_gamma = 0.;
-  float xMax_gamma = 50.;
-  float yMax_gamma = 21590.;
+  float xMax_gamma = 45.;
+  float yMax_gamma = 23590.;
 
   TH2D* h2_axes_gamma = new TH2D( "axes_gamma", "", 10, xMin_gamma, xMax_gamma, 10, 0., yMax_gamma );
   h2_axes_gamma->GetYaxis()->SetTitleOffset( 1.3 );
   h2_axes_gamma->GetYaxis()->SetMaxDigits(3);
   //h2_axes_gamma->GetXaxis()->SetNdivisions(505);
   h2_axes_gamma->SetXTitle( "r_{c} (nm)" );
-  h2_axes_gamma->SetYTitle( "Field enhancement factor #gamma");
+  h2_axes_gamma->SetYTitle( "Field enhancement factor #beta");
   h2_axes_gamma->Draw("");
 
 //std::cout << std::endl << "Mean radius of curvature: " << std::endl;
@@ -288,22 +288,22 @@ int main( ) {
   gr_asgrown->Draw("P same");
   gr_mild->Draw("P same");
   gr_strong->Draw("P same");
-  gr_pecvd->Draw("P same");
+  //gr_pecvd->Draw("P same");
 
   //label->Draw("same");
 
 
-  TLegend* legend_gamma = new TLegend( 0.47, 0.65, 0.9, 0.9 );
+  TLegend* legend_gamma = new TLegend( 0.49, 0.68, 0.9, 0.9 );
   //TLegend* legend_gamma = new TLegend( 0.47, 0.57, 0.9, 0.79 );
   //TLegend* legend_gamma = new TLegend( 0.47, 0.62, 0.9, 0.9, "T = 2.8 K, d = 0.53 mm" );
   legend_gamma->SetFillColor(0);
   legend_gamma->SetTextSize(0.035);
   legend_gamma->SetTextFont(42);
   legend_gamma->AddEntry(gr_asgrown, "As grown", "PL");
-  legend_gamma->AddEntry(gr_mild   , "Mild Ar/O_{2} etch", "PL");
-  legend_gamma->AddEntry(gr_strong , "Strong O_{2} etch", "PL");
-  legend_gamma->AddEntry(gr_pecvd , "PE-CVD", "PL");
-  legend_gamma->AddEntry(f1_invx, Form("#gamma = (%.0f #mum) / r_{c}", f1_invx->GetParameter(0)/1000.), "L");
+  legend_gamma->AddEntry(gr_mild   , "Mild etch", "PL");
+  legend_gamma->AddEntry(gr_strong , "Strong etch", "PL");
+  //legend_gamma->AddEntry(gr_pecvd , "PE-CVD", "PL");
+  legend_gamma->AddEntry(f1_invx, Form("#beta = (%.0f #mum) / r_{c}", f1_invx->GetParameter(0)/1000.), "L");
   //legend_gamma->AddEntry(f1_invx, "#gamma = k / r_{rms}", "L");
   //legend_gamma->AddEntry(f1_invx, "#gamma = #frac{k}{r_{rms}}", "L");
   legend_gamma->Draw("same");
@@ -320,7 +320,7 @@ int main( ) {
   h2_axes_gamma_vs_hor->GetYaxis()->SetTitleOffset( 1.3 );
   h2_axes_gamma_vs_hor->GetYaxis()->SetMaxDigits(3);
   h2_axes_gamma_vs_hor->SetXTitle( "h_{cnt} / r_{c}" );
-  h2_axes_gamma_vs_hor->SetYTitle( "Field enhancement factor #gamma");
+  h2_axes_gamma_vs_hor->SetYTitle( "Field enhancement factor #beta");
   h2_axes_gamma_vs_hor->Draw("");
 
   TGraphErrors* gr_gamma_vs_hor_asgrown = new TGraphErrors(0);
@@ -389,7 +389,7 @@ int main( ) {
   h2_axes_gamma_vs_por->GetYaxis()->SetTitleOffset( 1.3 );
   h2_axes_gamma_vs_por->GetYaxis()->SetMaxDigits(3);
   h2_axes_gamma_vs_por->SetXTitle( "p_{cnt} / r_{c}" );
-  h2_axes_gamma_vs_por->SetYTitle( "Field enhancement factor #gamma");
+  h2_axes_gamma_vs_por->SetYTitle( "Field enhancement factor #beta");
   h2_axes_gamma_vs_por->Draw("");
 
   TGraphErrors* gr_gamma_vs_por_asgrown = new TGraphErrors(0);
