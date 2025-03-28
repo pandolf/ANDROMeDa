@@ -36,8 +36,9 @@ int main( ) {
   style->cd();
 
   std::vector<int> colors;
-  colors.push_back( kBlack );
+  //colors.push_back( kBlack );
   colors.push_back( 46 );
+  colors.push_back( 92 );
   colors.push_back( 38 );
 
   std::vector<std::string> scanNames;
@@ -49,8 +50,9 @@ int main( ) {
   c1->cd();
 
   float xMin = 0.;
-  float xMax = 130.;
+  float xMax = 135.;
 
+  //TH2D* h2_axes = new TH2D( "axes_all", "", 10, xMin, xMax, 10, -0.5, 7.);
   TH2D* h2_axes = new TH2D( "axes_all", "", 10, xMin, xMax, 10, -0.2, 1.6 );
   h2_axes->GetYaxis()->SetTitleOffset( 1.5 );
   //h2_axes->SetXTitle( "V_{cnt} (V)" );
@@ -62,29 +64,27 @@ int main( ) {
   TLine* line_zero = new TLine( xMin, 0., xMax, 0. );
   line_zero->Draw("same");
 
-  TPaveText* label = new TPaveText( 0.19, 0.8, 0.6, 0.9, "brNDC" );
+  TPaveText* label = new TPaveText( 0.19, 0.85, 0.6, 0.9, "brNDC" );
   label->SetFillColor(0);
   label->SetTextAlign(12);
   label->SetTextSize(0.038);
   label->AddText( "T = 2.8 K" );
-  label->AddText( "0.56 #leq d #leq 0.62 mm" );
+  //label->AddText( "0.56 #leq d #leq 0.62 mm" );
   label->Draw("same");
 
 
-  TLegend* legend = new TLegend( 0.2, 0.63, 0.6, 0.79 );
+  TLegend* legend = new TLegend( 0.2, 0.7, 0.6, 0.84 );
   legend->SetFillColor(kWhite);
   legend->SetTextSize(0.035);
   legend->SetTextFont(42);
   legend->Draw("same");
 
   
-  std::ofstream ofs("gamma.dat");
-
 
   TCanvas* c1_fn = new TCanvas( "c1_fn", "", 600, 600 );
   c1_fn->cd();
 
-  TH2D* h2_axes_fn = new TH2D( "axes_fn", "", 10, 0.004, 0.017, 10, -11., -7.01 );
+  TH2D* h2_axes_fn = new TH2D( "axes_fn", "", 10, 0.004, 0.017, 10, -11., -5.51 );
   h2_axes_fn->GetYaxis()->SetTitleOffset( 1.5 );
   //h2_axes_fn->SetXTitle( "1/V_{cnt} (V^{-1})" );
   //h2_axes_fn->SetYTitle( "Log(I_{cnt}/V_{cnt}^{2}) (a.u.)" );
@@ -99,9 +99,16 @@ int main( ) {
 
   for( unsigned i=0; i<scanNames.size(); ++i ) {
 
+    std::string ofsName(Form("plots/%s/gamma.dat", scanNames[i].c_str()));
+    std::ofstream ofs(ofsName.c_str());
+
     float scale = -1.;
-    float iMin = 0.5; // default: compute FN only between 0.5 pA
-    float iMax = 1.5; //          and 1.5 pA
+    float iMin = 0.5; //(scanNames[i]=="CNTArO2Etching_Strongnew_INRiM_MICb_3Kplate_d0p5_IvsV_anode_20to95V_20231207_sweepR") ? 0.3 : 0.5; // default: compute FN only between 0.5 pA
+    float iMax = 7.;
+    if( scanNames[i] == "CNTArO2Etching_Strongnew_INRiM_MICb_3Kplate_d0p5_IvsV_anode_20to95V_20231207_sweepR" )
+      iMax = 1.5;
+    else if( scanNames[i] == "CNTArO2Etching_N1new_INRiM_MICb_3Kplate_d0p5_IvsV_drain_0to88V_20231130_sweepR" )
+      iMax = 2.;
 
     TString name_tstr(scanNames[i]);
     if( name_tstr.Contains("drain") ) scale = +1.;
@@ -156,9 +163,11 @@ int main( ) {
  
     ofs << gamma << " " << gamma_err << std::endl;
 
+    std::cout << " -> Saved gamma in: " << ofsName << std::endl;
+    ofs.close();
+
   }
 
-  ofs.close();
 
   c1->cd();
   gPad->RedrawAxis();
