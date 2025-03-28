@@ -33,8 +33,8 @@ int main( ) {
   style->cd();
 
   std::vector<int> colors;
-  colors.push_back( kBlack );
   colors.push_back( 46 );
+  colors.push_back( 92 );
   colors.push_back( 38 );
 
 
@@ -90,18 +90,18 @@ int main( ) {
   //rerr_pecvd   = sqrt( rerr_pecvd  *rerr_pecvd   + 2.*2. ); 
 
  
-  h1_asgrown->SetFillColor( 46 );
-  h1_asgrown->SetLineColor( 46 );
+  h1_asgrown->SetFillColor( colors[0] );
+  h1_asgrown->SetLineColor( colors[0] );
   h1_asgrown->SetLineWidth( 3 );
   h1_asgrown->SetFillStyle( 3006 );
 
-  h1_mild->SetFillColor( 38 );
-  h1_mild->SetLineColor( 38 );
+  h1_mild->SetFillColor( colors[1] );
+  h1_mild->SetLineColor( colors[1] );
   h1_mild->SetLineWidth( 3 );
   h1_mild->SetFillStyle( 3004 );
 
-  h1_strong->SetFillColor( 92 );
-  h1_strong->SetLineColor( 92 );
+  h1_strong->SetFillColor( colors[2] );
+  h1_strong->SetLineColor( colors[2] );
   h1_strong->SetLineWidth( 3 );
   h1_strong->SetFillStyle( 3005 );
 
@@ -120,7 +120,7 @@ int main( ) {
 
 
   //TLegend* legend = new TLegend( 0.47, 0.57, 0.9, 0.79 );
-  TLegend* legend = new TLegend( 0.54, 0.71, 0.9, 0.9 );
+  TLegend* legend = new TLegend( 0.54, 0.67, 0.9, 0.86 );
   legend->SetFillColor(0);
   legend->SetTextSize(0.035);
   legend->SetTextFont(42);
@@ -147,15 +147,15 @@ int main( ) {
   h2_axes_norm->GetYaxis()->SetTitleOffset( 1.6 );
   h2_axes_norm->GetYaxis()->SetMaxDigits(3);
   h2_axes_norm->SetXTitle( "r_{rms} (nm)" );
-  h2_axes_norm->SetYTitle( "Normalized to Unity" );
+  h2_axes_norm->SetYTitle( "Normalized to unity" );
   h2_axes_norm->Draw("");
 
-  label->Draw("same");
+  //label->Draw("same");
 
   h1_mild->DrawNormalized("same");
   h1_strong->DrawNormalized("same");
   h1_asgrown->DrawNormalized("same");
-  h1_pecvd->DrawNormalized("same");
+  //h1_pecvd->DrawNormalized("same");
 
   legend->Draw("same");
 
@@ -254,18 +254,18 @@ int main( ) {
 
   gr_asgrown->SetMarkerStyle(20);
   gr_asgrown->SetMarkerSize(1.6);
-  gr_asgrown->SetMarkerColor(46);
-  gr_asgrown->SetLineColor(46);
+  gr_asgrown->SetMarkerColor(colors[0]);
+  gr_asgrown->SetLineColor  (colors[0]);
 
   gr_mild->SetMarkerStyle(21);
   gr_mild->SetMarkerSize(1.6);
-  gr_mild->SetMarkerColor(38);
-  gr_mild->SetLineColor  (38);
+  gr_mild->SetMarkerColor(colors[1]);
+  gr_mild->SetLineColor  (colors[1]);
 
   gr_strong->SetMarkerStyle(22);
   gr_strong->SetMarkerSize(1.6);
-  gr_strong->SetMarkerColor(92);
-  gr_strong->SetLineColor  (92);
+  gr_strong->SetMarkerColor(colors[2]);
+  gr_strong->SetLineColor  (colors[2]);
 
   gr_pecvd->SetMarkerStyle(23);
   gr_pecvd->SetMarkerSize(1.6);
@@ -326,24 +326,24 @@ int main( ) {
   TGraphErrors* gr_gamma_vs_hor_asgrown = new TGraphErrors(0);
   gr_gamma_vs_hor_asgrown->SetMarkerStyle(20);
   gr_gamma_vs_hor_asgrown->SetMarkerSize(1.6);
-  gr_gamma_vs_hor_asgrown->SetMarkerColor(46);
-  gr_gamma_vs_hor_asgrown->SetLineColor(46);
+  gr_gamma_vs_hor_asgrown->SetMarkerColor(colors[0]);
+  gr_gamma_vs_hor_asgrown->SetLineColor  (colors[0]);
   gr_gamma_vs_hor_asgrown->SetPoint( 0, ivs_asgrown.h()*1000000./r_asgrown, g_asgrown );
   gr_gamma_vs_hor_asgrown->Draw("Psame");
 
   TGraphErrors* gr_gamma_vs_hor_mild = new TGraphErrors(0);
   gr_gamma_vs_hor_mild->SetMarkerStyle(21);
   gr_gamma_vs_hor_mild->SetMarkerSize(1.6);
-  gr_gamma_vs_hor_mild->SetMarkerColor(38);
-  gr_gamma_vs_hor_mild->SetLineColor(38);
+  gr_gamma_vs_hor_mild->SetMarkerColor(colors[1]);
+  gr_gamma_vs_hor_mild->SetLineColor  (colors[1]);
   gr_gamma_vs_hor_mild->SetPoint( 0, ivs_mild.h()*1000000./r_mild, g_mild );
   gr_gamma_vs_hor_mild->Draw("Psame");
 
   TGraphErrors* gr_gamma_vs_hor_strong = new TGraphErrors(0);
   gr_gamma_vs_hor_strong->SetMarkerStyle(22);
   gr_gamma_vs_hor_strong->SetMarkerSize(1.6);
-  gr_gamma_vs_hor_strong->SetMarkerColor(92);
-  gr_gamma_vs_hor_strong->SetLineColor(92);
+  gr_gamma_vs_hor_strong->SetMarkerColor(colors[2]);
+  gr_gamma_vs_hor_strong->SetLineColor  (colors[2]);
   gr_gamma_vs_hor_strong->SetPoint( 0, ivs_strong.h()*1000000./r_strong, g_strong );
   gr_gamma_vs_hor_strong->Draw("Psame");
 
@@ -395,24 +395,24 @@ int main( ) {
   TGraphErrors* gr_gamma_vs_por_asgrown = new TGraphErrors(0);
   gr_gamma_vs_por_asgrown->SetMarkerStyle(20);
   gr_gamma_vs_por_asgrown->SetMarkerSize(1.6);
-  gr_gamma_vs_por_asgrown->SetMarkerColor(46);
-  gr_gamma_vs_por_asgrown->SetLineColor(46);
+  gr_gamma_vs_por_asgrown->SetMarkerColor(colors[0]);
+  gr_gamma_vs_por_asgrown->SetLineColor  (colors[0]);
   gr_gamma_vs_por_asgrown->SetPoint( 0, ivs_asgrown.h()/r_asgrown, g_asgrown );
   gr_gamma_vs_por_asgrown->Draw("Psame");
 
   TGraphErrors* gr_gamma_vs_por_mild = new TGraphErrors(0);
   gr_gamma_vs_por_mild->SetMarkerStyle(21);
   gr_gamma_vs_por_mild->SetMarkerSize(1.6);
-  gr_gamma_vs_por_mild->SetMarkerColor(38);
-  gr_gamma_vs_por_mild->SetLineColor(38);
+  gr_gamma_vs_por_mild->SetMarkerColor(colors[1]);
+  gr_gamma_vs_por_mild->SetLineColor  (colors[1]);
   gr_gamma_vs_por_mild->SetPoint( 0, ivs_mild.h()/r_mild, g_mild );
   gr_gamma_vs_por_mild->Draw("Psame");
 
   TGraphErrors* gr_gamma_vs_por_strong = new TGraphErrors(0);
   gr_gamma_vs_por_strong->SetMarkerStyle(22);
   gr_gamma_vs_por_strong->SetMarkerSize(1.6);
-  gr_gamma_vs_por_strong->SetMarkerColor(92);
-  gr_gamma_vs_por_strong->SetLineColor(92);
+  gr_gamma_vs_por_strong->SetMarkerColor(colors[2]);
+  gr_gamma_vs_por_strong->SetLineColor  (colors[2]);
   gr_gamma_vs_por_strong->SetPoint( 0, ivs_strong.h()/r_strong, g_strong );
   gr_gamma_vs_por_strong->Draw("Psame");
 
@@ -448,7 +448,8 @@ void fillHistoFromFile( const std::string& fileName, TH1D* histo, float& mean, f
 
     float r(std::atof(line.c_str()));
 
-    histo->Fill( r );
+    if( r >= 2. )
+      histo->Fill( r );
     data.push_back(r);
 
 
