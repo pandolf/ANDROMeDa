@@ -124,6 +124,9 @@ IVScanFN analyzeFN( const std::string& name ) {
   } else if ( name_tstr.BeginsWith( "CNTArO2Etching_Strongnew_INRiM_MICb_3Kplate_d0p5_IvsV_anode_20to95V_20231207_sweepA" ) ) {
     iMin = 2.5;
     iMax = 7.;
+  } else if ( name_tstr.BeginsWith( "CNTArO2Etching_N1new_INRiM_MICb_3Kplate_d0p5_IvsV_drain_0to88V_20231130_sweepR" ) ) {
+    iMin = 0.5;
+    iMax = 2.;
   } else if ( name_tstr.BeginsWith( "CNTArO2Etching_Strongnew_INRiM_MICb_3Kplate_d0p5_IvsV_anode_20to95V_20231207_sweepR" ) ) {
     iMin = 0.5;
     iMax = 1.5;
