@@ -362,7 +362,7 @@ void IScan::set_h_and_herr() { // this function is private
   } else if( sampleName_ == "PECVD_FE_INRIM_001" ) {
 
     h_ = 0.023;
-    h_err_ = 0.05;
+    h_err_ = 0.005;
 
   } else { // default (do we need a default?)
 
