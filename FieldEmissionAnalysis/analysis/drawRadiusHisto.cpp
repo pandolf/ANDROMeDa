@@ -146,8 +146,8 @@ int main( ) {
   TH2D* h2_axes_norm = new TH2D( "axes_norm", "", 10, xMin, xMax, 10, 0., 0.1 );
   h2_axes_norm->GetYaxis()->SetTitleOffset( 1.6 );
   h2_axes_norm->GetYaxis()->SetMaxDigits(3);
-  h2_axes_norm->SetXTitle( "r_{rms} (nm)" );
-  h2_axes_norm->SetYTitle( "Normalized to unity" );
+  h2_axes_norm->SetXTitle( "r_{c} (nm)" );
+  h2_axes_norm->SetYTitle( "Entries (normalized to unity)" );
   h2_axes_norm->Draw("");
 
   //label->Draw("same");
@@ -170,7 +170,7 @@ int main( ) {
   TH2D* h2_axes_long = new TH2D( "axes_long", "", 10, xMin, 1000., 10, 0.001, 20000.);
   h2_axes_long->GetYaxis()->SetTitleOffset( 1.6 );
   h2_axes_long->GetYaxis()->SetMaxDigits(3);
-  h2_axes_long->SetXTitle( "r_{rms} (nm)" );
+  h2_axes_long->SetXTitle( "r_{c} (nm)" );
   h2_axes_long->SetYTitle( "Normalized to Unity" );
   h2_axes_long->Draw("");
 
