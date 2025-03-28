@@ -303,7 +303,10 @@ void IVScanFN::get_d_fromMeas( float& d, float& d_err ) {  // from benedetta's m
   float nanotubes = this->h();
   float nanotubes_err = this->h_err();
 
-  std::cout << sapphire_grease << " + " << scasso << " - " << glue << " - " << silicon << " - " << nanotubes << std::endl;
+  std::cout << sapphire_grease << " + " << scasso << " - " << glue << " - " << silicon << " - " << nanotubes << " (in mm)" << std::endl;
+  float d0 = sapphire_grease + scasso - glue - silicon;
+  float d0_err = sqrt( sapphire_grease_err*sapphire_grease_err + scasso_err*scasso_err + glue_err*glue_err + silicon_err*silicon_err );
+  std::cout << "d0 = " << d0 << " +/- " << d0_err << " mm" << std::endl;
   d = sapphire_grease + scasso - glue - silicon - nanotubes;
   d_err = sqrt( sapphire_grease_err*sapphire_grease_err + scasso_err*scasso_err + glue_err*glue_err + silicon_err*silicon_err + nanotubes_err*nanotubes_err );
 
